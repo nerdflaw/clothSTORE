@@ -4241,7 +4241,8 @@ const userGenerateInvoice_get = async (req, res )=> {
 	});
 	const page = await browser.newPage();
 	await page.goto(`${req.protocol}://${req.get('host')}/user-download-Invoice/${id}`, {
-		waitUntil : 'networkidle2'
+		waitUntil : 'networkidle0',
+		timeout: 60000
 	})
 	await page.setViewport({
 		width : 1680,
