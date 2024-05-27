@@ -4237,7 +4237,7 @@ const userGenerateInvoice_get = async (req, res )=> {
 	console.log(executablePath , 'executablePath')
 	const browser = await puppeteer.launch({
 		headless : false,
-		executablePath : executablePath
+		executablePath : '/usr/bin/chromium-browser'
 	});
 	const page = await browser.newPage();
 	await page.goto(`${req.protocol}://${req.get('host')}/user-download-Invoice/${id}`, {
