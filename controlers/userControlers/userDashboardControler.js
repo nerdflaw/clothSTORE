@@ -1,6 +1,6 @@
 const express = require('express')
 const Razorpay = require('razorpay');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const path = require('path');
 const allCountries = require('../../helpers/functions/countriesListGenerator')
 const verifyPayment = require('../../helpers/functions/verifyPaymentSignature')
