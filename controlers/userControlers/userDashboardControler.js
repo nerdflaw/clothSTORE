@@ -4236,7 +4236,7 @@ const userGenerateInvoice_get = async (req, res )=> {
 	const executablePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 	console.log(executablePath , 'executablePath')
 	const browser = await puppeteer.launch({
-		headless : false,
+		headless : 'new',
 		executablePath : '/usr/bin/chromium-browser'
 	});
 	const page = await browser.newPage();
