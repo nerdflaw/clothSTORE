@@ -1,0 +1,285 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard-cart">My cart</a>
+            </div>
+            <% if(locals.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 p-2 ">
+          <div class="col-12 border rounded-3 p-3">
+            <div class="col-12">
+              <% if (message) { %>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  toastMessage("<%= message %>");
+                });
+              </script>
+              <% } %>
+              <div class="container">
+                <div class="row">
+                  <% if(paginatedCartProducts?.length === 0){ %>
+                  <div class="w-100">
+                    <h6 class="text-danger font-size m-0 p-0 animate__animated animate__flash "><em>You haven`t added a product to cart yet</em></h6>
+                  </div>
+                  <% } %>
+                  <% paginatedCartProducts?.forEach(cart=>{ %>
+                  <div class="col-12 mb-3 border rounded-3 position-relative">
+                    <div class="row">
+                      <div class="m-0 p-0">
+                        <form action="/user-cancel-product?cartId=<%=cart?.cartId%>&product=<%= cart?.product %>" method="post">
+                          <button type="submit" class="border-0 m-0 p-0">
+                            <i class="fa-solid fa-trash-can border rounded-3 bg-black text-white position-absolute top-0 end-0 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;"></i>
+                          </button>
+                        </form>
+                      </div>
+                      <div class="py-3 col-sm-12 col-md-12 col-lg-2 col-xl-2 d-flex">
+                        <img class="" src="/productImages/<%= cart?.images[0] %>" style="width: 100%; height: 150px; object-fit: contain;" alt="<%= cart?.product %>">
+                      </div>
+                      <div class="py-3 col-sm-12 col-md-12 col-lg-6 col-xl-6 d-flex justify-content-center align-items-center">
+                        <div class="col-sm-5 col-md-5 col-lg-2 col-xl-2">
+                          <p class="font-size-bold">Title</p>
+                          <p class="font-size-bold">Color</p>
+                          <p class="font-size-bold">Size</p>
+                          <p class="font-size-bold">MRP</p>
+                        </div>
+                        <div class="col-sm-7 col-md-7 col-lg-10 col-xl-10">
+                          <p class="font-size"> :
+                            <span class="font-size-bold text-success">
+                              <%= cart?.product?.split(' ').map(word => word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase())?.join(' ') %>
+                            </span>
+                          </p>
+                          <p class="font-size">: <%= cart?.color %></p>
+                          <p class="font-size">: <%= cart?.size %></p>
+                          <p class="font-size-bold">: &#8377; <%= cart?.mrp?.toFixed(2) %> (Including taxes.)</p>
+                        </div>
+                      </div>
+                      <div class="py-3 col-sm-12 col-md-12 col-lg-4 col-xl-4 d-flex flex-column justify-content-center align-items-center">
+                        <div class="col-6">
+                          <div class="col-12 d-flex">
+                            <div class="col-6 d-flex flex-column justify-content-center align-items-center">
+                              <p class="font-size-bold">Quantity :</p>
+                              <p class="font-size-bold">Discount :</p>
+                            </div>
+                            <div class="col-6 d-flex flex-column justify-content-center align-items-start">
+                              <p class="font-size-bold"><%= cart?.quantity?.toFixed(2) %> NOS. </p>
+                              <p class="font-size-bold"><%= cart?.discount?.toFixed(2) %> %</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="input-group d-flex">
+                            <div class="col-4 d-flex justify-content-end">
+                              <span class="input-group-btn">
+                                <button <% if (cart?.quantity==1) { %> disabled <% } %> type="button" class="quantity-left-minus btn btn-dark btn-number" data-type="minus" data-field="" onclick="changeQuantity('<%= cart?._id %>','<%= cart?.cartId %>',-1)">
+                                  <span class="">-</span>
+                                </button>
+                              </span>
+                            </div>
+                            <div class="col-4 d-flex justify-content-center align-items-center">
+                              <input disabled style="background-color: transparent;" type="text" id="quantity" name="quantity" class="form-control input-number font-size-bold border-0 text-center" value="<%= cart?.quantity %>">
+                            </div>
+                            <div class="col-4 d-flex justify-content-start">
+                              <span class="input-group-btn">
+                                <button type="button" class="quantity-right-plus btn btn-dark btn-number" data-type="plus" data-field="" <% if (cart?.quantity==10) { %> disabled <% } %> onclick="changeQuantity('<%= cart?._id %>','<%= cart?.cartId %>',1)">
+                                  <span class="">+</span>
+                                </button>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="container p-0">
+                      <div class="row rounded-bottom">
+                        <div class="border-top border-1 py-2 col-sm-12 col-md-12 col-lg-4 d-flex justify-content-center align-items-center">
+                          <div class="d-flex justify-content-center align-items-center">
+                            <p class="font-size-bold m-0 p-0">Price</p><span class="font-size">&nbsp;(per item)&nbsp;:</span>
+                            <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= cart?.AmountAfterSecondDiscount?.toFixed(2)%>&nbsp;x</p>
+                            <p class="font-size-bold m-0 p-0">&nbsp;<%= cart?.quantity?.toFixed(2)%>&nbsp; NOS.</p>
+                          </div>
+                        </div>
+                        <div class="border-top border-1 py-2 col-sm-12 col-md-12 col-lg-4 d-flex justify-content-center align-items-center">
+                          <div class="d-flex justify-content-center align-items-center">
+                            <p class="font-size-bold m-0 p-0">Discount amount :</p>
+
+                            <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= totalDiscount?.toFixed(2) %></p>
+                            <p class="font-size-bold m-0 p-0"></p>
+                          </div>
+                        </div>
+                        <div class="border-top border-1 py-2 col-sm-12 col-md-12 col-lg-4 d-flex justify-content-center align-items-center flex-wrap">
+                          <div class="col d-flex justify-content-center align-items-center">
+                            <p class="font-size-bold m-0 p-0">Total :</p>
+                            <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= (cart?.AmountAfterSecondDiscount + cart?.gst)?.toFixed(2) %></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+                </div>
+              </div>
+              <% if(paginatedCartProducts?.length > 0){ %>
+              <div class="container mb-3">
+                <div class="row border rounded-3">
+                  <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-0">
+                    <a class="btn w-100 border-0 m-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                      <p class="font-size-small-bold text-primary m-0 py-2 fst-italic">See GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
+                    </a>
+                    <div class="collapse m-0 p-0" id="collapseExample">
+                      <div class="col d-flex px-3">
+                        <div class="col-6">
+                          <p class="font-size-bold border-bottom">Total Price</p>
+                          <p class="font-size-bold border-bottom">GST @ 18%</p>
+                          <p class="font-size-bold border-bottom">SGST @ 9%</p>
+                          <p class="font-size-bold border-bottom">CGST @ 9%</p>
+                          <p class="font-size-bold border-bottom">Discount %</p>
+                          <p class="font-size-bold border-bottom">Discount Amt.</p>
+                          <p class="font-size-bold border-bottom">Round-off</p>
+                        </div>
+                        <div class="col-1">
+                          <p class="font-size text-end border-bottom">:</p>
+                          <p class="font-size text-end border-bottom">:</p>
+                          <p class="font-size text-end border-bottom">:</p>
+                          <p class="font-size text-end border-bottom">:</p>
+                          <p class="font-size text-end border-bottom">:</p>
+                          <p class="font-size text-end border-bottom">:</p>
+                          <p class="font-size text-end border-bottom">:</p>
+                        </div>
+                        <div class="col-5">
+                          <p class="font-size text-end border-bottom"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
+                          <p class="font-size text-end border-bottom"><%= totalGst?.toFixed(2) %></p>
+                          <p class="font-size text-end border-bottom"><%= totalSgst?.toFixed(2)  %></p>
+                          <p class="font-size text-end border-bottom"><%= totalCgst?.toFixed(2)  %></p>
+                          <p class="font-size text-end border-bottom"><%= totalDiscountPercentage?.toFixed(2)%></p>
+                          <p class="font-size text-end border-bottom"><%= totalDiscount?.toFixed(2) %></p>
+                          <p class="font-size text-end border-bottom"><%= roundOff?.toFixed(2) %></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <% } %>
+              <% if(paginatedCartProducts?.length > 0){ %>
+              <div class="container mt-3">
+                <div class="row border rounded-3">
+                  <div class="col-sm-12 col-md-12 col-lg-8 m-0 p-0 d-flex justify-content-center align-items-center">
+                    <div class="d-flex">
+                      <p class="fs-6 fw-bold m-0 p-0 text-black">Grand total :</p>
+                      <p class="fs-6 fw-bold m-0 p-0 text-b">&nbsp;&#8377;&nbsp;<%= grandTotal?.toFixed(2) %></p>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-12 col-lg-4 m-0 p-0">
+                    <div class="d-flex justify-content-center align-items-center m-0 p-0">
+                      <form action="/user-checkout" method="get" class="m-0 p-0">
+                        <button class="btn btn-dark text-white font-size-bold " type="submit">checkout <span>
+                            <i class="fa-sharp fa-solid fa-arrow-right ps-2" style="color: #ffffff;"></i></span></button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 justify-content-center pb-2" style="display: flex;" id="pagination">
+          <% if (currentPage > 1) { %>
+          <div class="text-center border rounded-1 bg-light">
+            <a class="text-decoration-none" href="/user-dashboard-cart?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-dark">&lt;</p>
+            </a>
+          </div>
+          <% } %>
+
+          <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+          <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-dark' : 'bg-light' %>">
+            <a class="text-decoration-none" href="/user-dashboard-cart?page=<%= i %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-white"><%= i %></p>
+            </a>
+          </div>
+          <% } else { %>
+          <div class="text-center border rounded-1 bg-light">
+            <a class="text-decoration-none" href="/user-dashboard-cart?page=<%= i %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+            </a>
+          </div>
+          <% } %>
+          <% } %>
+
+          <% if (currentPage < totalPages) { %>
+          <div class="text-center border rounded-1 bg-light">
+            <a class="text-decoration-none" href="/user-dashboard-cart?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-dark">&gt;</p>
+            </a>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <script>
+      let plusButton = document.querySelector('.quantity-right-plus')
+      let minusButton = document.querySelector('.quantity-left-minus')
+
+      async function changeQuantity(cart, cartId, change) {
+        try {
+          const response = await fetch('/updateQuantity', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cart,
+              cartId,
+              change
+            }),
+          });
+
+          const result = await response.json();
+          console.log(result, 'result')
+          if (result.success) {
+            window.location.reload()
+          } else {
+            alert('Failed to update quantity');
+          }
+        } catch (error) {
+          console.error('Error updating quantity:', error);
+        }
+      }
+    </script>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

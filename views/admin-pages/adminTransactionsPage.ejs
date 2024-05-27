@@ -1,0 +1,103 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+
+  <section>
+    <div class="row d-flex m-0 p-0">
+      <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 left-side-nav border-1 border-white m-0 p-0">
+        <div class="user">
+          <div class="admin-image d-flex flex-column">
+            <h2 class="text-primary admin-name m-auto mb-3">Admin</h2>
+            <img src="/images/admin-profile.jpg" alt="" class="admin-img">
+          </div>
+          <div>
+            <div class="d-flex justify-content-center align-items-center ml-0">
+              <h2 class="text-black me-1">Admin</h2>
+            </div>
+            <p class="text-black admin-email">admin@gmail.com</p>
+            <img src="/images/verified-icon.png" alt="" class="verified-img">
+          </div>
+        </div>
+        <ul>
+          <li>
+            <p class="text-primary font-size">Main menu</p>
+          </li>
+          <li><i class="fa-solid fa-chart-line"></i>
+            <a class="text-white" href="/admin-dashboard">Dashboard</a>
+          </li>
+          <li><i class="fa-solid fa-arrow-up-short-wide"></i>
+            <a class="text-white"  href="/admin-order-management">Order Management</a>
+          </li>
+          <li><i class="fa-solid fa-users-line"></i>
+            <a class="text-white"  href="/admin-user-management">User Management</a>
+          </li>
+          <li><i class="fa-solid fa-calculator"></i></i>
+            <a class="text-white" href="/admin-transactions">Transactions</a>
+          </li>
+          <li>
+            <p class="text-primary font-size">Products</p>
+          </li>
+          <li><i class="fa-solid fa-money-bill-transfer"></i>
+            <a class="text-white" href="/admin-add-product">Add product</a>
+          </li>
+          <li><i class="fa-brands fa-product-hunt"></i>
+            <a class="text-white"  href="/admin-product-management">Product management</a>
+          </li>
+          <li><i class="fa-solid fa-text-height"></i>
+            <a class="text-white"  href="/admin-categoires">Categoires</a>
+          </li>
+          <li>
+            <p class="text-primary font-size">Admin</p>
+          </li>
+          <li><i class="fa-solid fa-ticket"></i>
+            <a class="text-white"  href="/admin-manage-admin">Manage admin</a>
+          </li> 
+          <li><i class="fa-regular fa-copyright"></i>
+            <a class="text-white"  href="/admin-add-brand">Add Brand</a>
+          </li>
+          <li><i class="fa-solid fa-file-image"></i>
+            <a class="text-white"  href="/admin-add-banner">Add Banner</a>
+          </li>
+          <li><i class="fa-solid fa-bullhorn"></i>
+            <a class="text-white"  href="/admin-add-coupon">Add Coupon</a>
+          </li>
+        </ul>
+        <ul>
+          <li><i class="fa-solid fa-right-from-bracket text-danger"></i>
+            <a class="text-danger" href="/admin-logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-8 col-md-8 col-lg-9 col-xl-10 right-side-nav bg-black overflow-auto m-0 p-0">
+        <h1>Transactions</h1>
+        <!-- unmatched search start -->
+
+        <!-- unmatched search end -->
+        <table class="table table-dark table-striped table-bordered">
+          <thead>
+            <tr>
+              <th class="table-dark text-info text-center" scope="col">No.</th>
+              <th class="table-dark text-info text-center" scope="col">Name</th>
+              <th class="table-dark text-info text-center" scope="col">Email</th>
+              <th class="table-dark text-info text-center" scope="col">Password</th>
+              <th class="table-dark text-info text-center" scope="col">Edit</th>
+              <th class="table-dark text-info text-center" scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

@@ -1,0 +1,547 @@
+<footer>
+  <section>
+    <div class="container-fluid" style="background-color: #F0F0F0;">
+      <div class="row">
+        <div class="col-md-3 py-3 d-flex flex-column justify-content-around footer-part-1">
+          <a class="fs-3 fw-bold text-decoration-none text-black d-flex justify-content-center align-items-center" href="/">cloth<span class="fw-bold">STORE</span></a>
+          <p class="text-black px-2 font-size">
+            We have clothes that suits your style and which
+            you are proud to wear We have collections for
+            men only at the moment
+          </p>
+          <div class="social-media d-flex justify-content-around p-0 ">
+            <div class="facebook">
+              <i class="fa-brands fa-facebook fa-2xl text-black"></i>
+            </div>
+            <div class="x">
+              <i class="fa-brands fa-x-twitter fa-2xl text-black"></i>
+            </div>
+            <div class="instagram">
+              <i class="fa-brands fa-instagram fa-2xl text-black"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 py-3 footer-part-2">
+          <ul class="d-flex flex-column justify-content-start align-items-center">
+            <li class="text-black text-start fw-bold"><a class="text-black" href="#">COMPANY</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">About</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Reviews</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3 py-3 footer-part-3">
+          <ul class="d-flex flex-column justify-content-start align-items-center">
+            <li class="text-black text-start fw-bold"><a class="text-black" href="#">HELP</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Customer Support</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Terms & Conditions</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3 py-3 footer-part-4">
+          <ul class="d-flex flex-column justify-content-start align-items-center">
+            <li class="text-black text-start fw-bold"><a class="text-black" href="#">FAQ</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Accounts</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Deliveries</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Payment</a></li>
+            <li class="text-black text-start"><a class="text-black text-decoration-none" href="#">Orders</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 bg-black border-2 border-top border-bottom">
+          <p class="text-white text-center text-primary m-3 font-size">Copyright &copy; clothSTORE.com <%= new Date().getFullYear() %></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    // $(document).ready(function() {
+    //   $('#myTable').DataTable();
+    // });
+    let table = new DataTable('#myTable');
+  </script>
+
+  <!-- admin product add / edit validation  -->
+  <script>
+    $(document).ready(function() {
+
+      $.validator.addMethod('titleValidation', function(value, element) {
+        let titleRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+        return titleRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+      $.validator.addMethod('prventSpaces', function(value, element) {
+        let spaceRegex = /^[a-z]+(?!\s)(?!.*\s$)(?!.*\s{2,}).*$/;
+
+        return spaceRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words and only small alphabets are allowed.');
+
+      $.validator.addMethod('numbersOnly', function(value, element) {
+        let pattern = /^[1-9][0-9]*$/
+        return pattern.test(value);
+      }, 'MRP can not be zero or any other characters');
+
+      // Initialize form validation
+      $('#productForm').validate({
+        rules: {
+          title: {
+            required: true,
+            titleValidation: true,
+            minlength: 2,
+            maxlength: 18
+          },
+          description: {
+            required: true,
+            prventSpaces: true,
+            minlength: 10,
+            maxlength: 300
+          },
+          mrp: {
+            required: true,
+            numbersOnly: true,
+          }
+        },
+        messages: {
+          title: {
+            required: 'Please enter a title',
+            minlength: 'Title must contain 2 or more characters',
+            maxlength: 'Title must not contain more than 18 characters'
+          },
+          description: {
+            required: 'Please enter a description',
+            minlength: 'Description must contain 10 or more characters',
+            maxlength: 'Description must contain not contain more than 300 characters',
+          },
+          mrp: {
+            required: 'Please enter a mrp amount',
+          }
+        },
+        errorClass: 'error',
+        onkeyup: function(element) {
+          if ($(element).valid()) {
+            $('.submitButton').removeAttr('disabled');
+          } else {
+            $('.submitButton').attr('disabled', true);
+          }
+        },
+        onclick: function(element) {
+          if ($(element).valid()) {
+            $('.submitButton').removeAttr('disabled');
+          } else {
+            $('.submitButton').attr('disabled', true);
+          }
+        },
+        highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('div.form-group'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <!-- admin category validation -->
+  <script>
+    $(document).ready(function() {
+      $.validator.addMethod('categoryValidation', function(value, element) {
+        // Adjust the regular expression to match your category name requirements
+        // let categoryRegex = /^[A-Za-z][A-Za-z\s]*$/; // Allows mixed case letters and spaces
+        let categoryRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+
+        return categoryRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+      // Initialize form validation
+      $('#categoryForm').validate({
+        rules: {
+          category: {
+            required: true,
+            categoryValidation: true,
+            minlength: 2,
+            maxlength: 18
+          },
+        },
+        messages: {
+          category: {
+            required: 'Please enter a category name',
+            minlength: 'Category name must contain 2 or more characters',
+            maxlength: 'Category name must not contain more than 18 characters'
+          },
+        },
+        errorClass: 'error',
+        highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('div.form-group'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <!-- admin color validation -->
+  <script>
+    $(document).ready(function() {
+
+      $.validator.addMethod('titleValidation', function(value, element) {
+        let titleRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+        return titleRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+      // Initialize form validation
+      $('#colorForm').validate({
+        rules: {
+          color: {
+            required: true,
+            titleValidation: true,
+            minlength: 2,
+            maxlength: 18
+          },
+        },
+        messages: {
+          color: {
+            required: 'Please enter a color',
+            minlength: 'Title must contain 2 or more characters',
+            maxlength: 'Title must not contain more than 18 characters'
+          },
+        },
+        errorClass: 'error',
+        highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('div.form-group'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <!-- admin brand validation -->
+  <script>
+    $(document).ready(function() {
+
+      $.validator.addMethod('titleValidation', function(value, element) {
+        let titleRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+        return titleRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+      // Initialize form validation
+      $('#brandForm').validate({
+        rules: {
+          brand: {
+            required: true,
+            titleValidation: true,
+            minlength: 2,
+            maxlength: 18
+          },
+        },
+        messages: {
+          brand: {
+            required: 'Please enter a brand',
+            minlength: 'Title must contain 2 or more characters',
+            maxlength: 'Title must not contain more than 18 characters'
+          },
+        },
+        errorClass: 'error',
+        highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('div.form-group'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <!-- admin size validation -->
+  <script>
+    $(document).ready(function() {
+
+      $.validator.addMethod('titleValidation', function(value, element) {
+        let titleRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+        return titleRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+      // Initialize form validation
+      $('#sizeForm').validate({
+        rules: {
+          size: {
+            required: true,
+            titleValidation: true,
+            minlength: 2,
+            maxlength: 18
+          },
+        },
+        messages: {
+          size: {
+            required: 'Please enter a size',
+            minlength: 'Size must contain 2 or more characters',
+            maxlength: 'Size must not contain more than 18 characters'
+          },
+        },
+        errorClass: 'error',
+        highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('div.form-group'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <!-- admin coupon validation -->
+  <script>
+    $(document).ready(function() {
+
+      $.validator.addMethod('titleValidation', function(value, element) {
+        let titleRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+        return titleRegex.test(value);
+      }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+      $.validator.addMethod('numbersOnly', function(value, element) {
+        let pattern = /^[1-9][0-9]*$/
+        return pattern.test(value);
+      }, 'Coupon discount can not be zero or any other characters');
+
+      // Initialize form validation
+      $('#couponForm').validate({
+        rules: {
+          coupon: {
+            required: true,
+            titleValidation: true,
+            minlength: 5,
+            maxlength: 18
+          },
+          couponDiscount: {
+            required: true,
+            numbersOnly : true,
+            min: 1,
+            max:20
+          }
+        },
+        messages: {
+          coupon: {
+            required: 'Please enter a title',
+            minlength: 'Title must contain 5 or more characters',
+            maxlength: 'Title must not contain more than 18 characters'
+          },
+          couponDiscount: {
+            required: 'Please enter a coupon percentage between 1-20 (including both)',
+          }
+        },
+        errorClass: 'error',
+        highlight: function(element) {
+          $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function(element) {
+          $(element).closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('div.form-group'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+  <!-- availability check -->
+  <script>
+    // let availabilityCheck = document.querySelector('.availability-check');
+    // // console.log(availabilityCheck, 'availabilityCheck');
+    // let criteria = availabilityCheck.id;
+    // console.log(criteria, 'criteria');
+
+    // availabilityCheck.addEventListener('input', () => {
+    //   let inputValue = availabilityCheck.value;
+    //   let submitButton = document.querySelector('.submitButton');
+
+    //   let url = `/admin-add-criteria-check?value=${encodeURIComponent(inputValue)}&criteria=${encodeURIComponent(criteria)}`;
+
+    //   fetch(url)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //       if (data.status) {
+    //         submitButton.removeAttribute('disabled', true)
+
+    //       } else {
+    //         submitButton.setAttribute('disabled', true)
+    //         let message = data.message;
+    //         toastMessage(message);
+    //       }
+    //     })
+    //     .catch(error => {
+    //       console.error(error);
+    //     });
+    // });
+  </script>
+
+  <!-- toast messages for actions -->
+  <script>
+    function toastMessage(message) {
+      if (message) {
+        // Create the toast div
+        let toastDiv = document.createElement('div');
+        toastDiv.classList.add('toast', 'position-fixed', 'top-0', 'end-0', 'p-3', 'bg-black');
+        toastDiv.setAttribute('role', 'alert');
+        toastDiv.setAttribute('aria-live', 'assertive');
+        toastDiv.setAttribute('aria-atomic', 'true');
+        toastDiv.setAttribute('data-delay', '5000');
+
+        // Create the toast header
+        let toastHeaderDiv = document.createElement('div');
+        toastHeaderDiv.classList.add('toast-header', 'bg-white');
+
+        // Create and append the image to the toast header
+        let img = document.createElement('img');
+        img.src = "/images/clothStore_favicon.jpg";
+        img.style.width = '20px';
+        img.style.height = '20px';
+        img.classList.add('border', 'rounded', 'me-2');
+        toastHeaderDiv.appendChild(img);
+
+        // Create and append the strong element for store name to the toast header
+        let strong = document.createElement('strong');
+        strong.classList.add('me-auto', 'text-black');
+        strong.textContent = 'clothStore';
+        toastHeaderDiv.appendChild(strong);
+
+        // Create and append the small element for timestamp to the toast header
+        let small = document.createElement('small');
+        small.id = 'toast-timestamp';
+        small.classList.add('text-black');
+        toastHeaderDiv.appendChild(small);
+
+        // Create and append the button element for closing the toast to the toast header
+        let closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.classList.add('btn-close', 'font-size-bold');
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.setAttribute('aria-label', 'Close');
+        toastHeaderDiv.appendChild(closeButton);
+
+        // Append the toast header to the toast div
+        toastDiv.appendChild(toastHeaderDiv);
+
+        // Create and append the toast body to the toast div
+        let toastBodyDiv = document.createElement('div');
+        toastBodyDiv.classList.add('toast-body', 'text-white', 'font-size');
+        toastBodyDiv.textContent = message;
+        toastDiv.appendChild(toastBodyDiv);
+
+        // Append the toast div to the document body
+        document.body.appendChild(toastDiv);
+
+        // Show the toast notification
+        let notification = new bootstrap.Toast(toastDiv);
+        notification.show();
+
+        // Update the timestamp
+        let timestampElement = document.getElementById('toast-timestamp');
+        timestampElement.textContent = new Date().toLocaleTimeString();
+      }
+    }
+  </script>
+  <!-- sales report validation -->
+  <script>
+    $(document).ready(function() {
+      // Add custom validation method for end date
+      $.validator.addMethod('endDateNotGreaterThanToday', function(value, element) {
+        var selectedEndDate = new Date(value);
+        var today = new Date();
+        return selectedEndDate <= today;
+      }, 'Please select a valid date');
+  
+      // Initialize form validation
+      $('#salesReportForm').validate({
+        rules: {
+          customRange: {
+            required: true
+          },
+          startDate: {
+            required: true,
+            endDateNotGreaterThanToday: true
+          },
+          endDate: {
+            required: true,
+            endDateNotGreaterThanToday: true
+          }
+        },
+        messages: {
+          customRange: {
+            required: "Please select a range"
+          },
+          startDate: {
+            required: "Please select a start date"
+          },
+          endDate: {
+            required: "Please select an end date"
+          }
+        },
+        errorClass: 'error',
+        errorPlacement: function(error, element) {
+          error.addClass('font-size text-danger p-0 m-0');
+          error.insertAfter(element.closest('.row'));
+        },
+        submitHandler: function(form) {
+          form.submit();
+        }
+      });
+    });
+  </script>
+  
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+<!-- include JQuery validation from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+
+<!-- Include Cropper.js from CDN -->
+<script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>

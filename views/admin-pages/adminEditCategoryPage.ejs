@@ -1,0 +1,123 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-around">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border-2 border-end" style="height: 600px;">
+          <img class="login-image img-fluid" src="/images/login.png" alt="Login page image" style="width: 500px">
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
+          <div class="loginDiv" style="width: 500px;">
+            <h4 class="text-center text-black font-size-bold-title">Edit a category</h4>
+
+            <% if (message) { %>
+            <h6 id="flash" class="text-center text-danger animate__animated animate__flash font-size"><%= message %></h6>
+            <% } %>
+
+            <form id="categoryForm1" action="/admin-edit-category/<%-editCategory._id%>" method="POST">
+              <div class="mb-3 form-group">
+                <label for="category" class="form-label text-black font-size">Category name</label>
+                <input value="<%-editCategory.category%>" type="text" class="form-control bg-whit text-black font-size validateInputValues" id="category" name="category" required>
+                <!-- <div class="text-danger font-size" id="validateErrors"></div> -->
+              </div>
+              <!-- <span id="errorMessage" class="error-message font-size text-danger">First letter must be uppercase, and the rest must be lowercase.</span> -->
+              <div class="d-flex justify-content-around align-items-center flex-wrap">
+                <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-category-management">cancel</a>
+                <button id="postButton" type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold">confirm</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <script>
+      setTimeout(function() {
+        document.getElementById('success').style.display = 'none';
+      }, 3000);
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const categoryInput = document.getElementById('category');
+        const errorMessage = document.getElementById('errorMessage');
+        const postButton = document.getElementById('postButton');
+        const validCategoryFormat = /^[A-Z][a-z]*(\s[A-Z][a-z]*)*$/; // First letter of each word is uppercase
+
+        categoryInput.addEventListener('input', () => {
+          const categoryValue = categoryInput.value.trim();
+
+          if (!validCategoryFormat.test(categoryValue)) {
+            errorMessage.textContent = 'Invalid category format. Each word should start with an uppercase letter.';
+            postButton.disabled = true;
+          } else {
+            errorMessage.textContent = '';
+            postButton.disabled = false;
+          }
+        });
+      });
+
+      function postData() {
+        // Add your code to handle the post route here
+        alert('Data posted!');
+      }
+    </script>
+    <!-- admin category validation -->
+    <script>
+      $(document).ready(function() {
+        $.validator.addMethod('categoryValidation', function(value, element) {
+          // Adjust the regular expression to match your category name requirements
+          // let categoryRegex = /^[A-Za-z][A-Za-z\s]*$/; // Allows mixed case letters and spaces
+          let categoryRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+
+          return categoryRegex.test(value);
+        }, 'No space at start or end, no multiple spaces between words, no special characters and only small alphabets are allowed.');
+
+        // Initialize form validation
+        $('#categoryForm1').validate({
+          rules: {
+            category: {
+              required: true,
+              categoryValidation: true,
+              minlength: 2,
+              maxlength: 18
+            },
+          },
+          messages: {
+            category: {
+              required: 'Please enter a category name',
+              minlength: 'Category name must contain 2 or more characters',
+              maxlength: 'Category name must not contain more than 18 characters'
+            },
+          },
+          errorClass: 'error',
+          highlight: function(element) {
+            $(element).closest('.form-group').addClass('has-error');
+          },
+          unhighlight: function(element) {
+            $(element).closest('.form-group').removeClass('has-error');
+          },
+          errorPlacement: function(error, element) {
+            error.addClass('font-size text-danger p-0 m-0');
+            error.insertAfter(element.closest('div.form-group'));
+          },
+          submitHandler: function(form) {
+            form.submit();
+          }
+        });
+      });
+    </script>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

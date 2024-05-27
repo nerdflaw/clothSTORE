@@ -1,0 +1,238 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard">My profile</a>
+            </div>
+            <% if(locals.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 p-2">
+          <div class="col-12 border rounded-3 p-3">
+            <div class="col">
+              <div class="col p-3 border rounded-3">
+                <p class="text-center fs-6 fw-bold m-0">Edit your profile</p>
+                <div>
+                  <% if (success || error) { %>
+                  <h6 id="flash" class="m-0 p-0 text-center <%= success ? 'text-success' : 'text-danger' %> animate__animated animate__flash font-size">
+                    <%= success || error %>
+                  </h6>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <form name="dashboardForm" onsubmit="validateForm(event)" action="/user-change-password" method="post">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
+                  <div class="col">
+                    <div class="col font-size py-2">
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="firstName">First name<span class="text-danger font-size-bold">*</span></label>
+                        <input oninput="validateFirstName()" required type="text" name="firstName" id="firstName" value="<%= locals.user.firstName %>" class="form-control font-size fst-italic" placeholder="your first name">
+                        <span id="firstNameError" class="text-danger"></span>
+                      </div>
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="lastName">Last name<span class="text-danger font-size-bold">*</span></label>
+                        <input oninput="validateLastName()" required type="text" name="lastName" id="lastName" value="<%= locals.user.lastName %>" class="form-control font-size fst-italic" placeholder="your last name">
+                        <span id="lastNameError" class="text-danger"></span>
+                      </div>
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="email">Email<span class="text-danger font-size-bold">*</span></label>
+                        <input required type="text" oninput="validateEmail()" name="email" id="email" value="<%= locals.user.email %>" class="form-control font-size fst-italic" placeholder="your email">
+                        <span id="emailError" class="text-danger"></span>
+                      </div>
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="phoneNumber">Phone number<span class="text-danger font-size-bold">*</span></label>
+                        <input required type="number" oninput="validatePhoneNumber()" name="phoneNumber" id="phoneNumber" value="<%= locals.user.phoneNumber %>" class="form-control font-size fst-italic" placeholder="your phone number">
+                        <span id="phoneNumberError" class="text-danger"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
+                  <div class="col">
+                    <div class="col font-size py-2">
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="oldPassword">Old password<span class="text-danger font-size-bold">*</span></label>
+                        <input required oninput="checkOldPassword()" type="password" name="oldPassword" id="oldPassword" value="" class="form-control font-size" placeholder="old assword">
+                        <span id="oldPasswordError" class="text-danger"></span>
+                      </div>
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="newPassword">New password<span class="text-danger font-size-bold">*</span></label>
+                        <input required oninput="validatePassword()" type="password" name="newPassword" id="newPassword" value="" class="form-control font-size" placeholder="new password">
+                        <span id="newPasswordError" class="text-danger"></span>
+                      </div>
+                      <div class="col py-2">
+                        <label class="font-size-bold" for="confirmPassword">Confirm password<span class="text-danger font-size-bold">*</span></label>
+                        <input required type="password" oninput="checkPassword()" name="confirmPassword" id="confirmPassword" value="" class="form-control font-size" placeholder="confirm password">
+                      </div>
+                      <span id="checkPasswordError" class="text-danger"></span>
+                    </div>
+                    <div class="col text-center py-2 d-flex justify-content-around">
+                      <a href="/user-dashboard" class="btn btn-dark px-3 font-size" style="width: 150px;">cancel</a>
+                      <button type="submit" id="submitButton" class="btn btn-danger font-size" style="width: 150px;">confirm</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    function validateFirstName() {
+      let firstName = document.forms['dashboardForm']['firstName'].value
+      let nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!nameRegex.test(firstName)) {
+        document.getElementById('firstNameError').innerText = "Please enter a valid first name"
+      } else {
+        document.getElementById('firstNameError').innerText = ""
+      }
+    }
+
+    function validateLastName() {
+      let lastName = document.forms['dashboardForm']['lastName'].value
+      let nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!nameRegex.test(lastName)) {
+        document.getElementById('lastNameError').innerText = "Please enter a valid last name"
+      } else {
+        document.getElementById('lastNameError').innerText = ""
+      }
+    }
+
+    function validateEmail() {
+      let email = document.forms['dashboardForm']['email'].value
+      let emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      if (!emailRegex.test(email)) {
+        document.getElementById('emailError').innerText = "Please enter a valid email"
+      } else {
+        document.getElementById('emailError').innerText = ""
+      }
+    }
+
+    function validatePhoneNumber() {
+      let phoneNumber = document.forms['dashboardForm']['phoneNumber'].value;
+      if (isNaN(phoneNumber) || phoneNumber <= 0) {
+        document.getElementById('phoneNumberError').innerText = "Please enter a valid phone number";
+      } else if (phoneNumber.length !== 10) {
+        document.getElementById('phoneNumberError').innerText = "Phone number must be in 10 digits";
+      } else {
+        document.getElementById('phoneNumberError').innerText = "";
+      }
+    }
+
+    function validatePassword() {
+      let newPassword = document.forms['dashboardForm']['newPassword'].value;
+      let oldPassword = document.forms['dashboardForm']['oldPassword'].value;
+      console.log(newPassword)
+      console.log(oldPassword)
+      let strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      if (oldPassword === newPassword) {
+        document.getElementById('newPasswordError').innerText = "Old password and new password cannot be same";
+      } else {
+        if (!strongPasswordRegex.test(newPassword)) {
+          document.getElementById('newPasswordError').innerText = "Password must be strong (at least 8 characters, including uppercase, lowercase, digit, and special character)";
+        } else {
+          document.getElementById('newPasswordError').innerText = "";
+        }
+      }
+    }
+
+    function checkPassword() {
+      let newPassword = document.forms['dashboardForm']['newPassword'].value;
+      let confirmPassword = document.forms['dashboardForm']['confirmPassword'].value;
+      if (newPassword !== confirmPassword) {
+        document.getElementById('checkPasswordError').innerText = "New password and confirm password are must be the same";
+      } else {
+        document.getElementById('checkPasswordError').innerText = "";
+      }
+    }
+
+    function checkOldPassword() {
+      let oldPassword = document.forms['dashboardForm']['oldPassword'].value;
+      fetch('/check-old-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            oldPassword: oldPassword,
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (oldPassword === '') {
+            document.getElementById('oldPasswordError').innerText = "Please enter the old password";
+          } else {
+            if (data.error) {
+              document.getElementById('oldPasswordError').innerText = data.error;
+            } else {
+              document.getElementById('oldPasswordError').innerText = "";
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    function validateForm(event) {
+      event.preventDefault();
+      validateFirstName()
+      validateLastName()
+      validateEmail()
+      validatePhoneNumber()
+      validatePassword()
+      checkPassword()
+      checkOldPassword()
+      let firstNameError = document.getElementById('firstNameError').innerText;
+      let lastNameError = document.getElementById('lastNameError').innerText;
+      let emailError = document.getElementById('emailError').innerText;
+      let phoneNumberError = document.getElementById('phoneNumberError').innerText;
+      let newPasswordError = document.getElementById('newPasswordError').innerText;
+      let checkPasswordError = document.getElementById('checkPasswordError').innerText;
+      let oldPasswordError = document.getElementById('oldPasswordError').innerText;
+      // if (firstNameError || lastNameError || emailError || phoneNumberError || newPasswordError || checkPasswordError || oldPasswordError) {
+      //   return false
+      // } else {
+      //   return true
+      // }
+      let submitButton = document.getElementById('submitButton');
+      if (!(firstNameError || lastNameError || emailError || phoneNumberError || newPasswordError || checkPasswordError || oldPasswordError)) {
+        document.forms['dashboardForm'].submit();
+      }
+    }
+  </script>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

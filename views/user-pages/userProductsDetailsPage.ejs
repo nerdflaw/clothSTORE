@@ -1,0 +1,433 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center p-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/">Home</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-view-product-details/<%= productDetails[0]._id %>">Product details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="conatiner-fluid">
+      <div class="row w-100 m-0 p-0">
+        <div class="col-lg border rounded-3 m-1 p-0">
+          <div class="row w-100 m-0 p-0">
+            <div class="col-md-5 m-0 p-0">
+              <div class="row m-2 p-0">
+                <div class="col-md d-flex justify-content-center align-items-center w-100 m-0 p-0">
+                  <img src="/productImages/<%= productDetails[0].images[3]%>" class="image-fluid m-0 p-0 border rounded-3 productImage" style="width: 100%; height: 200px; object-fit: cover;" alt="">
+                </div>
+              </div>
+              <div class="row m-2 p-0">
+                <div class="col-md d-flex justify-content-center align-items-center m-0 p-0">
+                  <img src="/productImages/<%= productDetails[0].images[1]%>" class="image-fluid m-0 p-0 border rounded-3 productImage" style="width: 100%; height: 200px; object-fit: cover;" alt="">
+                </div>
+              </div>
+              <div class="row m-2 p-0">
+                <div class="col-md d-flex justify-content-center align-items-center m-0 p-0">
+                  <img src="/productImages/<%= productDetails[0].images[2]%>" class="image-fluid m-0 p-0 border rounded-3 productImage" style="width: 100%; height: 200px; object-fit: cover;" alt="">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-7 d-flex justify-content-center align-items-center m-0 p-0 ">
+              <div class="row w-100 m-2 p-0" id="main-container">
+                <img src="/productImages/<%= productDetails[0].images[0]%>" id="productMain" class="image-fluid m-0 p-0 border rounded-3" style="width: 100%; height: 618px; object-fit: cover;" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg border rounded-3 m-1 p-2 ">
+          <form action="/user-add-to-cart" method="post" onsubmit="addToCart(event)">
+            <div class="row w-100 m-0 p-0">
+              <div class="col-md  my-2 p-0 d-flex justify-content-start align-items-center position-relative">
+                <h5 id="productId" data-productId="<%= productDetails[0]?._id %>" class="text-black fw-bold fs-3 m-0 pe-2">
+                  <% var title = productDetails[0]?.title; %>
+                  <% if (title) { %>
+                  <% var capitalizedTitle = title.charAt(0).toUpperCase() + title.slice(1); %>
+                  <%= capitalizedTitle %>
+                  <% } %>
+                </h5>
+                <h5 class="text-black font-size m-0">
+                  <% if (productDetails[0].variants[0].quantity >= 10) { %>
+                  <span style="color: #ffffff; background-color: #24b311; border-radius: 5px; padding: 5px 10px; font-weight: bold;">In stock</span>
+                  <% } else if (productDetails[0].variants[0].quantity > 0) { %>
+                  <span style="color: #ffffff; background-color: #f7d306; border-radius: 5px; padding: 5px 10px; font-weight: bold;">Limitted stock</span>
+                  <% } else { %>
+                  <span style="color: #ffffff; background-color: #f70606; border-radius: 5px; padding: 5px 10px; font-weight: bold;">Out of stock</span>
+                  <% } %>
+                </h5>
+                <% if (productDetails[0]?.discount > 0) { %>
+                <button class="border-0 bg-black font-size text-white position-absolute top-0 end-0 p-2 border rounded-3" style="width: 50px; height: 50px;"><%= productDetails[0]?.discount %>% OFF.</button>
+                <% } %>
+              </div>
+            </div>
+            <div class="row w-100 m-0 p-0">
+              <div class="col-md  my-2 p-0 d-flex justify-content-start align-items-center">
+                <h3 class="text-black fs-6 fw-bold m-0 p-0">&#8377.<%= productDetails[0]?.mrp %></h3>
+              </div>
+            </div>
+            <div class="row w-100 m-0 p-0">
+              <div class="col-md my-2 p-0 d-flex justify-content-start align-items-center">
+                <div class="star-rating">
+                  <% if (productDetails[0]?.averageRating > 0) { %>
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= productDetails[0]?.averageRating) { %>
+                  <span class="fa fa-star checked"></span>
+                  <% } else if (i - productDetails[0]?.averageRating <= 0.5) { %>
+                  <span class="fa fa-star-half checked"></span>
+                  <% } else { %>
+                  <span class="fa fa-star"></span>
+                  <% } %>
+                  <% } %>
+                  <span class="font-size text-primary">
+                    <%= productDetails[0]?.averageRating.toFixed(1) %> Stars. |
+                    <%= productDetails[0]?.review !== undefined && productDetails[0]?.review?.length > 0 ? productDetails[0]?.review?.length : '0' %> Ratings.
+                  </span>
+                  <% } else { %>
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <span class="fa fa-star"></span>
+                  <% } %>
+                  <span class="font-size text-primary">
+                    <%= productDetails[0]?.averageRating !== null ? productDetails[0]?.averageRating.toFixed(1) : '0' %> Stars. |
+                    <%= productDetails[0]?.review !== undefined && productDetails[0]?.review?.length > 0 ? productDetails[0]?.review?.length : '0' %> Ratings.
+                  </span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <div class="row w-100 m-0 p-0">
+              <div class="col-md  my-2 p-0 d-flex justify-content-start align-items-center">
+                <p class="text-black font-size m-0 p-0"><%= productDetails[0].description %></p>
+              </div>
+            </div>
+            <div class="row w-100 m-0 p-0">
+              <div class="col my-2 p-0">
+                <div class="row w-100  m-0 p-0">
+                  <div class="col-md  m-0 p-0 w-100 d-flex justify-content-center align-items-center">
+                    <select id="colorSelect" name="color[]" class="form-select font-size m-0 px-2 py-2" onchange="getSelectedValue()">
+                      <option value="" disabled selected>Select a color</option>
+                      <% productVariants.forEach(availableColors => { %>
+                      <% colorDetails.forEach(data => { %>
+                      <% if (data._id.toString() === availableColors.color.toString()) { %>
+                      <option value="<%= availableColors.color %>"><%= data.color %></option>
+                      <% } %>
+                      <% }) %>
+                      <% }); %>
+                    </select>
+                  </div>
+                  <div class="col-md  m-0 p-0 w-100 d-flex justify-content-center align-items-center">
+                    <select id="sizeSelect" name="size[]" class="form-select font-size m-0 px-2 py-2">
+                      <option value="" disabled selected>Select a color</option>
+                      <!-- Options will be dynamically added by the JavaScript code bellow -->
+                    </select>
+                  </div>
+                  <div class="col-md  m-0 p-0 w-100 d-flex justify-content-center align-items-center">
+                    <select id="quantitySelect" name="quantity[]" class="form-select font-size m-0 px-2 py-2">
+                      <option value="" disabled selected>Select a quantity</option>
+                      <!-- Options will be dynamically added by the JavaScript code below -->
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row m-0 p-0">
+              <div class="col-md my-2 p-0 d-flex justify-content-center align-items-center">
+                <button class="bg-dark m-0 px-2 py-2 w-25 text-white font-size-bold outline-none border rounded-pill" <%= productDetails[0].variants[0].quantity === 0 ? 'disabled' : '' %>>add to cart</button>
+              </div>
+            </div>
+          </form>
+          <!-- product preview portion -->
+          <div class="row w-100 m-0 p-0">
+            <% let hasReviews = false; %>
+            <% productDetails?.forEach(element => { %>
+            <% if (element?.review?.length > 0) { %>
+            <% hasReviews = true; %>
+            <% } %>
+            <% }) %>
+            <% if (hasReviews) { %>
+            <div class="col-md mt-4  p-0 d-flex justify-content-center align-items-center">
+              <h3 class="text-black fs-6 fw-bold m-0 p-0">Product Reviews</h3>
+            </div>
+            <% } %>
+          </div>
+          <% let reviewCount = 0;
+            productDetails?.forEach((element, index) => {
+            element?.review?.forEach(data => {
+            if (reviewCount < 2) {
+                reviewCount++;
+            %>
+          <div class="border border rounded-3 m-0 mt-2">
+            <!-- review username -->
+            <div class="row w-100 m-0 px-3 py-1 bg-light">
+              <div class="col-md p-0 m-0 d-flex justify-content-start align-items-center">
+                <% if (locals?.user?.fullName === data?.username) { %>
+                <h3 class="text-black font-size-bold m-0 p-0">You</h3>
+                <% } else { %>
+                <h3 class="text-black font-size-bold m-0 p-0"><%= data?.username %></h3>
+                <% } %>
+              </div>
+            </div>
+            <div class="row w-100 m-0 px-3 bg-light">
+              <div class="col-md p-0 d-flex justify-content-start align-items-center">
+                <h3 class="text-black font-size-small fst-italic m-0 p-0 ">
+                  added on : <%= data?.updatedAt?.toLocaleDateString("en-US", 
+                  { year: 'numeric',
+                    month: 'short',
+                    day: 'numeric' 
+                 }
+                  ) %>
+                </h3>
+              </div>
+            </div>
+            <hr class="pt-1 m-0 text-secondary">
+            <!-- review star rating -->
+            <div class="row w-100 m-0 p-0">
+              <div class="col-md my-1 px-3 py-1 d-flex justify-content-start align-items-center">
+                <div class="star-rating">
+                  <% if (data?.rating > 0) { %>
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= data?.rating) { %>
+                  <span class="fa fa-star checked"></span>
+                  <% } else { %>
+                  <span class="fa fa-star"></span>
+                  <% } %>
+                  <% } %>
+                  <span class="font-size text-primary"><%= data?.rating %>/5 Stars.</span>
+                  <% } else { %>
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <span class="fa fa-star"></span>
+                  <% } %>
+                  <span class="font-size text-primary"><%= data?.rating !== null ? data?.rating : '0' %>/5 Stars.</span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <hr class="pt-1 m-0 text-secondary">
+            <!-- review message -->
+            <div class="row w-100 m-0 px-3 py-1">
+              <div class="col-md  my-1 p-0 d-flex justify-content-start align-items-center">
+                <h3 class="text-black font-size m-0 me-2 p-0 fst-italic">"<%= data.message %>"</h3>
+              </div>
+            </div>
+          </div>
+          <%
+              }
+            });
+          });
+        %>
+          <% if (productDetails[0]?.review?.length > 2) { %>
+          <div class="d-flex justify-content-center align-items-center mt-3">
+            <form action="/user-list-product-reviews/<%= productDetails[0]._id %>" method="get">
+              <button class="text-center px-3 py-2 rounded-pill font-size bg-black text-white " type="submit" style="background-color: transparent; border: 2px solid #F0F0F0;">see all reviews</button>
+            </form>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </section>
+  <% if (relatedProducts.length > 0 ) { %>
+  <section>
+    <div class="container-fluid m-0 px-1">
+      <div class="row border rounded-3 bg-light py-2 m-0">
+        <h2 class="text-center text-black m-0 p-0 px-3 py-1 fs-6 fw-bold">Related Products</h2>
+      </div>
+      <div class="row m-0 p-0">
+        <% relatedProducts.forEach(product => { %>
+        <div class="m-0 p-0 p-0 col-sm-12 col-md-6 col-lg-3 col-xl-2 my-2 d-flex justify-content-around align-items-center">
+          <div class="card" style="width: 100%">
+            <div class="wish-list position-absolute top-0 end-0 pt-2 pe-2">
+              <% const hasMatchingProduct = locals?.wishlists?.some(wishlist => wishlist?.product?.toString() === product?.relatedProducts?._id.toString()); %>
+              <button type="submit" class="border-0 wish-list-button" value="<%= product?.relatedProducts?._id %>" style="background-color: transparent;">
+                <% if(hasMatchingProduct){ %>
+                <i class="fa-solid fa-heart fa-xl" style="color: #ff0000;"></i>
+                <% } else {%>
+                <i class="fa-solid fa-heart fa-xl" style="color: #000000;"></i>
+                <% } %>
+              </button>
+            </div>
+            <div class="d-flex justify-content-center align-items-center flex-column">
+              <div class="col-12">
+                <a class="text-decoration-none" href="/user-view-product-details/<%= product?.relatedProducts?._id %>">
+                  <img src="/productImages/<%= product?.relatedProducts?.images[1] %>" class="card-img-top img-fluid w-100" style="height: 200px; object-fit:cover;" alt="<%= product?.relatedProducts?.title %>">
+                </a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="col text-truncate">
+                <a class="text-decoration-none" href="/user-view-product-details/<%= product?.relatedProducts?._id %>">
+                  <h5 class="card-title text-black product-item-title m-0 p-0"><%= product?.relatedProducts?.title %></h5>
+                </a>
+              </div>
+              <div class="col text-truncate py-1">
+                <p class="card-text text-secondary product-item-description m-0 p-0"><%= product?.relatedProducts?.description %></p>
+              </div>
+              <div class="col w-100 d-flex align-items-center justify-content-between py-1">
+                <h3 class="text-secondary product-item-price m-0 p-0">&#8377. <%= product?.relatedProducts?.mrp.toFixed(2) %></h3>
+              </div>
+              <form class="pt-2" action="/user-view-product-details/<%= product?.relatedProducts?._id %>" method="get">
+                <button class="btn btn-dark text-center w-100 text-white font-size">add to cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+
+  <section>
+    <script>
+      var productVariants;
+
+      function getSelectedValue() {
+        var selectElement = document.getElementById("colorSelect");
+        var selectedColor = selectElement.options[selectElement.selectedIndex].value;
+
+        console.log("Selected Color: " + selectedColor);
+
+        var productIdElement = document.getElementById("productId");
+        var productIdValue = productIdElement.getAttribute("data-productId");
+
+        if (selectedColor) {
+          const url = `/user-select-product-details/${productIdValue}?color=${selectedColor}`;
+
+          fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              // console.log("Data from the backend (Product Variants):", data.productVariants);
+              // console.log("Data from the backend (Size Details):", data.sizeDetails);
+              productVariants = data.productVariants;
+              updateSizeOptions(data.productVariants, data.sizeDetails);
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+            });
+        }
+      }
+
+      function updateSizeOptions(productVariants, sizeDetails) {
+        var sizeSelect = document.getElementById("sizeSelect");
+        sizeSelect.innerHTML = "";
+
+        var defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Select a size";
+        sizeSelect.appendChild(defaultOption);
+
+        productVariants.forEach(variant => {
+          variant.sizes.forEach(size => {
+            var option = document.createElement("option");
+            option.value = size.toString();
+            option.textContent = sizeDetails.find(detail => detail._id.toString() === size.toString()).size;
+            sizeSelect.appendChild(option);
+          });
+        });
+      }
+
+      sizeSelect.addEventListener("change", function() {
+        var selectedSize = sizeSelect.options[sizeSelect.selectedIndex].value;
+        console.log("Selected Size: " + selectedSize);
+
+        // Clear existing options in quantitySelect
+        var quantitySelect = document.getElementById("quantitySelect");
+        quantitySelect.innerHTML = "";
+
+        productVariants.forEach(variant => {
+          variant.sizes.forEach((size, index) => {
+            if (selectedSize === size.toString()) {
+              const data = variant.quantity[index];
+              const loopVal = data >= 10 ? 10 : data
+
+              // Append new options to quantitySelect
+              for (var i = 1; i <= loopVal; i++) {
+                var option = document.createElement("option");
+                option.value = i.toString();
+                option.textContent = i.toString();
+                quantitySelect.appendChild(option);
+              }
+            }
+          });
+        });
+      });
+    </script>
+    <script>
+      function addToCart(event) {
+        event.preventDefault();
+        var selectedColor = document.getElementById("colorSelect").value;
+        console.log(selectedColor, 'selectedColor');
+        var selectedSize = document.getElementById("sizeSelect").value;
+        console.log(selectedSize, 'selectedSize');
+        var selectedQuantity = document.getElementById("quantitySelect").value;
+        console.log(selectedQuantity, 'selectedQuantity');
+        var productIdElement = document.getElementById("productId");
+        var productIdValue = productIdElement.getAttribute("data-productId");
+        console.log(productIdValue, 'productIdValue');
+
+        var data = {
+          selectedColor: selectedColor,
+          selectedSize: selectedSize,
+          selectedQuantity: parseInt(selectedQuantity),
+          productId: productIdValue
+        };
+        console.log(data);
+
+        var options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        };
+
+        fetch('/user-add-to-cart', options)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Response from server:', data);
+            // Redirect to home after successful response
+            window.location.href = `/user-dashboard-cart`;
+          })
+          .catch(error => {
+            console.error('Error during fetch operation:', error);
+          });
+      }
+    </script>
+    <script>
+      $(document).ready(function() {
+        $('.productImage').hover(function() {
+          $('#productMain').attr('src', $(this).attr('src'))
+        })
+      })
+      $(document).ready(function() {
+        $('#productMain').imagezoomsl({
+          zoomrange: [3, 3]
+        })
+      })
+    </script>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

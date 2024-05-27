@@ -1,0 +1,94 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-around">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border-1 border-end">
+          <img class="login-image img-fluid" src="/images/login.png" alt="Login page image">
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
+          <div class="loginDiv" style="width: 500px;">
+            <h4 class="text-center text-danger font-size-bold-title">Enter the OTP received via email</h4>
+
+            <!-- Display the message if it exists start -->
+            <% if (message) { %>
+            <h6 id="flashMessages" class="text-center text-danger animate__animated animate__flash font-size">
+              <%= message %>
+              <span id="countdown">5:00</span>
+            </h6>
+
+            <% } %>
+            <!-- Display the message if it exists end -->
+
+            <div class="container">
+              <% if (error) { %>
+              <p class="text-danger text-center font-size"><%= error %></p>
+              <% } %>
+
+              <form action="/user-otp-validation" method="post">
+                <div class="my-3 d-flex justify-content-between">
+                  <input type="text" name="otp1" class="form-control m-1 bg-white text-black font-size otp-input" maxlength="1" required>
+                  <input type="text" name="otp2" class="form-control m-1 bg-white text-black font-size otp-input" maxlength="1" required>
+                  <input type="text" name="otp3" class="form-control m-1 bg-white text-black font-size otp-input" maxlength="1" required>
+                  <input type="text" name="otp4" class="form-control m-1 bg-white text-black font-size otp-input" maxlength="1" required>
+                  <input type="text" name="otp5" class="form-control m-1 bg-white text-black font-size otp-input" maxlength="1" required>
+                  <input type="text" name="otp6" class="form-control m-1 bg-white text-black font-size otp-input" maxlength="1" required>
+                </div>
+
+                <!-- Ensure you include the email value as a hidden input -->
+                <input type="hidden" name="email" value="<%= email %>">
+
+                <div class="text-center mb-3 d-flex flex-column justify-content-center align-items-center">
+                  <button type="submit" class="btn btn-danger my-3 text-white font-size-bold">Validate OTP</button>
+                </div>
+              </form>
+            </div>
+            <hr class="text-dark py-1">
+            <!-- Resend OTP -->
+            <div class="resend-otp text-center">
+              <p class="me-3 text-black font-size-bold">Not received OTP yet?</p>
+              <form action="/user-resend-otp" method="get">
+                <button type="submit" class="btn btn-danger font-size-bold text-white">Resend</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    let countdownValue = 300; // 5 minutes in seconds
+
+    function updateCountdown() {
+      const minutes = Math.floor(countdownValue / 60);
+      const seconds = countdownValue % 60;
+      document.getElementById('countdown').innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function startCountdown() {
+      updateCountdown();
+      const countdownInterval = setInterval(function() {
+        countdownValue--;
+        updateCountdown();
+
+        if (countdownValue <= 0) {
+          clearInterval(countdownInterval);
+          document.getElementById('flashMessages').style.display = 'none';
+        }
+      }, 1000);
+    }
+    setTimeout(startCountdown, 0); // Delay the start of the countdown to ensure DOM is ready
+  </script>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

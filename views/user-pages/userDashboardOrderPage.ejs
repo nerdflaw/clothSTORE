@@ -1,0 +1,605 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 text-secondary text-start px-3 font-size">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard-orders">My orders</a>
+            </div>
+            <% if(locals.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid m-0 p-0">
+      <div class="row m-0 p-0">
+        <div class="col-sm-12 col-md-12 col-lg-2 m-0 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 m-0 p-2">
+          <div class="row m-0 px-3 pt-3 border rounded-3">
+            <div class="col-12">
+              <% if (message) { %>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  toastMessage("<%= message %>");
+                });
+              </script>
+              <% } %>
+              <% if(paginatedOrder?.length > 0){ %>
+              <!-- order total -->
+              <div class="row border rounded-3 mb-3 p-0">
+                <div class="col-sm-12 col-md-12 col-lg-8 m-0 p-0 d-flex justify-content-center align-items-center">
+                  <div class="d-flex py-1">
+                    <p class="fs-6 fw-bold m-0 p-0 text-black">Order total :</p>
+                    <p class="fs-6 fw-bold m-0 p-0 text-b">&nbsp;&#8377;&nbsp;<%= grandTotal?.toFixed(2) %></p>
+                  </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 m-0 p-0">
+                  <div class="d-flex justify-content-end align-items-center m-0 p-0">
+                    <% if (paginatedOrder[0]?.orders[0]?.paymentStatus === 'failed') { %>
+                    <form id="makePaymentForm" method="post">
+                      <button id="submitButton" data-page="<%= currentPage %>" data-orderId="<%= paginatedOrder[0]?._id %>" data-amount="<%= grandTotal?.toFixed(2) %>" data-keyId="<%= RAZORPAY_KEY_ID %>" type="submit" class="border-0 font-size bg-dark text-white px-3 py-2" style="border-top-right-radius: 5px;">
+                        Complete Payment
+                      </button>
+                    </form>
+                    <% } %>
+                    <% if (paginatedOrder[0]?.orders[0]?.paymentStatus === 'paid') { %>
+                    <div class="col-12 d-flex justify-content-end align-items-center">
+                      <a href="/generate-invoice/<%= paginatedOrder[0]?.orders[0]?._id %>" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-bounce fa-solid fa-download pe-2 text-primary"></i>Download Invoice</a>
+                    </div>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+              <!-- order filter -->
+              <div class="row mb-3 p-0">
+                <div class="col-sm-12 col-md-12 m-0 p-0">
+                  <form id="orderStatusForm" action="/user-filter-order-status?orderStatuses=<%= uniqueStatusTypes %>" method="post">
+                    <label for="orderStatusFilter" class="font-size-bold text-danger">Filter Order Status</label>
+                    <select class="w-100 border-1 rounded-2 font-size p-1" name="orderStatusFilter" id="orderStatusFilter" onchange="submitForm()">
+                      <option class="bg-white text-black" value="" disabled selected>Select an option</option>
+                      <% uniqueStatusTypes.forEach(element => { %>
+                      <option class="bg-white" value="<%= element %>">
+                        <%= element.charAt(0).toUpperCase() + element.slice(1) %>
+                      </option>
+                      <% }) %>
+                    </select>
+                  </form>
+                  <script>
+                    function submitForm() {
+                      const form = document.getElementById('orderStatusForm');
+                      form.submit();
+                    }
+                  </script>
+                </div>
+              </div>
+              <% } %>
+              <!-- tax details  -->
+              <% if(paginatedOrder?.length > 0){ %>
+              <div class="row border rounded-3 p-0 mb-3">
+                <div class="col-sm-12 col-md-12 col-lg-12 m-0 p-0">
+                  <a class="btn w-100 border-0 m-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <p class="font-size-small-bold text-primary m-0 py-2 fst-italic">See GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
+                  </a>
+                  <div class="collapse m-0 p-0" id="collapseExample">
+                    <div class="col d-flex px-3">
+                      <div class="col-6">
+                        <p class="font-size-bold border-bottom">Total Price</p>
+                        <p class="font-size-bold border-bottom">GST @ 18%</p>
+                        <p class="font-size-bold border-bottom">SGST @ 9%</p>
+                        <p class="font-size-bold border-bottom">CGST @ 9%</p>
+                        <p class="font-size-bold border-bottom">Discount %</p>
+                        <p class="font-size-bold border-bottom">Discount Amt.</p>
+                        <p class="font-size-bold border-bottom">Round-off</p>
+                      </div>
+                      <div class="col-1">
+                        <p class="font-size text-end border-bottom">:</p>
+                        <p class="font-size text-end border-bottom">:</p>
+                        <p class="font-size text-end border-bottom">:</p>
+                        <p class="font-size text-end border-bottom">:</p>
+                        <p class="font-size text-end border-bottom">:</p>
+                        <p class="font-size text-end border-bottom">:</p>
+                        <p class="font-size text-end border-bottom">:</p>
+                      </div>
+                      <div class="col-5">
+                        <p class="font-size text-end border-bottom"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
+                        <p class="font-size text-end border-bottom"><%= totalGst?.toFixed(2) %></p>
+                        <p class="font-size text-end border-bottom"><%= totalSgst?.toFixed(2)  %></p>
+                        <p class="font-size text-end border-bottom"><%= totalCgst?.toFixed(2)  %></p>
+                        <p class="font-size text-end border-bottom"><%= totalDiscountPercentage?.toFixed(2)%></p>
+                        <p class="font-size text-end border-bottom"><%= totalDiscount?.toFixed(2) %></p>
+                        <p class="font-size text-end border-bottom"><%= roundOff?.toFixed(2) %></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <% } %>
+              <% if(paginatedOrder.length === 0){ %>
+              <div class="row p-0 m-0">
+                <h6 class="text-danger font-size m-0 pb-3 animate__animated animate__flash " colspan="5"><em>Your haven`t ordered a product yet</em></h6>
+              </div>
+              <% } %>
+              <!-- order details  -->
+              <div class="row p-0">
+
+                <% paginatedOrder?.forEach((data)=>{ %>
+                <% data?.orders?.forEach((item, index)=>{ %>
+                <div class="col-12 border rounded-3 mb-3 overflow-hidden">
+                  <div class="row bg-light font-size-bold">
+                    <div class="border-bottom col-sm-12 col-md-12 col-lg-4 d-flex justify-content-center align-items-center m-0 p-0 py-2">
+                      <p class="m-0 p-0">Order ID : &nbsp;</p>
+                      <% const orderID = "clothStore_" + data._id.toString().slice(-8); %>
+                      <p class="text-black m-0 p-0"><%= orderID %> ( <span class="text-danger"><%= index+1 %> of <%= data.orders.length %></span> )</p>
+                    </div>
+                    <div class="border-bottom col-sm-12 col-md-12 col-lg-4 d-flex justify-content-center align-items-center m-0 p-0 py-2">
+                      <p class="m-0 p-0">Order Status : &nbsp;</p>
+                      <% if (item?.orderStatus) { %>
+                      <% const status = item?.orderStatus?.toLowerCase(); %>
+                      <% if (status === 'cancelled') { %>
+                      <p class="border-0 font-size m-0 p-0" style="color: #d80614;">
+                        <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                      </p>
+                      <% } else if (status === 'delivered') { %>
+                      <p class="border-0 font-size m-0 p-0" style="color: #14b13e;">
+                        <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                      </p>
+                      <% } else if (status === 'placed') { %>
+                      <p class="border-0 font-size m-0 p-0" style="color: #ac0081;">
+                        <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                      </p>
+                      <% } else if (status === 'shipped') { %>
+                      <p class="border-0 font-size m-0 p-0" style="color: #e2aa02;">
+                        <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                      </p>
+                      <% } else if (status === 'pending') { %>
+                      <p class="border-0 font-size m-0 p-0" style="color: #001c9b;">
+                        <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                      </p>
+                      <% } else if (status === 'returned') { %>
+                      <p class="border-0 font-size m-0 p-0" style="color: #00ddff;">
+                        <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                      </p>
+                      <% } %>
+                      <% } %>
+                    </div>
+                    <div class="border-bottom col-sm-12 col-md-12 col-lg-4 d-flex justify-content-end align-items-center m-0 p-0">
+                      <% if (item?.orderStatus === 'delivered') { %>
+                      <button type="button" class="border-0 font-size bg-dark text-white px-3 py-2" data-bs-toggle="modal" data-bs-target="#addReviewModal<%= index %>" style="border-top-right-radius: 5px;">
+                        add a review
+                      </button>
+                      <% } %>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="py-3 col-sm-12 col-md-12 col-lg-2 col-xl-2 d-flex">
+                      <img class="" src="/productImages/<%= item.images[0] %>" style="width: 100%; height: 90px; object-fit: contain;" alt="">
+                    </div>
+                    <div class="py-3 col-sm-12 col-md-12 col-lg-5 col-xl-5 d-flex">
+                      <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                        <p class="font-size-bold">Title</p>
+                        <p class="font-size-bold">Color</p>
+                        <p class="font-size-bold">Size</p>
+                        <p class="font-size-bold">MRP</p>
+                        <p class="font-size-bold">Discount</p>
+                        <p class="font-size-bold">Order placed on</p>
+                      </div>
+                      <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+                        <p class="font-size"> :
+                          <span class="font-size-bold text-success">
+                            <%= item.title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                          </span>
+                        </p>
+                        <p class="font-size">: <%= item.color %></p>
+                        <p class="font-size">: <%= item.size %></p>
+                        <p class="font-size">: &#8377;&nbsp;<%= item.mrp %></p>
+                        <p class="font-size">: <%= item.discount %> %</p>
+                        <p class="font-size">:
+                          <%= item.createdAt.toLocaleString("en-US", {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: 'numeric',
+                                            minute: 'numeric',
+                                            second: 'numeric'
+                                          }) %>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="py-3 col-sm-12 col-md-12 col-lg-5 col-xl-5 d-flex">
+                      <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                        <p class="font-size-bold">Payment mode</p>
+                        <p class="font-size-bold">Payment status</p>
+                        <p class="font-size-bold">Order status</p>
+                        <p class="font-size-bold">Coupon applied</p>
+                        <p class="font-size-bold">Coupon discount</p>
+                      </div>
+                      <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7 ">
+                        <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.paymentMode%></span></p>
+                        <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.paymentStatus%></span></p>
+                        <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.status%></span></p>
+                        <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.couponCode? item.couponName : 'nill'%></span></p>
+                        <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.couponValue? item.couponValue + '%' : 'nill' %></span></p>
+                      </div>
+                      <form action="/user-add-review?productId=<%= item.productId %>&page=<%= currentPage %>" method="post">
+                        <div class="modal fade font-size" id="addReviewModal<%= index %>" tabindex="-1" aria-labelledby="addReviewModalLabel<%= index %>" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title font-size-bold text-primary" id="addReviewModalLabel<%= index %>">Add Review | <%= item?.title?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')  %></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <% const productIdToDisplayReviewFor = item?.userId.toString() %>
+                                <% const productToDisplayReviewFor = item?.productDetailsReview?.find(product => product?.userId?.toString() === productIdToDisplayReviewFor); %>
+                                <label class="form-label">Rating:</label>
+                                <% for (let i = 0; i <= 5; i++) { %>
+                                <div class="">
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="rating" id="rating<%= index %>-<%= i %>" value="<%= i %>" required <% if (productIdToDisplayReviewFor && productToDisplayReviewFor && productToDisplayReviewFor?.rating === i) { %> checked <% } %>>
+                                    <label class="form-check-label" for="rating<%= index %>-<%= i %>">
+                                      <% for (let j = 1; j <= i; j++) { %>
+                                      <i class="fas fa-star" style="color: #ffee00;"></i>
+                                      <% } %><%= i %> stars
+                                    </label>
+                                  </div>
+                                </div>
+                                <% } %>
+                                <div class="mb-3 font-size">
+                                  <textarea class="form-control font-size text-black" id="reviewMessage<%= index%>" name="reviewMessage" minlength="1" maxlength="50" rows="1" required <% let message = ''; %> <% if (productIdToDisplayReviewFor && productToDisplayReviewFor ){ %> <% message = productToDisplayReviewFor.message; %> <% } %>><%= message %></textarea>
+                                </div>
+                                <button type="submit" id="submitButton<%= index %>" class="btn btn-dark font-size">Submit Review</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="row bg-light">
+                    <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+                      <div class="d-flex justify-content-center align-items-center py-2">
+                        <p class="font-size-bold m-0 p-0">Price</p><span class="font-size">&nbsp;(per item)&nbsp;:</span>
+                        <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= item.mrpWithoutTax.toFixed(2)%>&nbsp;x</p>
+                        <p class="font-size-bold m-0 p-0">&nbsp;<%= item.quantity%>&nbsp; NOS.</p>
+                      </div>
+                    </div>
+                    <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+                      <div class="d-flex justify-content-center align-items-center py-2">
+                        <% let totalDiscountAmt = item.individualTotal - (  item.AmountAfterSecondDiscount +  item.gst )%>
+                        <% let totalDiscountPercentageValue = ( totalDiscountAmt /  item.individualTotal ) * 100 %>
+                        <p class="font-size-bold m-0 p-0">Discount percentage:</p>
+                        <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= totalDiscountPercentageValue.toFixed(0) %> %</p>
+                      </div>
+                    </div>
+                    <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+                      <div class="d-flex justify-content-center align-items-center py-2">
+                        <p class="font-size-bold m-0 p-0">Discount received :</p>
+                        <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= totalDiscountAmt.toFixed(2) %></p>
+                      </div>
+                    </div>
+                    <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-between align-items-center flex-wrap">
+                      <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <p class="font-size-bold m-0 p-0">Total :</p>
+                        <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= item.totalPrice ?.toFixed(2) %></p>
+                      </div>
+
+                      <% if(item.status === 'pending' || item.status === 'placed') {%>
+                      <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <form action="/user-cancel-single-product?page=<%= currentPage %>&single=<%=item.singleOrderId %>&whole=<%=item.wholeOrderId%>&product=<%= item.title %>" method="post">
+                          <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit">cancel product</button>
+                        </form>
+                      </div>
+                      <%  }%>
+
+                      <% if(item.status === 'cancelled') {%>
+                      <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>cancelled</button>
+                      </div>
+                      <%  }%>
+
+                      <% if(item.status === 'delivered') {%>
+                      <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>delivered</button>
+                      </div>
+                      <%  }%>
+
+                      <% if(item.status === 'shipped') {%>
+                      <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>shipped</button>
+                      </div>
+                      <%  }%>
+                    </div>
+                  </div>
+                </div>
+                <% }) %>
+                <% }) %>
+                <!-- cancel orders  -->
+                <% if ( paginatedOrder?.length > 0 && pendingArr?.length > 1 || placedArr?.length > 1) { %>
+                <div class="container mb-3">
+                  <div class="row border rounded-3 p-0">
+                    <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                      <p class="text-primary m-0 p-0 font-size-bold">
+                        Cancel all orders from <span class="text-black">clothStore_<%= paginatedOrder[0]?._id?.toString().slice(-8) %></span>
+                      </p>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                      <% const orderID = "clothStore_" + paginatedOrder[0]?.orders[0]?._id.toString().slice(-8); %>
+                      <form action="/user-cancel-whole-products?page=<%= currentPage %>&orderId=<%= paginatedOrder[0]?.orders[0]?.wholeOrderId %>&orderName=<%= orderID %>" method="post">
+                        <button class="btn text-primary font-size-bold" type="submit">
+                          cancel all
+                          <span>
+                            <i class="fa-sharp fa-solid fa-arrow-right ps-2"></i>
+                          </span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <% } %>
+                <!-- return orders  -->
+                <% if (paginatedOrder?.length > 0 && deliveredArr && deliveredArr?.length > 1) { %>
+                <div class="container mb-3">
+                  <div class="row border rounded-3">
+                    <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                      <p class="text-primary m-0 p-0 font-size-bold">
+                        return all orders from <span class="text-black">clothStore_<%= paginatedOrder[0]?.orders[0]?._id.toString().slice(-8) %></span>
+                      </p>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                      <% const orderID = "clothStore_" + paginatedOrder[0]?._id?.toString().slice(-8); %>
+                      <form action="/user-return-whole-products?page=<%= currentPage %>&orderId=<%= paginatedOrder[0]?.orders[0]?.wholeOrderId %>&orderName=<%= orderID %>&currentStatus=<%= paginatedOrder[0]?.orders[0]?.orderStatus %>" method="post">
+                        <button class="btn text-primary font-size-bold" type="submit">
+                          return product(s)
+                          <span>
+                            <i class="fa-sharp fa-solid fa-arrow-right ps-2"></i>
+                          </span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="fw-bold fs-6 bg-black">
+      <!-- pagination  -->
+      <div class="col-12 justify-content-center py-2" style="display: flex;" id="pagination">
+        <% if (currentPage > 1) { %>
+        <div class="text-center border rounded-1 bg-light">
+          <a class="text-decoration-none" href="/user-dashboard-orders?page=<%= currentPage - 1 %>&limit=<%= limit %>&currentPage=<%= currentPage %>">
+            <p class="font-size px-3 py-2 m-0 text-dark">&lt;</p>
+          </a>
+        </div>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+        <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-dark' : 'bg-light' %>">
+          <a class="text-decoration-none" href="/user-dashboard-orders?page=<%= i %>&limit=<%= limit %>&currentPage=<%= currentPage %>">
+            <p class="font-size px-3 py-2 m-0 text-white"><%= i %></p>
+          </a>
+        </div>
+        <% } else { %>
+        <div class="text-center border rounded-1 bg-light">
+          <a class="text-decoration-none" href="/user-dashboard-orders?page=<%= i %>&limit=<%= limit %>&currentPage=<%= currentPage %>">
+            <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+          </a>
+        </div>
+        <% } %>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+        <div class="text-center border rounded-1 bg-light">
+          <a class="text-decoration-none" href="/user-dashboard-orders?page=<%= currentPage + 1 %>&limit=<%= limit %>&currentPage=<%= currentPage %>">
+            <p class="font-size px-3 py-2 m-0 text-dark">&gt;</p>
+          </a>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+  <section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      $(document).ready(function() {
+        let formData = {};
+        let orderId;
+
+        function handleSubmit(event) {
+          event.preventDefault();
+          sendData();
+        }
+        async function sendData() {
+          let formData = gatherFormData();
+          orderId = formData.orderId
+          console.log(formData);
+          if (formData) {
+            try {
+              const response = await sendRequest(formData);
+              handleResponse(response);
+            } catch (error) {
+              console.error("Error:", error);
+            }
+          }
+        }
+
+        function gatherFormData() {
+          formData.amount = $('#submitButton').data('amount') * 100;
+          formData.keyId = $('#submitButton').data('keyid');
+          formData.orderId = $('#submitButton').data('orderid');
+          formData.page = $('#submitButton').data('page');
+          return formData;
+        }
+
+        function sendRequest(formData) {
+          return new Promise((resolve, reject) => {
+            $.ajax({
+              url: '/retry/payment',
+              method: "POST",
+              contentType: "application/json",
+              data: JSON.stringify(formData),
+              success: resolve,
+              error: reject
+            });
+          });
+        }
+
+        function handleResponse(response) {
+          console.log('handleResponse', response);
+          if (response.status) {
+            handleOnlinePayment(response);
+          }
+        }
+        // Function to handle online payment
+        function handleOnlinePayment(online) {
+          var options = {
+            "key": formData?.keyId,
+            "amount": online?.order?.amount,
+            "currency": "INR",
+            "name": "clothSTORE",
+            "description": "Test Transaction",
+            "image": "/images/clothStore_favicon.jpg",
+            "order_id": online?.order?.id,
+            "handler": function(response) {
+              console.log(response);
+              paymentVerification(response, online)
+            },
+            "prefill": {
+              "name": "Gaurav Kumar",
+              "email": "gaurav.kumar@example.com",
+              "contact": "9000090000"
+            },
+            "notes": {
+              "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+              "color": "#000000"
+            }
+          }
+
+          let razorpay = new Razorpay(options);
+          razorpay.on('payment.failed', function(response) {
+            const errorMessage = `
+              <p style="text-align: left; font-size: 15px;">Reason: ${response.error.reason}</p>
+              <p style="text-align: left; font-size: 15px;">Order ID: ${response.error.metadata.order_id}</p>
+              <p style="text-align: left; font-size: 15px;">Payment ID: ${response.error.metadata.payment_id}</p>
+              <p style="text-align: left; font-size: 15px;">Info: ${response.error.description}</p>
+            `;
+            Swal.fire({
+              title: 'Error!',
+              html: errorMessage.trim(),
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: 'red'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                changePaymentStatus(orderId, 'failed');
+              }
+            });
+          });
+          razorpay.open();
+        }
+        // Function to handle verify the online payment
+        function paymentVerification(paymentDetails, orderDetails) {
+          $.ajax({
+            url: '/verify/payment',
+            data: {
+              paymentDetails,
+              orderDetails
+            },
+            method: 'POST',
+            success: (response) => {
+              if (response.status) {
+                if (response.message) {
+                  Swal.fire({
+                    title: 'Success!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'green'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      changePaymentStatus(orderId, 'paid');
+                    }
+                  });
+                } else {
+                  changePaymentStatus(orderId, 'paid');
+                }
+              } else {
+                if (response.message) {
+                  Swal.fire({
+                    title: 'Error!',
+                    text: response.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'red'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      changePaymentStatus(orderId, 'failed');
+                    }
+                  });
+                } else {
+                  changePaymentStatus(orderId, 'failed');
+                }
+              }
+            }
+          });
+        }
+
+        function changePaymentStatus(orderId, status) {
+          $.ajax({
+            url: '/change/payment/status',
+            data: {
+              orderId,
+              status
+            },
+            method: 'POST',
+            success: (response) => {
+              if (response.status) {
+                if (response.message) {
+                  Swal.fire({
+                    title: 'Payment status',
+                    text: response.paymentStatus,
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'blue'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                    }
+                  });
+                } else {
+                  location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                }
+              }
+            }
+          });
+        }
+        $('#makePaymentForm').submit(handleSubmit);
+      });
+    </script>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

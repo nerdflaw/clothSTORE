@@ -1,0 +1,82 @@
+<nav>
+  <div class="container-fluid m-0 p-0">
+    <div class="row w-100 m-0 p-0">
+      <div class="col-lg-2 order-lg-1 d-flex justify-content-center align-items-center m-0 py-2 border-1 border-bottom">
+        <a class="fs-3 fw-bold text-decoration-none text-black" href="/">cloth<span class="fw-bold">STORE</span></a>
+      </div>
+      <div class="col-lg-2 order-lg-4 d-flex justify-content-around align-items-center m-0 py-2 border-1 border-bottom">
+        <a href="/user-dashboard-cart" class="outline-none text-white position-relative justify-content-center align-items-center">
+          <% if (locals?.carts&& locals?.carts?.cart?.length > 0) { %>
+          <i class="fa-solid fa-cart-shopping text-black"></i>
+          <span class="font-size-bold position-absolute border rounded-circle d-flex justify-content-center align-items-center text-white" style="top: -9px; right: -9px; background-color: #ff0000; padding: 2px; width: 15px; height: 15px; font-size: 10px; font-weight: bolder;"><%= locals?.carts?.cart?.length %></span>
+          <% } else { %>
+          <i class="fa-solid fa-cart-shopping text-black"></i>
+          <% } %>
+        </a>
+        <a href="/user-dashboard-wish-lists" class="outline-none text-white position-relative justify-content-center align-items-center">
+          <% if (locals?.wishlists && locals?.wishlists?.length > 0) { %>
+          <i class="fa-solid fa-heart text-black"></i>
+          <span id="whish-list-count" class="position-absolute border rounded-circle d-flex justify-content-center align-items-center text-white" style="top: -9px; right: -9px; background-color: #ff0000; padding: 2px; width: 15px; height: 15px; font-size: 10px; font-weight: bolder;"><%= locals?.wishlists?.length%></span>
+          <% } else { %>
+          <i class="fa-solid fa-heart text-black"></i>
+          <% } %>
+        </a>
+        <div class="dropdown">
+          <button class="btn position-relative border-0" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+            <% if(locals?.user) {%>
+            <i class="fa-solid fa-user" style="color: #000000;"></i>
+            <span class="position-absolute border rounded-circle d-flex justify-content-center align-items-center text-white" style="top: 0px; right: 7px; background-color: #1ac504; padding: 2px; width: 10px; height: 10px;"></span>
+
+            <% }else{ %>
+            <i class="fa-solid fa-user" style="color: #000000;"></i>
+            <% } %>
+          </button>
+          <ul class="dropdown-menu m-0 p-0 bg-black" aria-labelledby="dropdownMenuButton2">
+            <% if(locals?.user) {%>
+            <li><a class="dropdown-item active bg-black" href="/user-dashboard">Dashboard</a></li>
+            <li><a class="dropdown-item active bg-black" href="/user-signout">Sign out</a></li>
+            <% }else { %>
+            <li><a class="dropdown-item active bg-black" href="/user-login">Login</a></li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-5 order-lg-2 d-flex justify-content-center align-items-center m-0 py-2 border-1 border-bottom">
+        <div class="row w-100 m-0 p-0">
+          <div class="col-sm-6 text-center">
+            <select name="shop" id="shop" class="search-select border-0" onchange="window.location.href = this.value;">
+              <option class="bg-black text-white" value="" disabled selected>Shop</option>
+              <option class="bg-black text-white" value="/user-list-average-rated">Average Rated</option>
+              <option class="bg-black text-white" value="/user-list-featured-products">Featured</option>
+              <option class="bg-black text-white" value="/user-list-flash-sales">Flash Sales</option>
+              <option class="bg-black text-white" value="/user-list-new-arrivals">New Arrivals</option>
+              <option class="bg-black text-white" value="/user-list-popular-products">Popularity</option>
+            </select>
+          </div>
+          <div class="col-sm-6 text-center">
+            <select name="brand" id="brand" class="search-select border-0" onchange="window.location.href = this.value;">
+              <option class="bg-black text-white" value="" disabled selected>Brands</option>
+              <% if (locals?.brands && locals?.brands?.length > 0) { %>
+              <% locals?.brands?.forEach(brand => { %>
+              <option class="bg-black text-white" value="/user-view-brandwise/<%= brand?._id %>"><%= brand?.brand %></option>
+              <% }); %>
+              <% } else { %>
+              <option class="bg-black text-white" value="#" disabled>No brands</option>
+              <% } %>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 order-lg-3 d-flex justify-content-center align-items-center m-0 py-2 border-1 border-bottom">
+        <div class="search w-100">
+          <form action="/user-search" method="get" class="d-flex justify-content-center align-items-center">
+            <input name="searchKey" class="search-input w-100 border rounded-start outline-none  text-center font-size" placeholder="search for products" aria-label="Search" style="height: 40px;">
+            <button id="searchButton" class="search-button border rounded-end outline-none border-black bg-black" type="submit" style="height: 40px;">
+              <i class="fa-solid fa-magnifying-glass border-1 px-3" style="color: #ffffff;"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

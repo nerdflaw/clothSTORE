@@ -1,0 +1,144 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex">
+        <div class="col-sm-12 col-md-12 col-lg-12 py-2">
+          <form action="" method="post" class="d-flex">
+            <input class="search-input rounded-start border w-100 text-center border-end-0 font-size" type="search" placeholder="search for products" aria-label="Search" style="height: 40px;">
+            <button class="search-button border-0 border-black bg-black rounded-end" type="submit">
+              <i class="fa-solid fa-magnifying-glass border-1 px-3" style="color: #ffffff;"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <form action="/admin-add-products-to-segements" method="post">
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="top-bar d-flex justify-content-end">
+              <button class="text-white search-button border-0 bg-danger rounded-3 text-center px-5" type="submit" style="height: 40px;">
+                Apply
+              </button>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12 py-2">
+            <div class="col border rounded-3 p-3 overflow-auto">
+              <table class="table table-black table-bordered">
+                <thead>
+                  <tr class="font-size">
+                    <th class="table-white text-black bg-light text-center" scope="col">No.</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Title</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Image</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Brand</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Category</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Created on</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">MRP</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Stock</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Status</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Action</th>
+                    <th class="table-white text-black bg-light text-center" scope="col">Segment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% ProductDetails.forEach((product, index) => { %>
+                  <tr class="font-size">
+                    <td class="text-black table-white text-start"><%= index+1 %></td>
+                    <td class="text-black table-white text-start">
+                      <a class="text-decoration-none text-black" href="/admin-edit-prouduct/<%- product._id %>" onclick="return confirm('Are you sure you want to edit <%=product.title%>?')"><%= product.title %></a>
+                    </td>
+                    <td class="text-black table-white d-flex justify-content-center align-items-center">
+                      <a href="/admin-edit-prouduct/<%- product._id %>">
+                        <img class="img-fluid border-0" style="width: 20px; height: 30px;" src="/productImages/<%= product.images[0] %>" alt="<%= product.images[0] %>" onclick="return confirm('Are you sure you want to edit <%=product.title%>?')">
+                      </a>
+                    </td>
+                    <td class="text-black table-white text-start">
+                      <% brandArray.forEach(brand => { %>
+                      <% if (brand._id.toString() === product.brandName.toString()) { %>
+                      <%= brand.brand %>
+                      <% } %>
+                      <% }) %>
+                    </td>
+                    <td class="text-black table-white text-start">
+                      <% categoryArray.forEach(category => { %>
+                      <% if (category._id.toString() === product.categoryName.toString()) { %>
+                      <%= category.category %>
+                      <% } %>
+                      <% }) %>
+                    </td>
+                    <td class="text-black table-white text-center">
+                      <%= product.createdAt.toLocaleDateString("en-US", 
+                    { year: 'numeric',
+                      month: 'short',
+                      day: 'numeric' 
+                   }
+                    ) %>
+                    </td>
+                    <td class="text-black table-white text-end"><%= product.mrp.toFixed(2)%></td>
+                    <td class="text-black table-white text-end"><%= product.quantity.toFixed(2)%></td>
+
+                    <% let value; %>
+                    <td class="<%= product.status ? 'text-success fw-bold' : 'text-danger fw-bold' %> table-white text-center">
+                      <% if (product.status) { %>
+                      <% value = 'enabled'; %>
+                      <% } else { %>
+                      <% value = 'disabled'; %>
+                      <% } %>
+                      <%= value %>
+                    </td>
+
+                    <td class="text-white table-white text-center">
+                      <% if (product.status) { %>
+                      <!-- If user is active, provide option to block -->
+                      <form action="/admin/disable-product/<%- product._id %>" method="post">
+                        <button type="submit" class="text-white font-size btn btn-danger px-3 py-0" onclick="return confirm('Are you sure you want to disable <%=product.title%>?')">Disable</button>
+                      </form>
+                      <% } else { %>
+                      <!-- If user is inactive, provide option to unblock -->
+                      <form action="/admin/enable-product/<%- product._id %>" method="post">
+                        <button type="submit" class="text-white font-size btn btn-primary px-3 py-0" onclick="return confirm('Are you sure you want to enable <%=product.title%>?')">Enable</button>
+                      </form>
+                      <% } %>
+                    </td>
+                    <td class="text-black table-white text-center">
+                      <div class="mb-3">
+                        <div class="dropdown">
+                          <button class="btn btn-danger dropdown-toggle font-size px-3 py-0" type="button" id="dropdownSegments" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Select Segments
+                          </button>
+                          <div class="dropdown-menu" aria-labelledby="dropdownSegments">
+                            <% if(segments.length <= 0){ %>
+                              <p class="dropdown-item" href="#" disabled>No segment found</p>
+                            <% } else { %>
+                              <% segments.forEach(segment => { %>
+                                <div class="form-check">
+                                  <input type="checkbox" class="" name="selectedSegments" value="<%= segment._id %>">
+                                  <label class=""><%= segment.segment %></label>
+                                </div>
+                              <% }) %>
+                            <% } %>   
+                          </div>
+                        </div>                     
+                      </div>
+                    </td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

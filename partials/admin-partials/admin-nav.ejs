@@ -1,0 +1,28 @@
+  <nav>
+    <div class="container-fluid border border-bottom-1">
+      <div class="row justify-content-between">
+        <div class="navbar-part-1 py-2 col-lg-6 col-sm-12 order-lg-1 bg-white d-flex justify-content-start">
+          <a class="fs-3 fw-bold text-decoration-none text-black" href="/">cloth<span class="fw-bold">STORE</span></a>
+        </div>
+        <div class="navbar-part-3 py-2 col-lg-6 col-sm-12 order-lg-2 d-flex justify-content-end">
+          <div class="dropdown">
+            <button class="btn position-relative" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+              <% if(locals.admin) {%>
+              <i class="fa-solid fa-user" style="color: #000000;"></i>
+              <span class="position-absolute border rounded-circle d-flex justify-content-center align-items-center text-white" style="top: 0px; right: 7px; background-color: #1ac504; padding: 2px; width: 10px; height: 10px;"></span>
+              <% }else{ %>
+              <i class="fa-solid fa-user" style="color: #000000;"></i>
+              <% } %>
+            </button>
+            <ul class="dropdown-menu m-0 p-0 bg-black" aria-labelledby="dropdownMenuButton2">
+              <% if(locals.admin) {%>
+                <li><a class="dropdown-item active bg-black text-start text-decoration-none" href="/admin-logout">Log Out</a></li>
+              <% }else { %>
+                <li><a class="dropdown-item active bg-black" href="/user-login">Log In</a></li>
+              <% } %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>

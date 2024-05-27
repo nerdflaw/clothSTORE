@@ -1,0 +1,122 @@
+<!-- including user head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body class="">
+
+  <!-- including user nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center p-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/">Home</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none" href="/user-view-product-details/<%= productReviewDetails[0]._id %>">Product details</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-list-product-reviews/<%= productReviewDetails[0]._id %>">Product Reviews</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <!-- heading -->
+          <div class="row my-2 px-2">
+            <div class="border rounded-3 bg-black py-2">
+              <h2 class="text-center text-white my-auto fs-6 fw-bold m-0 p-0">
+                Product Reviews - 
+                <% var title = productReviewDetails[0]?.title; %>
+                <% if (title) { %>
+                <% var capitalizedTitle = title.charAt(0).toUpperCase() + title.slice(1); %>
+                <%= capitalizedTitle %>
+                <% } %>
+              </h2>
+            </div>
+          </div>
+          <!-- product images portion -->
+          <div class="row my-2 px-2 ">
+            <div class="border rounded-3 bg-light py-2 mt-2">
+              <h2 class="text-start m-0 p-0 px-1 py-1 font-size-bold">Product images</h2>
+            </div>
+            <% for( let index = 0; index < productReviewDetails[0]?.images?.length; index++ ) { %>
+            <div class="col-sm-12 col-md-12 col-lg-3 col-xl-3 justify-content-between align-items-center m-0 p-0 mt-2">
+              <img src="/productImages/<%= productReviewDetails[0]?.images[index]%>" 
+              class="image-fluid m-0 p-0 border rounded-3" style="width: 100%; height: 300px; object-fit: cover;" alt="<%= productReviewDetails[0]?.title %>">
+            </div>
+            <% } %>
+          </div>
+          <!-- product review portion -->
+          <div class="row my-2 px-2">
+            <div class="border rounded-3 bg-light py-2">
+              <h2 class="text-start m-0 p-0 px-1 py-1 font-size-bold">Product reviews</h2>
+            </div>
+          </div>
+          <div class="row my-2 px-2">
+            <% productReviewDetails?.forEach((element, index) => { %>
+            <% element?.review.forEach((data, ind) => { %>
+            <div class="col-sm-12 col-md-12 col-lg-3 col-xl-3 m-0 p-0 mt-1 border rounded-3">
+              <!-- review username -->
+              <div class="col-md m-0 px-2 pt-2 d-flex justify-content-start align-items-center bg-light">
+                <% if (locals.user.fullName === data.username) { %>
+                <h3 class="text-black font-size-bold m-0 me-2 p-0 ">You</h3>
+                <% } else { %>
+                <h3 class="text-black font-size-bold m-0 me-2 p-0 "><%= data.username %></h3>
+                <% } %>
+              </div>
+              <!-- review adde date -->
+              <div class="col-md px-2 pt-2 pb-1 d-flex justify-content-start align-items-center bg-light">
+                <h3 class="text-black font-size-small fst-italic m-0 p-0 ">
+                  added on : <%= data?.updatedAt?.toLocaleDateString("en-US", 
+                    { year: 'numeric',
+                      month: 'short',
+                      day: 'numeric' 
+                   }
+                    ) %>
+                </h3>
+              </div>
+              <hr class="pt-1 m-0 text-secondary">
+              <!-- review star rating -->
+              <div class="col-md my-1 px-2 d-flex justify-content-start align-items-center">
+                <div class="star-rating">
+                  <% if (data?.rating > 0) { %>
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <% if (i <= data?.rating) { %>
+                  <span class="fa fa-star checked"></span>
+                  <% } else { %>
+                  <span class="fa fa-star"></span>
+                  <% } %>
+                  <% } %>
+                  <span class="font-size text-primary"><%= data?.rating %>/5 Stars.</span>
+                  <% } else { %>
+                  <% for (let i = 1; i <= 5; i++) { %>
+                  <span class="fa fa-star"></span>
+                  <% } %>
+                  <span class="font-size text-primary"><%= data?.rating !== null ? data?.rating : '0' %>/5 Stars.</span>
+                  <% } %>
+                </div>
+              </div>
+              <hr class="pt-1 m-0 text-secondary">
+              <!-- review message -->
+              <div class="col-md  my-1 px-2 pb-1 d-flex justify-content-start align-items-center">
+                <h3 class="text-black font-size m-0 me-2 p-0 fst-italic">"<%= data.message %>"</h3>
+              </div>
+            </div>
+            <% }) %>
+            <% }) %>
+          </div>
+        </div>
+  </section>
+
+
+  <!-- including user footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

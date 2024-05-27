@@ -1,0 +1,235 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body class="">
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center p-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/">Home</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-view-brandwise/">dddddddddddddddd</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2">
+          <div class="row px-2">
+            <div class="col-sm-12 col-md-12 col-lg-2 my-4 border rounded-3 w-100">
+              <div class="filter-brand py-2">
+                <p class="font-size-bold p-0 m-0">Brands</p>
+                <div class="d-flex flex-column align-items-start">
+                  <% brands.forEach(brand => { %>
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="checkbox" name="brandFilter" value="<%= brand._id %>">
+                    <%= brand.brand %>
+                  </label>
+                  <% }) %>
+                </div>
+              </div>
+              <div class="filter-category py-2">
+                <p class="font-size-bold p-0 m-0">Categories</p>
+                <div class="d-flex flex-column align-items-start">
+                  <% categories.forEach(category => { %>
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="checkbox" name="categoryFilter" value="<%= category._id %>">
+                    <%= category.category %>
+                  </label>
+                  <% }) %>
+                </div>
+              </div>
+              <div class="filter-color py-2">
+                <p class="font-size-bold p-0 m-0">Colors</p>
+                <div class="d-flex flex-column align-items-start">
+                  <% colors.forEach(color => { %>
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="checkbox" name="colorFilter" value="<%= color._id %>">
+                    <%= color.color %>
+                  </label>
+                  <% }) %>
+                </div>
+              </div>
+              <div class="filter-size py-2">
+                <p class="font-size-bold p-0 m-0">Sizes</p>
+                <div class="d-flex flex-column align-items-start">
+                  <% sizes.forEach(size => { %>
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="checkbox" name="sizeFilter" value="<%= size._id %>">
+                    <%= size.size %>
+                  </label>
+                  <% }) %>
+                </div>
+              </div>
+              <!-- <div class="filter-price py-2">
+                <p class="font-size-bold p-0 m-0">Price</p>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="lowToHigh">Low to High
+                  </label>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="highToLow">HIgh to Low
+                  </label>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="newest">Newest
+                  </label>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="oldest">Oldest
+                  </label>
+                </div>
+                <div class="filter-price py-2">
+                  <div class="d-flex flex-column align-items-start">
+                    <p class="font-size-bold p-0 m-0">Price</p>
+                    <label class="font-size d-flex align-items-center me-3 py-1"><span id="selectedMinPrice">0</span>
+                      <input class="me-1 py-1" type="range" name="minPrice" value="0" min="0" max="4000"><span id="selectedMaxPrice">4000</span>
+                    </label>
+                  </div>
+                </div>
+              </div> -->
+              <div id="sortOptions" class="filter-price py-2">
+                <p class="font-size-bold p-0 m-0">Price</p>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="lowToHigh">Low to High
+                  </label>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="highToLow">High to Low
+                  </label>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="newest">Newest
+                  </label>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                  <label class="font-size d-flex align-items-center me-3 py-1">
+                    <input class="me-1 py-1" type="radio" name="sort" value="oldest">Oldest
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10">
+          <div class="row">
+            <div class="col-12 my-4 d-flex justify-content-end">
+              <div class="col-sm-12 col-md-12 col-lg-2">
+                <select class="form-select bg-white text-black font-size" id="sort" name="sort" required>
+                  <option value="highToLow">Price Low to High</option>
+                  <option value="lowToHigh">Price High to Low </option>
+                  <option value="newestToOldest">Newest to Oldest</option>
+                  <option value="OldestTonewest">Oldest to Newest</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="all-products">
+
+            <% if(paginatedProducts.length > 0){ %>
+            <% } else { %>
+            <div>
+              <h6 class="text-black font-size p-2 animate__animated animate__flash " colspan="5"><em>no products to show</em></h6>
+            </div>
+            <% } %>
+
+            <% paginatedProducts.forEach(products => { %>
+            <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 d-flex justify-content-center align-items-start">
+              <div class="card" style="width: 18rem;">
+                <div class="wish-list position-absolute top-0 end-0 pt-4 pe-4">
+                  <a class="nav-link active" aria-current="page" href="#">
+                    <i class="fa-regular fa-heart fa-xl"></i>
+                  </a>
+                </div>
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                  <div class="col-12">
+                    <a class="text-decoration-none" href="/user-view-product-details/<%= products._id %>">
+                      <img src="/productImages/<%= products.images[1] %>" class="card-img-top img-fluid w-100" style="height: 400px; object-fit: cover;" alt="<%= products.title %>">
+                    </a>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="col text-truncate">
+                    <a class="text-decoration-none" href="/user-view-product-details/<%= products._id %>">
+                      <h5 class="card-title text-black product-item-title"><%= products.title %></h5>
+                    </a>
+                  </div>
+                  <div class="col text-truncate py-2">
+                    <p class="card-text product-item-description"><%= products.description %></p>
+                  </div>
+                  <div class="col-2 w-100 d-flex align-items-center justify-content-start">
+                    <% const discountedPrice = Math.round(products.mrp - products.mrp * 0.20); %>
+                    <h3 class="text-danger product-item-price pt-1 me-1">&#8377.<%= discountedPrice %></h3>
+                    <h3 class="text-secondary product-item-price pt-1">&#8377.<span><strike><%= Math.round(products.mrp) %></strike></span>
+                      <span class="font-size ms-1 text-success">
+                        you save &#8377.<%= Math.round(products.mrp * 0.20) %>
+                      </span>
+                    </h3>
+                  </div>
+                  <form class="py-2" action="" method="post">
+                    <button class="btn btn-dark text-center w-100 text-white font-size">add to cart</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <% })%>
+            <hr class="fw-bold fs-6 bg-black">
+            <div class="col-12 d-flex justify-content-center py-2">
+              <% if (currentPage > 1) { %>
+              <div class="text-center border rounded-1 bg-light">
+                <a class="text-decoration-none" href="/user-list-all-products?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+                  <p class="font-size px-3 py-2 m-0 text-dark">&lt;&lt;</p>
+                </a>
+              </div>
+              <% } %>
+
+              <% for (let i = 1; i <= totalPages; i++) { %>
+              <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-danger' : 'bg-light' %>">
+                <a class="text-decoration-none" href="/user-list-all-products?page=<%= i %>&limit=<%= limit %>">
+                  <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+                </a>
+              </div>
+              <% } %>
+
+              <% if (currentPage < totalPages) { %>
+              <div class="text-center border rounded-1 bg-light">
+                <a class="text-decoration-none" href="/user-list-all-products?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+                  <p class="font-size px-3 py-2 m-0 text-dark">&gt;&gt;</p>
+                </a>
+              </div>
+              <% } %>
+            </div>
+          </div>ccc
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

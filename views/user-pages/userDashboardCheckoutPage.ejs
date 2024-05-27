@@ -1,0 +1,645 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none" href="/user-dashboard-cart">My cart</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-checkout">Checkout</a>
+            </div>
+            <% if(locals.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-8 p-2">
+          <div class="col border rounded-3 p-3">
+            <div class="col-12 px-3 py-1 border rounded-3 d-flex flex-wrap justify-content-center align-items-center">
+              <p class="text-black text-center fs-6 fw-bold m-0">select your address</p>
+              <% if (message) { %>
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  toastMessage("<%= message %>");
+                });
+              </script>
+              <% } %>
+            </div>
+            <div class="col-12 mt-3 d-flex flex-wrap justify-content-center align-items-center">
+              <div class="col-12 d-flex justify-content-end">
+                <form action="/user-add-address-on-place-order" method="get">
+                  <button type="submit" class="btn btn-dark font-size">add a new address</button>
+                </form>
+              </div>
+            </div>
+            <form id="placeOrderForm" method="post">
+              <!-- action="/user-place-order/<%#= cartDetails[0]?._id %>" -->
+              <div class="row mt-3">
+                <% locals?.addresses?.forEach(data=>{ %>
+                <% data?.addresses?.forEach((address, index)=>{ %>
+                <div class="col-12 col-md-6">
+                  <div class="col border mt-3 rounded-top position-relative">
+                    <input required type="radio" id="address" name="address" value="<%= address._id %>" class="mx-3 position-absolute top-0 mt-3 start-0">
+                    <a class="btn w-100 p-3 border-0" type="text" data-bs-toggle="collapse" data-bs-target="#collapseExample<%= index %>" aria-expanded="false" aria-controls="collapseExample<%= index %>">
+                      <p class="font-size-bold">Saved address - <%= index+1 %></p>
+                      <div class="col-12 d-flex justify-content-around">
+                        <div class="col-6">
+                          <p class="font-size-small m-0 p-0 text-start">Name</p>
+                          <p class="font-size-small m-0 p-0 text-start">Phone number</p>
+                        </div>
+                        <div class="col-6">
+                          <p class="font-size-small m-0 p-0 text-start">: <%= address.fullName %></p>
+                          <p class="font-size-small m-0 p-0 text-start">: <%= address.phoneNumber %></p>
+                        </div>
+                      </div>
+                      <p class="font-size-small-bold text-primary m-0 pt-2 fst-italic">See more <span class="font-size-bold">&gt;&gt;</span> </p>
+                    </a>
+                  </div>
+                  <div class="collapse" id="collapseExample<%= index %>">
+                    <div class="col-12 w-100 border rounded-bottom">
+                      <div class="col-12 px-3 pt-3 pb-2">
+                        <div class="col-12 d-flex flex-column">
+                          <div class="col-12 border rounded-top d-flex justify-content-start align-items-start text-truncate">
+                            <ul class="font-size-small p-0 w-50 d-flex justify-content-start">
+                              <li class="m-0 p-3">
+                                Full name <br>
+                                Phone number <br>
+                                Email <br>
+                                Building <br>
+                                House number <br>
+                                Street <br>
+                                City <br>
+                                State <br>
+                                Country <br>
+                                Area <br>
+                                Circle <br>
+                                Region <br>
+                                Pincode <br>
+                                Division <br>
+                                Location <br>
+                                District <br>
+                              </li>
+                              <li class="m-0 py-3">
+                                : <%= address.fullName %> ,<br>
+                                : <%= address.phoneNumber %> ,<br>
+                                : <%= address.email %> ,<br>
+                                : <%= address.building %> ,<br>
+                                : <%= address.houseNumber %> ,<br>
+                                : <%= address.street %> ,<br>
+                                : <%= address.city %> ,<br>
+                                : <%= address.area %> ,<br>
+                                : <%= address.circle %> ,<br>
+                                : <%= address.region %> ,<br>
+                                : <%= address.pincode %> ,<br>
+                                : <%= address.division %> ,<br>
+                                : <%= address.location %> ,<br>
+                                : <%= address.district %> ,<br>
+                                : <%= address.state %> ,<br>
+                                : <%= address.country %> ,<br>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <% }) %>
+                <% }) %>
+              </div>
+              <div class="col-12 px-3 py-1 mt-3 border rounded-3 d-flex flex-wrap justify-content-center align-items-center">
+                <p class="text-black text-center fs-6 fw-bold m-0">select a payment method</p>
+              </div>
+              <div class="row ">
+                <% if (grandTotal < 1000) { %>
+                <div class="col-12 col-md-4 mt-3">
+                  <div class="col-12 w-100 border rounded-3">
+                    <div class="col-12 px-3 pt-3">
+                      <p class="font-size-bold">Cash On Delivery (COD)</p>
+                    </div>
+                    <input required type="radio" id="paymentMode" name="paymentMode" value="COD" class="mx-3 pb-3">
+                  </div>
+                </div>
+                <% } %>
+                <div class="col-12 col-md-4 mt-3">
+                  <div class="col-12 w-100 border rounded-3">
+                    <div class="col-12 px-3 pt-3">
+                      <p class="font-size-bold">Online Payment</p>
+                    </div>
+                    <input required type="radio" id="paymentMode" name="paymentMode" value="online" class="mx-3 pb-3">
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-4 p-2">
+          <div class="col-12 p-3 border rounded-top-3 ">
+            <div class="col px-3 py-1 border rounded-3 bg-light">
+              <p class="text-black text-center fs-6 fw-bold m-0 p-0">Order summary</p>
+            </div>
+            <% cartDetails?.forEach(el => { %>
+            <div class="col mt-3 border rounded-3">
+              <div class="col">
+                <div class="row m-0 p-0 justify-content-center align-items-center position-relative">
+                  <button <% if (cartDetails?.length <= 1) { %> hidden <% } %> class="border-0 m-0 p-0" onclick="deleteProduct('<%= el?.cartId %>', '<%= el?.product %>')">
+                    <i class="fa-solid fa-trash-can text-black position-absolute top-0 end-0 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;"></i>
+                  </button>
+                  <div class="col-md-6 col-lg-2 col-xl-2 my-3">
+                    <img src="/productImages/<%= el?.images[0] %>" class="img-fluid">
+                  </div>
+                  <div class="col-md-6 col-lg-10 col-xl-5 my-3">
+                    <div class="col d-flex m-0 p-0">
+                      <div class="col-4">
+                        <p class="text-black font-size-small m-0 p-0">Title</p>
+                        <p class="text-black font-size-small m-0 p-0">Color</p>
+                        <p class="text-black font-size-small m-0 p-0">Size</p>
+                      </div>
+                      <div class="col-2">
+                        <p class="text-black font-size-small m-0 p-0 text-center">:</p>
+                        <p class="text-black font-size-small m-0 p-0 text-center">:</p>
+                        <p class="text-black font-size-small m-0 p-0 text-center">:</p>
+                      </div>
+                      <div class="col-6">
+                        <p class="text-black font-size-small m-0 p-0"><%= el?.product.split(' ').map(word => word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase())?.join(' ')%></p>
+                        <p class="text-black font-size-small m-0 p-0"><%= el?.color %></p>
+                        <p class="text-black font-size-small m-0 p-0"><%= el?.size %></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-lg-10 col-xl-5 my-3">
+                    <div class="col d-flex m-0 p-0">
+                      <div class="col-4">
+                        <p class="text-black font-size-small m-0 p-0">MRP</p>
+                        <p class="text-black font-size-small m-0 p-0">Discount</p>
+                        <p class="text-black font-size-small m-0 p-0">Quantity</p>
+                      </div>
+                      <div class="col-2">
+                        <p class="text-black font-size-small m-0 p-0 text-center">:</p>
+                        <p class="text-black font-size-small m-0 p-0 text-center">:</p>
+                        <p class="text-black font-size-small m-0 p-0 text-center">:</p>
+                      </div>
+                      <div class="col-6">
+                        <p class="text-black font-size-small m-0 p-0">&#8377;&nbsp;<%= el?.mrp %></p>
+                        <p class="text-black font-size-small m-0 p-0"><%= el?.discount %> %</p>
+                        <p class="text-black font-size-small m-0 p-0"><%= el?.quantity %> NOS.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <hr class="m-0 p-0 pb-2 text-black">
+                <div class="row m-0 p-0">
+                  <div class="col-md-6 col-lg-6 col-xl-6 mb-3 d-flex justify-content-center align-items-center">
+                    <div class="col d-flex justify-content-center align-items-center">
+                      <div class="col-6">
+                        <p class="font-size-small m-0 p-0">Quantity :</p>
+                      </div>
+                      <div class="col-6">
+                        <p class="font-size-small m-0 p-0"><%= el?.quantity %>&nbsp; NOS. </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-lg-6 col-xl-6 mb-3">
+                    <div class="col d-flex">
+                      <div class="input-group d-flex">
+                        <div class="col-4 d-flex justify-content-end">
+                          <span class="input-group-btn">
+                            <button <% if (el?.quantity==1) { %> disabled <% } %> type="button" class="quantity-left-minus-place-order btn btn-dark btn-number" data-type="minus" data-field="" onclick="changeQuantity('<%= el?._id %>','<%= el?.cartId %>', -1)">
+                              <span class="">-</span>
+                            </button>
+                          </span>
+                        </div>
+                        <div class="col-4 d-flex justify-content-center align-items-center">
+                          <input disabled style="background-color: transparent;" type="text" id="quantity" name="quantity" class="form-control input-number font-size-bold border-0 text-center" value="<%= el?.quantity %>">
+                        </div>
+                        <div class="col-4 d-flex justify-content-start">
+                          <span class="input-group-btn">
+                            <button type="button" class="quantity-right-plus-place-order btn btn-dark btn-number" data-type="plus" data-field="" <% if (el.quantity==10) { %> disabled <% } %> onclick="changeQuantity('<%= el?._id %>','<%= el?.cartId %>', 1)">
+                              <span class="">+</span>
+                            </button>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+            <div class="col mt-3 m-0 p-0 border rounded-3">
+              <div class="row m-0 p-0">
+                <div class="col-md-12 m-0 p-0">
+                  <a class="btn w-100 border-0 m-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    <p class="font-size-small-bold text-primary m-0 py-2 fst-italic">See GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
+                  </a>
+                  <div class="collapse" id="collapseExample">
+                    <div class="col p-3 border-0 border-top-3 d-flex">
+                      <div class="col-5">
+                        <p class="text-black font-size-small m-0 p-0">Total Price</p>
+                        <p class="text-black font-size-small m-0 p-0">GST @ 18%</p>
+                        <p class="text-black font-size-small m-0 p-0">SGST @ 9%</p>
+                        <p class="text-black font-size-small m-0 p-0">CGST @ 9%</p>
+                        <p class="text-black font-size-small m-0 p-0">Discount %</p>
+                        <p class="text-black font-size-small m-0 p-0">Discount Amt.</p>
+                        <p class="text-black font-size-small m-0 p-0">Round-off</p>
+                      </div>
+                      <div class="col-1">
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                      </div>
+                      <div class="col-6">
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= totalGst?.toFixed(2) %></p>
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= totalSgst?.toFixed(2)  %></p>
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= totalCgst?.toFixed(2)  %></p>
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= totalDiscountPercentage?.toFixed(2)%></p>
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= totalDiscount?.toFixed(2) %></p>
+                        <p class="text-black font-size-small m-0 p-0 text-end"><%= roundOff?.toFixed(2) %></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col mt-3 m-0 p-0 border rounded-3">
+              <div class="row m-0 p-0">
+                <div class="col-md-12 m-0 p-0">
+                  <a class="btn w-100 border-0 m-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#couponCollapse" aria-expanded="true" aria-controls="couponCollapse">
+                    <p class="font-size-small-bold text-primary m-0 py-2 fst-italic">See all avilable coupons % <span class="font-size-bold">&gt;&gt;</span> </p>
+                  </a>
+                  <% allCoupons.forEach(coupon => { %>
+                  <% if (!(grandTotal >= 1000 && coupon.couponValue >= 30)) { %>
+                  <div class="collapse" id="couponCollapse">
+                    <div class="col p-3 border-0 border-top-3 d-flex">
+                      <div class="col-3">
+                        <p class="text-black font-size-small m-0 p-0">Coupon</p>
+                        <p class="text-black font-size-small m-0 p-0">Coupon code</p>
+                        <p class="text-black font-size-small m-0 p-0">Coupon dicount</p>
+                      </div>
+                      <div class="col-1">
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                        <p class="text-black font-size-small m-0 p-0">:</p>
+                      </div>
+                      <div class="col-6">
+                        <p class="text-black text-start font-size-small-bold m-0 p-0"><%= coupon?.coupon?.split(' ').map(word => word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase())?.join(' ')%></p>
+                        <p class="text-black text-start font-size-small-bold m-0 p-0"><%= coupon?.couponCode %></p>
+                        <p class="text-black text-start font-size-small-bold m-0 p-0"><%= coupon?.couponValue %> %</p>
+                      </div>
+                      <div class="col-2 d-flex justify-content-end align-items-center" style="cursor: pointer;">
+                        <a class="text-decoration-none border rounded-3 bg-dark text-white d-flex justify-content-center align-items-center font-size-small-bold border-0 m-0 p-0 px-2 py-2" <% if (cartDetails[0]?.couponId?.toString() === coupon?._id?.toString()) { %> onclick="removeCoupon('<%= cartDetails[0]?._id %>', '<%= coupon?._id %>')" <% } else { %> onclick="applyCoupon('<%= cartDetails[0]?._id %>', '<%= coupon?._id %>')" <% } %>>
+
+                          <% if (cartDetails[0]?.couponId?.toString() === coupon?._id?.toString() ) { %>
+                          Remove
+                          <% } else { %>
+                          Apply
+                          <% } %>
+                        </a>
+                      </div>
+                    </div>
+                    <hr class="text-black m-0 p-0">
+                  </div>
+                  <% } %>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+
+            <div class="col pt-3">
+              <div class="col px-3 py-1 border rounded-3 bg-light">
+                <p class="text-black text-center fs-6 fw-bold m-0" id="grandTotal" data-grandTotal="<%=grandTotal %>">Grand Total : &#8377;&nbsp;<%=grandTotal?.toFixed(2) %></p>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 d-flex flex-wrap justify-content-center align-items-center py-3">
+            <div class="col">
+              <button id="rzp-button1" class="w-100 border rounded-3 btn bg-dark text-white py-2 font-size-bold" type="submit">Place order</button>
+              <div hidden id="razorpay" data-keyId="<%= RAZORPAY_KEY_ID %>" data-keySecret="<%= RAZORPAY_KEY_SECRET%>"></div>
+              <div hidden id="cartId" data-cartId="<%= cartDetails[0]?._id %>"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+  </section>
+  <section>
+    <script>
+      let plusButton = document.querySelector('.quantity-right-plus-place-order')
+      let minusButton = document.querySelector('.quantity-left-minus-place-order')
+      async function changeQuantity(cart, cartId, change) {
+        try {
+          const response = await fetch('/updateQuantity-place-order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cart,
+              cartId,
+              change
+            }),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            window.location.reload()
+          } else {
+            alert('Failed to update quantity');
+          }
+        } catch (error) {
+          console.error('Error updating quantity:', error);
+        }
+      }
+    </script>
+    <script>
+      async function deleteProduct(cartId, productTitle) {
+        try {
+          const response = await fetch(`/user-cancel-product-place-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cartId,
+              productTitle
+            }),
+          });
+
+          const result = await response.json();
+          console.log(result, 'result')
+          if (result.success) {
+            window.location.reload()
+          } else {
+            alert('Failed to update quantity');
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+        }
+      }
+    </script>
+    <script>
+      async function applyCoupon(cartId, couponId) {
+        try {
+          const response = await fetch(`/user-apply-coupon-place-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cartId,
+              couponId,
+            }),
+          });
+          const result = await response.json();
+          if (result.success) {
+            toastMessage(result.message)
+            window.location.reload()
+          } else {
+            alert('Failed to update quantity');
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+        }
+      }
+      async function removeCoupon(cartId, couponId) {
+        try {
+          const response = await fetch(`/user-remove-coupon-place-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cartId,
+              couponId,
+            }),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            toastMessage(result.message)
+            window.location.reload()
+          } else {
+            alert('Failed to update quantity');
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+        }
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      $(document).ready(function() {
+        let formData = {};
+        let orderId;
+
+        function handleSubmit(event) {
+          event.preventDefault();
+          sendData();
+        }
+
+        async function sendData() {
+          let formData = gatherFormData();
+          console.log(formData);
+          if (formData) {
+            try {
+              const response = await sendRequest(formData);
+              handleResponse(response);
+            } catch (error) {
+              console.error("Error:", error);
+            }
+          }
+        }
+
+        function gatherFormData() {
+          formData.cartId = $('#cartId').data('cartid');
+          formData.amount = $('#grandTotal').data('grandtotal') * 100;
+          formData.paymentMode = $('input[name="paymentMode"]:checked').val();
+          formData.address = $('input[name="address"]:checked').val();
+          formData.keyId = $('#razorpay').data('keyid');
+          formData.keySecret = $('#razorpay').data('keysecret');
+          return formData;
+        }
+
+        function sendRequest(formData) {
+          return new Promise((resolve, reject) => {
+            $.ajax({
+              url: `/user-place-order/${formData.cartId}`,
+              method: "POST",
+              contentType: "application/json",
+              data: JSON.stringify(formData),
+              success: resolve,
+              error: reject
+            });
+          });
+        }
+
+        function handleResponse(response) {
+          console.log("Response place order on COD:", response);
+          console.log("Response place order on COD message:", response.message);
+          if (response.paymentMode === 'COD') {
+            location.replace("/user-dashboard-orders");
+            toastMessage(response.message);
+          } else if (response.paymentMode === 'online') {
+            orderId = response?.order?.receipt;
+            handleOnlinePayment(response);
+          }
+        }
+
+        function handleOnlinePayment(online) {
+          var options = {
+            "key": formData?.keyId,
+            "amount": online?.order?.amount,
+            "currency": "INR",
+            "name": "clothSTORE",
+            "description": "Test Transaction",
+            "image": "/images/clothStore_favicon.jpg",
+            "order_id": online?.order?.id,
+            "handler": function(response) {
+              console.log(response);
+              paymentVerification(response, online);
+            },
+            "prefill": {
+              "name": "Gaurav Kumar",
+              "email": "gaurav.kumar@example.com",
+              "contact": "9000090000"
+            },
+            "notes": {
+              "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+              "color": "#000000"
+            }
+          };
+
+          var rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function(response) {
+            const errorMessage = `
+              <p style="text-align: left; font-size: 15px;">Reason: ${response.error.reason}</p>
+              <p style="text-align: left; font-size: 15px;">Order ID: ${response.error.metadata.order_id}</p>
+              <p style="text-align: left; font-size: 15px;">Payment ID: ${response.error.metadata.payment_id}</p>
+              <p style="text-align: left; font-size: 15px;">Info: ${response.error.description}</p>
+            `;
+            Swal.fire({
+              title: 'Error!',
+              html: errorMessage.trim(),
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: 'red'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                changePaymentStatus(orderId, 'failed');
+              }
+            });
+          });
+          rzp1.open();
+        }
+
+        function paymentVerification(paymentDetails, orderDetails) {
+          $.ajax({
+            url: '/verify/payment',
+            data: {
+              paymentDetails,
+              orderDetails
+            },
+            method: 'POST',
+            success: (response) => {
+              if (response.status) {
+                if (response.message) {
+                  Swal.fire({
+                    title: 'Success!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'green'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      changePaymentStatus(orderId, 'paid');
+                    }
+                  });
+                } else {
+                  changePaymentStatus(orderId, 'paid');
+                }
+              } else {
+                if (response.message) {
+                  Swal.fire({
+                    title: 'Error!',
+                    text: response.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'red'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      changePaymentStatus(orderId, 'failed');
+                    }
+                  });
+                } else {
+                  changePaymentStatus(orderId, 'failed');
+                }
+              }
+            }
+          });
+        }
+
+        function changePaymentStatus(orderId, status) {
+          $.ajax({
+            url: '/change/payment/status',
+            data: {
+              orderId,
+              status
+            },
+            method: 'POST',
+            success: (response) => {
+              if (response.status) {
+                if (response.message) {
+                  Swal.fire({
+                    title: 'Payment status',
+                    text: response.paymentStatus,
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'blue'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.replace(`/user-dashboard-orders`);
+                    }
+                  });
+                } else {
+                  location.replace(`/user-dashboard-orders`);
+                }
+              }
+            }
+          });
+        }
+
+        $('#placeOrderForm').submit(handleSubmit);
+      });
+    </script>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

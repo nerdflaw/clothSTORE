@@ -1,0 +1,314 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 text-secondary text-start px-3 font-size">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard-cancellations">My cancellations</a>
+            </div>
+            <% if(locals.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 p-2">
+          <div class="col-12 border rounded-3 p-3">
+            <div class="col-12">
+              <% if (message) { %>
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                    toastMessage("<%= message %>");
+                  });
+                </script>
+                <% } %>
+                <div class="container">
+                  <div class="row">
+                    <% if(paginatedOrder.length > 0){ %>
+                    <% } else { %>
+                    <div>
+                      <h6 class="text-danger font-size m-0 p-0 animate__animated animate__flash " colspan="5"><em>Your haven`t cancelled a product yet</em></h6>
+                    </div>
+                    <% } %>
+                    <% paginatedOrder?.forEach((data)=>{ %>
+                    <% data?.orders?.forEach((item, index)=>{ %>
+                    <div class="col-12 border rounded-3 mt-3">
+                      <div class="row">
+                        <div class="col-12 font-size-bold d-flex border-bottom bg-light position-relative justify-content-between align-items-center ps-2 p-0">
+                          <div class="d-flex justify-content-start align-items-center col-6 col-sm--12 py-2">
+                            <p class="m-0 p-0">Order ID : &nbsp;</p>
+                            <% const orderID = "clothStore_" + data._id.toString().slice(-8); %>
+                            <p class="text-black m-0 p-0"><%= orderID %> ( <span class="text-danger"><%= index+1 %> of <%= data.orders.length %></span> )</p>
+                          </div>
+                          <div class="d-flex justify-content-start align-items-center col-6 col-sm--12 py-2">
+                            <p class="m-0 p-0">Order Status : &nbsp;</p>
+                            <% if (item?.orderStatus) { %>
+                              <% const status = item?.orderStatus?.toLowerCase(); %>
+                              <% if (status === 'cancelled') { %>
+                              <p class="border-0 font-size m-0 p-0" style="color: #d80614;">
+                                <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </p>
+                              <% } else if (status === 'delivered') { %>
+                              <p class="border-0 font-size m-0 p-0" style="color: #14b13e;">
+                                <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </p>
+                              <% } else if (status === 'placed') { %>
+                              <p class="border-0 font-size m-0 p-0" style="color: #ac0081;">
+                                <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </p>
+                              <% } else if (status === 'shipped') { %>
+                              <p class="border-0 font-size m-0 p-0" style="color: #e2aa02;">
+                                <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </p>
+                              <% } else if (status === 'pending') { %>
+                              <p class="border-0 font-size m-0 p-0" style="color: #001c9b;">
+                                <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </p>
+                              <% } else if (status === 'returned') { %>
+                              <p class="border-0 font-size m-0 p-0" style="color: #00ddff;">
+                                <%= item?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </p>
+                              <% } %>
+                              <% } %>
+                          </div>
+                        </div>
+                        <div class="py-3 col-sm-12 col-md-12 col-lg-2 col-xl-2 d-flex">
+                          <img class="" src="/productImages/<%= item.images[0] %>" style="width: 100%; height: 90px; object-fit: contain;" alt="">
+                        </div>
+                        <div class="py-3 col-sm-12 col-md-12 col-lg-5 col-xl-5 d-flex">
+                          <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                            <p class="font-size-bold">Title</p>
+                            <p class="font-size-bold">Color</p>
+                            <p class="font-size-bold">Size</p>
+                            <p class="font-size-bold">MRP</p>
+                            <p class="font-size-bold">Discount</p>
+                            <p class="font-size-bold">Order placed on</p>
+                          </div>
+                          <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7">
+                            <p class="font-size"> :
+                              <span class="font-size-bold text-success">
+                                <%= item.title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                              </span>
+                            </p>
+                            <p class="font-size">: <%= item.color %></p>
+                            <p class="font-size">: <%= item.size %></p>
+                            <p class="font-size">: &#8377;&nbsp;<%= item.mrp %></p>
+                            <p class="font-size">: <%= item.discount %> %</p>
+                            <p class="font-size">:
+                              <%= item.createdAt.toLocaleString("en-US", {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: 'numeric',
+                                  second: 'numeric'
+                                }) %>
+                            </p>
+                          </div>
+                        </div>
+                        <div class="py-3 col-sm-12 col-md-12 col-lg-5 col-xl-5 d-flex">
+                          <div class="col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                            <p class="font-size-bold">Payment mode</p>
+                            <p class="font-size-bold">Payment status</p>
+                            <p class="font-size-bold">Order status</p>
+                            <p class="font-size-bold">Coupon applied</p>
+                            <p class="font-size-bold">Coupon discount</p>
+                          </div>
+                          <div class="col-sm-7 col-md-7 col-lg-7 col-xl-7 ">
+                            <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.paymentMode%></span></p>
+                            <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.paymentStatus%></span></p>
+                            <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.status%></span></p>
+                            <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.couponCode? item.couponName : 'nill'%></span></p>
+                            <p class="font-size">: <span class="font-size-bold text-danger"><%= item?.couponValue? item.couponValue + '%' : 'nill' %></span></p>
+                          </div>
+                          <form action="/user-add-review?productId=<%= item.productId %>" method="post">
+                            <div class="modal fade font-size" id="addReviewModal<%= index %>" tabindex="-1" aria-labelledby="addReviewModalLabel<%= index %>" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title font-size-bold text-primary" id="addReviewModalLabel<%= index %>">Add Review | <%= item.title %></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <% const productIdToDisplayReviewFor = item.productId.toString() %>
+                                    <% const productToDisplayReviewFor = item.productDetailsReview.find(product => product._id.toString() === productIdToDisplayReviewFor); %>
+                                    <label class="form-label">Rating:</label>
+                                    <% for (let i = 0; i <= 5; i++) { %>
+                                    <div class="">
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="rating" id="rating<%= index %>-<%= i %>" value="<%= i %>" required <% if (productToDisplayReviewFor && productToDisplayReviewFor.review.length > 0 && productToDisplayReviewFor.review[0].rating === i) { %> checked <% } %>>
+                                        <label class="form-check-label" for="rating<%= index %>-<%= i %>">
+                                          <% for (let j = 1; j <= i; j++) { %>
+                                          <i class="fas fa-star" style="color: #ffee00;"></i>
+                                          <% } %><%= i %> stars
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <% } %>
+                                    <div class="mb-3 font-size">
+                                      <textarea class="form-control font-size text-black" id="reviewMessage<%= index%>" name="reviewMessage" minlength="1" maxlength="50" rows="1" required <% let message = ''; %> <% if (productToDisplayReviewFor && productToDisplayReviewFor.review.length > 0) { %> <% message = productToDisplayReviewFor.review[0].message; %> <% } %>><%= message %></textarea>
+                                    </div>
+                                    <button type="submit" id="submitButton<%= index %>" class="btn btn-dark font-size">Submit Review</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                      <div class="container p-0">
+                        <div class="row bg-light">
+                          <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+                            <div class="d-flex justify-content-center align-items-center py-2">
+                              <p class="font-size-bold m-0 p-0">Price</p><span class="font-size">&nbsp;(per item)&nbsp;:</span>
+                              <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= item.mrpWithoutTax.toFixed(2)%>&nbsp;x</p>
+                              <p class="font-size-bold m-0 p-0">&nbsp;<%= item.quantity%>&nbsp; NOS.</p>
+                            </div>
+                          </div>
+                          <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+                            <div class="d-flex justify-content-center align-items-center py-2">
+                              <% let totalDiscountAmt = item.individualTotal - (  item.AmountAfterSecondDiscount +  item.gst )%>
+                              <% let totalDiscountPercentageValue = ( totalDiscountAmt /  item.individualTotal ) * 100 %>
+                              <p class="font-size-bold m-0 p-0">Discount percentage:</p>
+                              <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= totalDiscountPercentageValue.toFixed(0) %> %</p>
+                            </div>
+                          </div>
+                          <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+                            <div class="d-flex justify-content-center align-items-center py-2">
+                              <p class="font-size-bold m-0 p-0">Discount received :</p>
+                              <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= totalDiscountAmt.toFixed(2) %></p>
+                            </div>
+                          </div>
+                          <div class="border-top border-1 col-sm-12 col-md-12 col-lg-3 d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                              <p class="font-size-bold m-0 p-0">Total :</p>
+                              <p class="font-size-bold m-0 p-0">&nbsp;&#8377;&nbsp;<%= item.totalPrice ?.toFixed(2) %></p>
+                            </div>
+  
+                            <% if(item.status === 'pending' || item.status === 'placed' ) {%>
+                            <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                              <form action="/user-cancel-single-product?page=<%= currentPage %>&single=<%=item.singleOrderId %>&whole=<%=item.wholeOrderId%>&product=<%= item.title %>" method="post">
+                                <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit">cancel product</button>
+                              </form>
+                            </div>
+                            <%  }%>
+  
+                            <% if(item.status === 'cancelled') {%>
+                            <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                              <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>cancelled</button>
+                            </div>
+                            <%  }%>
+  
+                            <% if(item.status === 'delivered') {%>
+                            <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                              <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>delivered</button>
+                            </div>
+                            <%  }%>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <% }) %>
+                    <% }) %>  
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="fw-bold fs-6 bg-black">
+      <div class="col-12 justify-content-center py-2" style="display: flex;" id="pagination">
+        <% if (currentPage > 1) { %>
+        <div class="text-center border rounded-1 bg-light">
+          <a class="text-decoration-none" href="/user-dashboard-cancellations?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+            <p class="font-size px-3 py-2 m-0 text-dark">&lt;</p>
+          </a>
+        </div>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === currentPage) { %>
+        <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-danger' : 'bg-light' %>">
+          <a class="text-decoration-none" href="/user-dashboard-cancellations?page=<%= i %>&limit=<%= limit %>">
+            <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+          </a>
+        </div>
+        <% } else { %>
+        <div class="text-center border rounded-1 bg-light">
+          <a class="text-decoration-none" href="/user-dashboard-cancellations?page=<%= i %>&limit=<%= limit %>">
+            <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+          </a>
+        </div>
+        <% } %>
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+        <div class="text-center border rounded-1 bg-light">
+          <a class="text-decoration-none" href="/user-dashboard-cancellations?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+            <p class="font-size px-3 py-2 m-0 text-dark">&gt;</p>
+          </a>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+  <section>
+    <script>
+      let plusButton = document.querySelector('.quantity-right-plus')
+      let minusButton = document.querySelector('.quantity-left-minus')
+
+      async function changeQuantity(cartId, productId, colorId, sizeId, change) {
+        try {
+          const response = await fetch('/updateQuantity', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cartId,
+              productId,
+              colorId,
+              sizeId,
+              change,
+            }),
+          });
+
+          const result = await response.json();
+          console.log(result, 'result')
+
+          if (result.success) {
+            window.location.reload()
+          } else {
+            alert('Failed to update quantity');
+          }
+        } catch (error) {
+          console.error('Error updating quantity:', error);
+        }
+      }
+    </script>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

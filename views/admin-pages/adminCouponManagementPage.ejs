@@ -1,0 +1,112 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+
+  <section>
+    <div class="row d-flex m-0 p-0">
+      <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 left-side-nav border-1 border-white m-0 p-0">
+        <%- include('../../partials/admin-partials/admin-sideBar.ejs') %>
+      </div>
+      <div class="col-sm-8 col-md-8 col-lg-9 col-xl-10 right-side-nav bg-white overflow-auto m-0 p-0">
+        <div class="top-bar d-flex justify-content-between align-items-center p-2">
+
+          <h6 class="text-primary">Coupon Management</h6>
+          <% if (message) { %>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                toastMessage("<%= message %>");
+              });
+            </script>
+          <% } %>
+                    
+          <button type="submit" class="btn btn-primary text-white text-center ">
+            <a class="text-white text-decoration-none p-0 font-size" href="/admin-add-coupon">Add coupon</a>
+          </button>
+
+        </div>
+
+        <table class="table table-black table-bordered" id="myTable">
+          <thead>
+            <tr class="font-size">
+              <th class="table-white text-black bg-light text-center" scope="col">No.</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Coupon name</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Coupon code</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Coupon discount</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Created on</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Status</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Action</th>
+              <th class="table-white text-black bg-light text-center" scope="col">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <% couponDetails?.forEach((data) => { %>
+            <tr class="font-size">
+              <td class="text-black table-white text-start"><%= ++i %></td>
+              <td class="text-black table-white text-start"><%= data?.coupon %></td>
+              <td class="text-black table-white text-start"><%= data?.couponCode %></td>
+              <td class="text-black table-white text-end"><%= data?.couponValue %>%</td>
+              <td class="text-black table-white text-center">
+                <%= data?.createdDate?.toLocaleDateString("en-US", 
+                { year: 'numeric',
+                  month: 'short',
+                  day: 'numeric' 
+               }
+                ) %>
+              </td>
+
+              <% let value; %>
+              <td class="<%= data?.status ? 'text-success fw-bold' : 'text-danger fw-bold' %> table-white text-center">
+                <% if (data?.status) { %>
+                <% value = 'enabled'; %>
+                <% } else { %>
+                <% value = 'disabled'; %>
+                <% } %>
+                <%= value %>
+              </td>
+
+              <td class="text-white table-white text-center">
+                <% if (data?.status) { %>
+                <form action="/admin/disable-coupon/<%- data?._id %>" method="post">
+                  <button type="submit" class="text-white font-size btn btn-danger px-3 py-0" onclick="return confirm('Are you sure you want to disable <%=data?.coupon%>?')">Disable</button>
+                </form>
+                <% } else { %>
+                <form action="/admin/enable-coupon/<%- data?._id %>" method="post">
+                  <button type="submit" class="text-white font-size btn btn-primary px-3 py-0" onclick="return confirm('Are you sure you want to enable <%=data?.coupon%>?')">Enable</button>
+                </form>
+                <% } %>
+              </td>
+
+              <td class="text-black table-white text-start">
+                <form action="/admin-edit-coupon/<%- data?._id %>" method="get" class="text-center">
+                  <button type="submit" class="text-white font-size btn btn-primary px-3 py-0" onclick="return confirm('Are you sure you want to edit <%=data?.coupon%>?')">edit</button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+
+          </tbody>
+        </table>
+
+        <% if(couponDetails?.length > 0){ %>
+        <% } else { %>
+        <div>
+          <h6 class="text-black font-size p-2 animate__animated animate__flash" colspan="5"><em>No coupon created yet!.</em></h6>
+        </div>
+        <% } %>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

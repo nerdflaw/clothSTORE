@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Poppins', sans-serif;
+}
+
+.left-side-nav {
+	/* width: 90px; */
+	padding: 15px 15px;
+	background-color: #000000;
+	backdrop-filter: blur(5px);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	transition: width 0.5s;
+	border-right: 1px solid rgb(112, 98, 98);
+	/* position: absolute; */
+}
+
+.user {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	width: 60px;
+	font-size: 12px;
+	padding-top: 10px;
+	border-radius: 8px;
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+
+	/* margin-left: auto; */
+	/* margin-right: auto; */
+	overflow: hidden;
+}
+
+.user div {
+	display: none;
+}
+
+.user h2 {
+	font-size: 12px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.admin-img {
+	width: 50px;
+	border-radius: 50%;
+	/* margin: auto; */
+}
+
+.verified-img {
+	width: 20px;
+	height: 20px;
+	/* display: none; */
+}
+
+.admin-name {
+	padding-top: 10px;
+}
+
+.admin-email {
+	padding-bottom: 10px;
+}
+
+ul {
+	list-style: none;
+	padding: 0 15px;
+}
+
+ul li {
+	margin: 20px 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+ul li i {
+	width: 30px;
+	margin-right: 0px;
+	color: #ffffff;
+}
+
+ul li a {
+	font-size: 12px;
+	white-space: nowrap;
+	/* display: none; */
+	margin: auto;
+	margin-left: 0;
+	text-decoration: none;
+}
+
+/* .left-side-nav:hover{
+	width: 300px;
+	align-items: flex-start;
+	position: absolute;
+}
+.left-side-nav:hover .user div{
+	display: block;
+}
+.left-side-nav:hover .user{
+	width: 100%;
+	background-color: #ffffff;
+	backdrop-filter: blur(5px);
+}
+.left-side-nav:hover .verified-img{
+	display: block;
+}
+.side-nav:hover .admin-img{
+	margin: 0;
+}
+.left-side-nav:hover ul li p{
+	display: block;
+}
+.left-side-nav:hover ul li i{
+	margin-right: 10px;
+}
+.left-side-nav:hover ul li{
+	justify-content: flex-start;
+}
+.left-side-nav:hover .admin-name{
+	display: none;
+} */
+
+
+.font-size {
+	font-size: 12px;
+}
+.font-size-small {
+	font-size: 10px;
+}
+.font-size-small-bold {
+	font-size: 10px;
+	font-weight: bolder;
+}
+
+.font-size-bold {
+	font-size: 12px;
+	font-weight: bolder;
+}
+
+.font-size-bold-title {
+	font-size: 20px;
+	font-weight: bolder;
+}
+
+select {
+	font-size: 12px;
+}
+
+select option {
+	font-size: 12px;
+}
+
+/* css */
+.quantity-controls {
+	display: flex;
+	align-items: center;
+}
+
+.quantity-controls button {
+	width: 30px;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.quantity {
+	margin: 0 10px;
+}
+
+/* Style for increment and decrement buttons */
+/* .increment {
+	background-color: #5cb85c;
+	color: #fff;
+}
+
+.decrement {
+	background-color: #d9534f;
+	color: #fff;
+} */
+
+/* css */
+
+
+.product-image {
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+}
+
+.product-image-main {
+	width: 100%;
+	object-fit: cover;
+	height: 620px;
+}
+
+.product-image img {
+	width: 100%;
+
+}
+
+.brand-font {
+	font-size: 29px;
+	font-weight: 900;
+}
+
+.font-size-404 {
+	font-size: 100px;
+	font-weight: 900;
+}
+
+
+.product-item-image {
+	width: auto;
+	height: 200px;
+	object-fit: contain;
+}
+
+.product-item-title {
+	font-size: 15px;
+	font-weight: bolder;
+}
+
+.product-item-description {
+	font-size: 10px;
+}
+
+.product-item-price {
+	font-size: 15px;
+	font-weight: bolder;
+}
+
+.google-auth-container :hover {
+	border: 2px solid #000000;
+}
+
+.checked {
+	color: orange;
+}
+
+/* to prevent resizing textarea  */
+
+textarea {
+	resize: none;
+}
+
+/* Center the toast */
+.toastConfrimation {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 1050;
+  }
+  
+

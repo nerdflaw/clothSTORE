@@ -1,0 +1,297 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body class="">
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/">Home</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-list-all-products">All Products</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row pt-2">
+        <div class="col-sm-12 col-md-12 col-lg-2 mb-2">
+          <div class="row px-2">
+            <div class="col-sm-12 col-md-12 col-lg-2 border rounded-3 w-100">
+              <form action="/user-list-all-products" method="post">
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                  <p class="fs-6 fw-bold p-0 m-0">Filter</p>
+                  <img width="20" height="20" src="https://img.icons8.com/ios/50/horizontal-settings-mixer--v1.png" alt="horizontal-settings-mixer--v1" />
+                </div>
+                <div class="accordion border-0" id="accordionBrand">
+                  <div class="accordion accordion-flush" id="accordionFlushBrand">
+                    <div class="accordion-item">
+                      <div class="accordion-header" id="flush-brand">
+                        <button class="collapsed m-0 py-2 font-size-bold w-100 text-start bg-white border-0 border-bottom" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseBrand" aria-expanded="false" aria-controls="flush-collapseBrand">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <p class="m-0 p-0">Brands</p>
+                            <i class="fa-solid fa-circle-chevron-down"></i>
+                          </div>
+                        </button>
+                      </div>
+                      <div id="flush-collapseBrand" class="accordion-collapse collapse" aria-labelledby="flush-brand" data-bs-parent="#accordionFlushBrand">
+                        <div class="accordion-body d-flex flex-column align-items-start p-0 border-0">
+                          <% brands.forEach((brand, index) => { %>
+                          <label for="brand<%= index %>" class="font-size d-flex align-items-center me-3 py-1">
+                            <% const brandChecked = brandsArr.some(selectedBrand => selectedBrand.toString() === brand._id.toString()); %>
+                            <input class="me-1 py-1" type="checkbox" name="brand[]" id="brand<%= brand._id %>" value="<%= brand._id %>" <% if (brandChecked) { %>checked<% } %>>
+                            <%= brand.brand %>
+                          </label>
+                          <% }) %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion border-0" id="accordionCategory">
+                  <div class="accordion accordion-flush" id="accordionFlushCategory">
+                    <div class="accordion-item">
+                      <div class="accordion-header" id="flush-category">
+                        <button class="collapsed m-0 py-2 font-size-bold w-100 text-start bg-white border-0 border-bottom" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseCategory" aria-expanded="false" aria-controls="flush-collapseCategory">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <p class="m-0 p-0">Categories</p>
+                            <i class="fa-solid fa-circle-chevron-down"></i>
+                          </div>
+                        </button>
+                      </div>
+                      <div id="flush-collapseCategory" class="accordion-collapse collapse" aria-labelledby="flush-category" data-bs-parent="#accordionFlushCategory">
+                        <div class="accordion-body d-flex flex-column align-items-start p-0 border-0">
+                          <% categories.forEach((category, index) => { %>
+                            <label for="category<%= index %>" class="font-size d-flex align-items-center me-3 py-1">
+                              <% const categoryChecked = categoriesArr.some(selectedCategory => selectedCategory.toString() === category._id.toString()); %>
+                              <input class="me-1 py-1" type="checkbox" name="category[]" id="category<%= category._id %>" value="<%= category._id %>" <% if (categoryChecked) { %>checked<% } %>>
+                              <%= category.category %>
+                            </label>
+                            <% }) %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion border-0" id="accordionColor">
+                  <div class="accordion accordion-flush" id="accordionFlushColor">
+                    <div class="accordion-item">
+                      <div class="accordion-header" id="flush-color">
+                        <button class="collapsed m-0 py-2 font-size-bold w-100 text-start bg-white border-0 border-bottom" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseColor" aria-expanded="false" aria-controls="flush-collapseColor">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <p class="m-0 p-0">Colors</p>
+                            <i class="fa-solid fa-circle-chevron-down"></i>
+                          </div>
+                        </button>
+                      </div>
+                      <div id="flush-collapseColor" class="accordion-collapse collapse" aria-labelledby="flush-color" data-bs-parent="#accordionFlushColor">
+                        <div class="accordion-body d-flex flex-column align-items-start p-0 border-0">
+                          <% colors.forEach((color, index) => { %>
+                            <% const colorChecked = colorsArr.some(selectedColor => selectedColor.toString() === color._id.toString()); %>
+                            <label for="color<%= index %>" class="font-size d-flex align-items-center me-3 py-1">
+                              <input class="me-1 py-1" type="checkbox" name="color[]" id="color<%= color._id %>" value="<%= color._id %>" <% if (colorChecked) { %>checked<% } %>>
+                              <%= color.color %>
+                            </label>
+                            <% }) %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion border-0" id="accordionSizes">
+                  <div class="accordion accordion-flush" id="accordionFlushSizes">
+                    <div class="accordion-item">
+                      <div class="accordion-header" id="flush-sizes">
+                        <button class="collapsed m-0 py-2 font-size-bold w-100 text-start bg-white border-0 border-bottom" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseSizes" aria-expanded="false" aria-controls="flush-collapseSizes">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <p class="m-0 p-0">Sizes</p>
+                            <i class="fa-solid fa-circle-chevron-down"></i>
+                          </div>
+                        </button>
+                      </div>
+                      <div id="flush-collapseSizes" class="accordion-collapse collapse" aria-labelledby="flush-sizes" data-bs-parent="#accordionFlushSizes">
+                        <div class="accordion-body d-flex flex-column align-items-start p-0 border-0">
+                          <% sizes.forEach((size, index) => { %>
+                            <% const sizeChecked = sizesArr.some(selectedSize => selectedSize.toString() === size._id.toString()) %>
+                            <label for="size<%= index %>" class="font-size d-flex align-items-center me-3 py-1">
+                              <input class="me-1 py-1" type="checkbox" name="size[]" id="size<%= size._id %>" value="<%= size._id %>" <% if (sizeChecked) { %>checked<% } %>>
+                              <%= size.size %>
+                            </label>
+                            <% }) %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="sortBy pt-2">
+                  <p class="font-size-bold p-0 m-0">Sort by</p>
+                  <div class="d-flex flex-column align-items-start py-2">
+                    <% const sortObject = {
+                      lowToHigh: 'Price Low to High',
+                      highToLow: 'Price High to Low',
+                      newestToOldest: 'Newest to Oldest',
+                      OldestToNewest: 'Oldest to Newest',
+                      aATozZ: 'aA to zZ',
+                      zZToaA: 'zZ to aA',
+                      ratingLowToHigh: 'Rating Low to High',
+                      ratingHighToLow: 'Rating High to Low',
+                    } %>
+                    <select class="w-100 border rounded-2 p-1 text-black font-size d-flex" id="sort" name="sort">
+                      <option value="" disabled<% if (!sorted) { %> selected<% } %>>Sort by</option>
+                      <% for (const key of Object.keys(sortObject)) { %>
+                        <% if (sorted && sorted === key) { %>
+                          <option value="<%= key %>" selected><%= sortObject[key] %></option>
+                        <% } else { %>
+                          <option value="<%= key %>"><%= sortObject[key] %></option>
+                        <% } %>
+                      <% } %>
+                    </select>
+                  </div>
+                </div>
+                <div class="sortBy pb-2">
+                  <div class="d-flex flex-column align-items-start w-100">
+                    <button class="w-100 btn btn-dark font-size-bold" type="submit">Apply</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10">
+          <div class="row" id="brand-container">
+            <% if(paginatedProducts.length > 0){ %>
+            <% } else { %>
+            <div>
+              <h6 class="text-black font-size p-2 animate__animated animate__flash " colspan="5"><em>no products to show</em></h6>
+            </div>
+            <% } %>
+            <% paginatedProducts.forEach(listAllProducts => { %>
+              <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 d-flex justify-content-center align-items-start">
+                <div class="card position-relative w-100">
+                    <div class="d-flex justify-content-center align-items-center flex-column position-relative ">
+                        <div class="col-12 m-0 p-0">
+                            <a class="text-decoration-none" href="/user-view-product-details/<%= listAllProducts?.productDetails?._id %>">
+                                <img src="/productImages/<%= listAllProducts?.productDetails?.images[1] %>" class="card-img-top img-fluid w-100 m-0 p-0" 
+                                style="height: 250px; object-fit: cover;" alt="<%= listAllProducts?.productDetails?.title %>">
+                            </a>
+                            <h5 class="text-black font-size m-0 py-1 sumOfQuantities position-absolute bottom-0 start-0">
+                              <% if (listAllProducts?.sumOfQuantities > 10) { %>
+                                  <span class="m-0 px-2 py-1" style="color: #ffffff; background-color: #24b311; font-weight: bold;">In stock</span>
+                              <% } else if (listAllProducts?.sumOfQuantities <= 10 && listAllProducts?.sumOfQuantities > 0) { %>
+                                <i class="fa-bounce fa-solid text-black">
+                                  <span class="m-0 px-2 py-1" style="color: #000000; background-color: #f7d306; font-weight: bold;">Limited stock</span>
+                                </i>
+                              <% } else { %>
+                                  <span class="m-0 px-2 py-1" style="color: #ffffff; background-color: #f70606; font-weight: bold;">Out of stock</span>
+                              <% } %>
+                          </h5>
+                          <div class="wish-list position-absolute top-0 end-0 pt-4 pe-4">
+                            <% const hasMatchingProduct = locals?.wishlists?.some(wishlist => wishlist?.product?.toString() === listAllProducts?.productDetails?._id.toString()); %>
+                            <button type="submit" class="border-0 wish-list-button" value="<%= listAllProducts?.productDetails?._id %>" style="background-color: transparent;">
+                              <% if(hasMatchingProduct){ %>
+                              <i class="fa-solid fa-heart fa-xl" style="color: #ff0000;"></i>
+                              <% } else {%>
+                              <i class="fa-solid fa-heart fa-xl" style="color: #000000;"></i>
+                              <% } %>
+                            </button>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col text-truncate">
+                            <a class="text-decoration-none" href="/user-view-product-details/<%= listAllProducts?.productDetails?._id %>">
+                                <h5 class="card-title text-black product-item-title m-0 p-0"><%= listAllProducts?.productDetails?.title.charAt(0).toUpperCase() + listAllProducts?.productDetails?.title.slice(1) %></h5>
+                            </a>
+                        </div>
+                        <div class="row w-100 m-0 p-0">
+                          <div class="col-md my-2 p-0 d-flex justify-content-start align-items-center">
+                            <div class="star-rating">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (i <= listAllProducts?.averageRating) { %>
+                                <span class="fa fa-star fa-sm checked"></span>
+                                <% } else if (i - listAllProducts?.averageRating <= 0.5) { %>
+                                <span class="fa fa-star-half fa-sm checked"></span>
+                                <% } else { %>
+                                <span class="fa fa-star fa-sm"></span>
+                                <% } %>
+                              <% } %>
+                              <span class="font-size text-primary">
+                                <%= listAllProducts?.averageRating%> Stars. |
+                                <%= listAllProducts?.countOfRatings%> Ratings.
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col text-truncate py-1">
+                            <p class="card-text text-secondary product-item-description m-0 p-0"><%= listAllProducts?.productDetails?.description.charAt(0).toUpperCase() + listAllProducts?.productDetails?.title.slice(1) %></p>
+                        </div>
+                        <div class="col w-100 d-flex align-items-center justify-content-between py-1">
+                            <h3 class="product-item-price m-0 p-0">&#8377. <%= listAllProducts?.productDetails?.mrp %></h3>
+                        </div>
+                        <form class="pt-2" action="/user-view-product-details/<%= listAllProducts?.productDetails?._id %>" method="get">
+                            <button class="btn btn-dark text-center w-100 text-white font-size">add to cart</button>
+                        </form>
+                    </div>
+                    <% if (listAllProducts?.productDetails?.discount) { %>
+                    <button class="border-0 bg-black font-size text-white position-absolute top-0 start-0 p-2" 
+                    style="width: 50px; height: 50px; border-top-left-radius: 5px ;"><%= listAllProducts?.productDetails?.discount %>% OFF.</button>
+                    <% } %>
+                </div>
+              </div>
+            <% })%>
+
+          </div>
+          <hr class="fw-bold fs-6 bg-black">
+          <div class="col-12 d-flex justify-content-center py-2" id="pagination">
+            <% if (currentPage > 1) { %>
+            <div class="text-center border rounded-1 bg-light">
+              <a class="text-decoration-none" href="/user-list-all-products?page=<%= currentPage - 1 %>&limit=<%= limit %>&brand=<%= brandsArr %>&category=<%= categoriesArr %>&color=<%= colorsArr %>&size=<%= sizesArr %>&sort=<%= sorted %>">
+                <p class="font-size px-3 py-2 m-0 text-dark">&lt;</p>
+              </a>
+            </div>
+            <% } %>
+
+            <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+            <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-danger' : 'bg-light' %>">
+              <a class="text-decoration-none" href="/user-list-all-products?page=<%= i %>&limit=<%= limit %>&brand=<%= brandsArr %>&category=<%= categoriesArr %>&color=<%= colorsArr %>&size=<%= sizesArr %>&sort=<%= sorted %>">
+                <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+              </a>
+            </div>
+            <% } else { %>
+            <div class="text-center border rounded-1 bg-light">
+              <a class="text-decoration-none" href="/user-list-all-products?page=<%= i %>&limit=<%= limit %>&brand=<%= brandsArr %>&category=<%= categoriesArr %>&color=<%= colorsArr %>&size=<%= sizesArr %>&sort=<%= sorted %>">
+                <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+              </a>
+            </div>
+            <% } %>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+            <div class="text-center border rounded-1 bg-light">
+              <a class="text-decoration-none" href="/user-list-all-products?page=<%= currentPage + 1 %>&limit=<%= limit %>&brand=<%= brandsArr %>&category=<%= categoriesArr %>&color=<%= colorsArr %>&size=<%= sizesArr %>&sort=<%= sorted %>">
+                <p class="font-size px-3 py-2 m-0 text-dark">&gt;</p>
+              </a>
+            </div>
+            <% } %>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

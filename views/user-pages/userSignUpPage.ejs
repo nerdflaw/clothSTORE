@@ -1,0 +1,172 @@
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-around">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border-1 border-end">
+          <img class="login-image img-fluid" src="/images/login.png" alt="Login page image">
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
+          <div class="loginDiv col-10">
+            <h4 class="text-center text-danger font-size-bold-title mt-3 p-0">Don't have an account?</h4>
+            <h4 class="text-center text-black font-size-bold-title">Please Sign Up</h4>
+
+            <form id="loginForm" name="signUpForm" onsubmit="validateForm(event)" action="/user-signup" method="POST">
+              <div class="mb-3">
+                <label for="firstName" class="form-label text-black font-size">First name</label>
+                <input oninput="validateFirstName()" type="text" class="form-control bg-white text-black font-size" id="firstName" name="firstName" required>
+                <span id="firstNameError" class="text-danger font-size"></span>
+              </div>
+
+              <div class="mb-3">
+                <label for="lastName" class="form-label text-black font-size">Last name</label>
+                <input type="text" oninput="validateLastName()" class="form-control bg-white text-black font-size" id="lastName" name="lastName" required>
+                <span id="lastNameError" class="text-danger font-size"></span>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label text-black font-size">Email</label>
+                <input type="email" oninput="validateEmail()" class="form-control bg-white text-black font-size" id="email" name="email" required>
+                <span id="emailError" class="text-danger font-size"></span>
+              </div>
+              <% if (message) { %>
+              <h6 id="flash" class="text-center text-success animate__animated animate__flash font-size"><%= message %></h6>
+              <% } %>
+              <% if (error) { %>
+              <h6 id="flash" class="text-center text-danger animate__animated animate__flash font-size"><%= error %></h6>
+              <% } %>
+
+              <div class="mb-3">
+                <label for="password" class="form-label text-black font-size">Password</label>
+                <input type="password" oninput="validatePassword()" class="form-control bg-white text-black font-size" id="password" name="password" required>
+                <span id="passwordError" class="text-danger font-size"></span>
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label text-black font-size">Confirm password</label>
+                <input type="password" oninput="checkPassword()" class="form-control bg-white text-black font-size" id="confirmPassword" name="confirmPassword" required>
+                <span id="confirmPasswordError" class="text-danger font-size"></span>
+              </div>
+
+              <div class="text-center mb-3 d-flex flex-column justify-content-center align-items-center">
+                <button id="submitButton" type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold">Sign up</button>
+                <a class="text-danger text-decoration-none font-size-bold text-center" href="/user-forgot-password">Forgot your password?</a>
+              </div>
+            </form>
+
+            <!-- google login -->
+            <a class="text-decoration-none " href="/auth/google">
+              <div class="container ">
+                <div class="row d-flex justify-content-between align-items-center border-0">
+                  <div class="col py-2 d-flex justify-content-end align-items-center border-0">
+                    <img src="/images/google_icon.png" alt="" srcset="" style="width: 20px; height: auto; object-fit: contain;">
+                  </div>
+                  <div class="col py-2 d-flex justify-content-start align-items-center border-0">
+                    <input type="submit" class="form-control bg-white text-black font-size-bold login-button border-0 p-0 m-0 text-start" value="Login with Google">
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <!-- forgot password -->
+            <div class="login">
+              <p class="me-3 text-black font-size text-center">Already have an account?
+                <a href="/user-login" class="font-size-bold text-danger">Login</a>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <script>
+      function validateFirstName() {
+        let firstName = document.forms['signUpForm']['firstName'].value
+        let nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+        if (firstName === '') {
+          document.getElementById('firstNameError').innerText = "First name cannot be empty"
+        }
+        if (!nameRegex.test(firstName)) {
+          document.getElementById('firstNameError').innerText = "Please enter a valid first name (Only alphabets)"
+        } else {
+          document.getElementById('firstNameError').innerText = ""
+        }
+      }
+
+      function validateLastName() {
+        let lastName = document.forms['signUpForm']['lastName'].value
+        let nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+        if (lastName === '') {
+          document.getElementById('lastNameError').innerText = "Last name cannot be empty"
+        }
+        if (!nameRegex.test(lastName)) {
+          document.getElementById('lastNameError').innerText = "Please enter a valid last name (Only alphabets)"
+        } else {
+          document.getElementById('lastNameError').innerText = ""
+        }
+      }
+
+      function validateEmail() {
+        let email = document.forms['signUpForm']['email'].value
+        let emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+          document.getElementById('emailError').innerText = "Please enter a valid email"
+        } else {
+          document.getElementById('emailError').innerText = ""
+        }
+      }
+
+      function validatePassword() {
+        let password = document.forms['signUpForm']['password'].value;
+        let strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!strongPasswordRegex.test(password)) {
+          document.getElementById('passwordError').innerText = "Password must be strong (at least 8 characters, including uppercase, lowercase, digit, and special character)";
+        } else {
+          document.getElementById('passwordError').innerText = "";
+        }
+      }
+
+      function checkPassword() {
+        let password = document.forms['signUpForm']['password'].value;
+        let confirmPassword = document.forms['signUpForm']['confirmPassword'].value;
+        if (password !== confirmPassword) {
+          document.getElementById('confirmPasswordError').innerText = "Password and confirm password must be the same";
+        } else {
+          document.getElementById('confirmPasswordError').innerText = "";
+        }
+      }
+
+      function validateForm(event) {
+        event.preventDefault();
+
+        validateFirstName();
+        validateLastName();
+        validateEmail();
+        validatePassword();
+        checkPassword();
+
+        let firstNameError = document.getElementById('firstNameError').innerText;
+        let lastNameError = document.getElementById('lastNameError').innerText;
+        let emailError = document.getElementById('emailError').innerText;
+        let passwordError = document.getElementById('passwordError').innerText;
+        let confirmPasswordError = document.getElementById('confirmPasswordError').innerText;
+
+        let submitButton = document.getElementById('submitButton');
+
+        if (!(firstNameError || lastNameError || emailError || passwordError || confirmPasswordError)) {
+          document.forms['signUpForm'].submit();
+        }
+      }
+    </script>
+  </section>
+
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

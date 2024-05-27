@@ -1,0 +1,107 @@
+Admin side :
+Admin sign in
+[x] User management (list user, block/unblock).
+[x] Category management (Add, Edit and Delete (soft delete))
+[x] Product management(add, edit & delete(soft delete) products).
+[x] Products must have multiple images (minimum 3 images).
+[x] Images should be cropped and resized properly before upload.
+
+User side :
+[x] Home page
+[x] Users sign up & login with validation.
+[x] Sign up using OTP with OTP timer and Resend Otp
+[x] Login or signup with single sign on (google , facebook …)
+[x] List products on the user side.
+[x] Product details view on the user side with image zoom.
+[x] Product detailed page should contain following 
+ 	[x] Breadcrumbs
+ 	[x] Ratings
+ 	[x] Price
+ 	[x] Discounts or coupons applied
+ 	[x] Reviews 
+ 	[x] Stock
+[x] Proper error handles Sold out / unavailable  and  out of stock EXAMPLE
+[x] Highlights / specs of product 
+[x] Related product recommendations
+
+Week 3
+
+User side : 
+[x] User profile(Show user details, show address, show orders, edit profile, cancel orders, change password).
+[x] Add address management in user profile( Multiple Address, Add, Edit, Delete).
+[x] Cart management (Add to cart, list products in cart, remove products from cart)
+[x] Qty (add to cart) should be controlled based on stocks left
+[x] Handle maximum qty per person to add to cart for a product 
+[x] Out of stock product need to shown or hidden based on filter
+[x] Advanced search with sort based on
+ 	[x] Popularity
+ 	[x] Price: low to high
+ 	[x] Price: high to low
+ 	[x] Average ratings
+ 	[x] Featured
+ 	[x] New arrivals
+ 	[x] aA - zZ
+ 	[x] zZ - aA
+[x] Inventory/Stock management.
+[x] Checkout page(Multiple address,edit and saved address)
+[x] Place order with Cash on Delivery(Address selection)
+[x] Purchase with COD.
+[x] Order Management-Order cancellation option, Order history and status.
+
+Admin side : 
+[x] Order Management
+[x] Admin Side: List orders, change order status, cancel orders
+[x] Stocks left - should be shown in product listing and product details page
+
+Week 4 
+
+User side :
+[x] Integrate online payment method(Razorpay or Paypal). 
+	The integration of multiple payment gateways will be an add-on..
+[x] Change order status(cancel,return etc.)
+[x] Coupon Management (Apply Coupon, Remove Coupon) 
+[x] Search, Category filtering
+[x] Wishlist (Add, Remove)
+[ ] Wallet (for canceled orders)
+
+Admin side : 
+[ ] Offer module(Product offer, Category offer, Referral offer).
+[x] Sales report(Daily, Weekly, Yearly, Custom date)
+[x] Generate sales report 
+[x] Should be able to filter based on  
+
+	[x] 1 Day / week / month 
+[x] Show  discount and coupons deduction in sales report 
+[x] Overall sales count  
+[x] Overall order amount
+[x] Overall discount
+[x] Report download (Pdf, Excel)
+
+Week 5
+
+User side :
+[x] Invoice download (Pdf)
+[x] Order above Rs 1000 should not be allowed for COD
+[ optional] Delivery charge can be applied according to location / fixed charges (optional)
+[x] Handle error for failed payments (update status as payment pending), 
+[x] Should be able to continue payment from my order page in case of failed payment
+
+Admin side :
+[x] Admin Dashboard - Chart with filter(yearly,monthly etc.)
+[x] Coupon Management (Create, Delete)
+[x] Best selling product (top 10) 
+[x] Best selling category (top 10) 
+[x] Best selling brands (top 10) 
+[ optional ] Generate ledger book (optional)
+Week 6
+
+Pending.
+
+[x] Sales report pagination, listing logic, bug in pdf download
+[x] Payment success/failed modal
+[x] Invoice download should be based on payment status instead of delivery status
+[x] Invoice download is not properly done
+[ ] Remove all JS alerts
+[x] Handle duplicate coupon validation
+
+Project Hosting

@@ -1,0 +1,325 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+  <section>
+    <div class="row d-flex m-0 p-0">
+      <% if (message) { %>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          toastMessage("<%= message %>");
+        });
+      </script>
+      <% } %>
+      <div class="col-12 right-side-nav m-0 p-0 px-3">
+        <!-- invoice heading  -->
+        <div class="row m-0 p-0 py-2 border rounded-3 mt-3">
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0 text-black text-center fs-6 fw-bolder">Tax Invoice</p>
+          </div>
+        </div>
+
+        <!-- date and time part  -->
+        <div class="row m-0 p-0 py-2 border rounded-3 mt-3">
+          <div class="col-md-12 col-lg-4 d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0 text-black text-center font-size-bold">Invoice Number : &nbsp;</p>
+            <% const orderID = "clothSTORE_" + orderDetails[0]._id.toString().slice(-8); %>
+            <p class="m-0 p-0 text-success text-center font-size-bold"><%= orderID %></p>
+          </div>
+          <div class="col-md-12 col-lg-4 d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0 text-black text-center font-size-bold">Order Status : &nbsp;</p>
+            <% if (orderDetails[0]?.orderStatus) { %>
+            <% const status = orderDetails[0]?.orderStatus.toLowerCase(); %>
+            <% if (status === 'cancelled') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #d80614;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'delivered') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #01cf38;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'placed') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #ac0081;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'shipped') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #e2aa02;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'pending') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #001c9b;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'returned') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #00ddff;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } %>
+            <% } %>
+          </div>
+          <div class="col-md-12 col-lg-4 d-flex justify-content-center align-items-center">
+            <% const createdAt = orderDetails[0]?.createdAt %>
+            <% const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' } %>
+            <% const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true } %>
+            <% const formattedDate = createdAt.toLocaleDateString('en-US', dateOptions).replace(',', '') %>
+            <% const formattedTime = createdAt.toLocaleTimeString('en-US', timeOptions) %>
+            <p class="m-0 p-0 text-black text-center font-size-bold">Date & Time : &nbsp;</p>
+            <p class="m-0 p-0 text-black text-center font-size-bold"><%= formattedDate %> - <%= formattedTime %></p>
+          </div>
+        </div>
+        <!-- compmay and customer details  -->
+        <div class="row m-0 p-0 border rounded-3 my-3">
+          <div class="col-md-12 col-lg-6 m-0 p-0">
+            <!-- company details  -->
+            <div class="row p-3 m-3 border rounded-3">
+              <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Company Details</p>
+              <div class="col-sm-6 col-md-6 col-lg-4">
+                <p class="m-0 p-0 text-black font-size text-start"><b>Company name</b></p>
+                <p class="m-0 p-0 text-black font-size text-start"><b>Address</b></p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start"><b>Email</b></p>
+                <p class="m-0 p-0 text-black font-size text-start"><b>Landline</b></p>
+                <p class="m-0 p-0 text-black font-size text-start"><b>Phone</b></p>
+                <p class="m-0 p-0 text-black font-size text-start"><b>Fax</b></p>
+                <p class="m-0 p-0 text-black font-size text-start"><b>GSTIN</b></p>
+                <p class="font-size-bold text-primary m-0 fst-italic text-start">Web</p>
+              </div>
+              <div class="col-sm-1 col-md-1 col-lg-1">
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+              </div>
+              <div class="col-sm-5 col-md-5 col-lg-7">
+                <p class="m-0 p-0 text-primary font-size text-start"><b>clothSTORE</b></p>
+                <p class="m-0 p-0 text-black font-size text-start">&nbsp;</p>
+                <p class="m-0 p-0 text-black font-size text-start">Puthoor Arcade</p>
+                <p class="m-0 p-0 text-black font-size text-start">Door No : 62/3747</p>
+                <p class="m-0 p-0 text-black font-size text-start">Therveed Lane</p>
+                <p class="m-0 p-0 text-black font-size text-start">A G Road</p>
+                <p class="m-0 p-0 text-black font-size text-start">4th Railway Gate</p>
+                <p class="m-0 p-0 text-black font-size text-start">Kozhikode</p>
+                <p class="m-0 p-0 text-black font-size text-start">Kerala</p>
+                <p class="m-0 p-0 text-black font-size text-start">673032</p>
+                <p class="m-0 p-0 text-black font-size text-start">contact@clothstore.com</p>
+                <p class="m-0 p-0 text-black font-size text-start">+91 22 1234 5678</p>
+                <p class="m-0 p-0 text-black font-size text-start">+91 949767 8839</p>
+                <p class="m-0 p-0 text-black font-size text-start">123-456-7890</p>
+                <p class="m-0 p-0 text-black font-size text-start">22AAAAA0000A1Z5</p>
+                <p class="font-size-bold text-primary m-0 fst-italic text-start">www.clothStore.com</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12 col-lg-6 m-0 p-0">
+            <% if (orderDetails && orderDetails.length > 0) { %>
+            <% const firstOrder = orderDetails[0]; %>
+            <% if (firstOrder && firstOrder.addressData && firstOrder.addressData.addresses && firstOrder.addressData.addresses.length > 0) { %>
+            <% const address = firstOrder.addressData.addresses.find(element => element._id.toString() === firstOrder.addressId.toString()); %>
+            <% if (address) { %>
+            <!-- Customer address details  -->
+            <div class="row p-3 m-3 border rounded-3">
+              <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Customer Details</p>
+              <div class="col-sm-6 col-md-6 col-lg-4">
+                <p class="m-0 p-0 text-black font-size text-start">Full Name</p>
+                <p class="m-0 p-0 text-black font-size text-start">Phone Number</p>
+                <p class="m-0 p-0 text-black font-size text-start">Email</p>
+                <p class="m-0 p-0 text-black font-size text-start">Building</p>
+                <p class="m-0 p-0 text-black font-size text-start">House Number</p>
+                <p class="m-0 p-0 text-black font-size text-start">Country</p>
+                <p class="m-0 p-0 text-black font-size text-start">State</p>
+                <p class="m-0 p-0 text-black font-size text-start">District</p>
+                <p class="m-0 p-0 text-black font-size text-start">City</p>
+                <p class="m-0 p-0 text-black font-size text-start">Division</p>
+                <p class="m-0 p-0 text-black font-size text-start">Region</p>
+                <p class="m-0 p-0 text-black font-size text-start">Area</p>
+                <p class="m-0 p-0 text-black font-size text-start">Location</p>
+                <p class="m-0 p-0 text-black font-size text-start">Street</p>
+                <p class="m-0 p-0 text-black font-size text-start">Circle</p>
+                <p class="m-0 p-0 text-black font-size text-start">Pincode</p>
+              </div>
+              <div class="col-sm-1 col-md-1 col-lg-1">
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+              </div>
+              <div class="col-sm-5 col-md-5 col-lg-7">
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.fullName%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.phoneNumber%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.email%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.building%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.houseNumber%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.country%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.state%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.district%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.city%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.division%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.region%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.area%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.location%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.street%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.circle%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.pincode%></p>
+              </div>
+            </div>
+            <% } %>
+            <% } %>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- date and time part  -->
+        <div class="row m-0 p-0 p-3 border rounded-3 mt-3">
+          <div class="col-md-12 col-lg-12 m-0 p-0">
+            <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Product Details</p>
+            <div class="row m-0 p-0 border rounded-3">
+              <table class="table table-hover m-0 p-0">
+                <thead>
+                  <tr>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">#</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Image</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Item</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Size</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Color</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">MRP</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Qty.</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Tax %</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Taxable</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">GST 18%</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">SGST 9%</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">CGST 9%</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Total disc. %</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Total disc. amt.</th>
+                    <th class="text-black font-size text-center align-middle text-truncate" scope="col">Total</th>
+                  </tr>
+                </thead>
+                <% orderDetails?.forEach((elem, index) => { %>
+                <tbody>
+                  <tr>
+                    <td class="text-black font-size text-center align-middle text-truncate"><%= index+1 %></td>
+                    <td class="text-black font-size text-center align-middle text-truncate">
+                      <img class="m-0 p-0 img-fluid border-0" style="object-fit: cover; width: auto; height: 50px;" src="/productImages/<%= elem?.images[0] %>" alt="">
+                    </td>
+                    <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.title?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %></td>
+                    <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.size %></td>
+                    <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.color %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.mrp %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.quantity %></td>
+                    <td class="text-black font-size text-center align-middle text-truncate"><%= elem?.taxRate * 100 %> %</td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.AmountAfterSecondDiscount?.toFixed(2)%></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.gst?.toFixed(2) %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.sgst?.toFixed(2) %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.cgst?.toFixed(2) %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.totalDiscountPercentage?.toFixed(2) %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.totalDiscount?.toFixed(2) %></td>
+                    <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.totalPrice?.toFixed(2) %></td>
+                  </tr>
+                </tbody>
+                <tbody>
+                  <% }) %>
+                  <tr>
+                    <td class="text-black font-size-bold text-center align-middle text-truncate">Total</td>
+                    <td class="text-black font-size-bold text-center align-middle text-truncate"></td>
+                    <td class="text-black font-size-bold text-center align-middle text-truncate"></td>
+                    <td class="text-black font-size-bold text-center align-middle text-truncate"></td>
+                    <td class="text-black font-size-bold text-center align-middle text-truncate"></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalIndividualTotal %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalQuantity%></td>
+                    <td class="text-black font-size-bold text-center align-middle text-truncate"></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalGst?.toFixed(2) %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalSgst?.toFixed(2) %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalCgst?.toFixed(2) %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalDiscountPercentage?.toFixed(2) %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= totalDiscount?.toFixed(2) %></td>
+                    <td class="text-black font-size-bold text-end align-middle text-truncate"><%= grandTotal?.toFixed(2) %></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- product details  -->
+        <div class="row m-0 p-0 border rounded-3 my-3">
+          <div class="col-md-12 col-lg-12 m-0 p-0">
+            <div class="row p-3 m-3 border rounded-3">
+              <p class="font-size-bold pb-2 p-0 text-primary m-0 fst-italic">GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
+              <div class="col-sm-6 col-md-6 col-lg-4 m-0 p-0">
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">Total Price</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">GST @ 18%</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">SGST @ 9%</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">CGST @ 9%</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">Discount %</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">Discount Amt.</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-start border-1 border-bottom">Round-off</p>
+                <p class="font-size-bold pt-2 text-primary m-0 fst-italic text-start">Grand total</p>
+              </div>
+              <div class="col-sm-1 col-md-1 col-lg-1 m-0 p-0">
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom">:</p>
+                <p class="m-0 p-0 pt-2 text-black font-size text-end ">:</p>
+              </div>
+              <div class="col-sm-5 col-md-5 col-lg-7 m-0 p-0">
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= totalGst?.toFixed(2) %></p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= totalSgst?.toFixed(2)  %></p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= totalCgst?.toFixed(2)  %></p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= totalDiscountPercentage?.toFixed(2)%></p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= totalDiscount?.toFixed(2) %></p>
+                <p class="m-0 p-0 py-1 text-black font-size text-end border-1 border-bottom"><%= roundOff?.toFixed(2) %></p>
+                <p class="font-size-bold pt-2 text-primary m-0 fst-italic text-end">&#8377;&nbsp;<%= grandTotal?.toFixed(2)%></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row m-0 p-0 border rounded-3 my-3">
+          <div class="col-md-12 col-lg-12 m-0 p-0">
+            <div class="row p-3 m-3 border rounded-3 " style="background-color: #188335;">
+              <p class="m-0 p-0 text-white fst-italic font-size">
+                We are honored to have customers like you. <br>Thank you for supporting our small business. <br>It's thanks to customers like you that we can keep crafting our quality products.
+              </p>
+              <p class="m-0 p-0 pt-3 text-white font-size">Thank you for shopping at <span class="text-black fs-6"><b> clothSTORE</b></span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+  </section>
+</body>
+
+</html>

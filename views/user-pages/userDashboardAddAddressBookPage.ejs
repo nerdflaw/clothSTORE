@@ -1,0 +1,368 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 text-secondary text-start px-3 font-size">
+                <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+                <span class="font-size-bold">&gt;</span>
+                <a class="text-black text-decoration-none font-size-bold" href="/user-add-address">My address book</a>
+            </div>
+            <% if(locals.user){ %>
+              <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 p-2">
+          <div class="col-12 border rounded-3 p-3">
+            <div class="col d-flex justify-content-between border rounded-3">
+              <div class="col p-2">
+                <p class="text-center fs-6 fw-bold m-0">Add a new address</p>
+                <div>
+                  <% if (message) { %>
+                  <h6 id="flash" class="m-0 p-0 text-center text-success animate__animated animate__flash font-size"><%= message %></h6>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form action="/user-add-address" name="addAddressForm" onsubmit="validateForm(event)" method="post">
+            <div class="row" id="addressFields">
+              <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
+                <div class="col">
+                  <div class="col font-size">
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="country">Country<span class="text-danger font-size-bold">*</span></label>
+                      <select name="country" id="country" class="form-select font-size">
+                        <% countryData.forEach(country => { %>
+                        <% if (country.code === 'in') { %>
+                        <option value="<%= country.name.name %>" selected><%= country.name.name %> - <%= country.code.toUpperCase() %></option>
+                        <% } else { %>
+                        <option value="<%= country.name.name %>"><%= country.name.name %> - <%= country.code.toUpperCase() %></option>
+                        <% } %>
+                        <% }); %>
+                      </select>
+                    </div>
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="fullName">Full name (First name and Last name)<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validateFullName()" required type="text" name="fullName" id="fullName" value="" class="form-control font-size" placeholder="your full name">
+                      <span id="fullNameError" class="text-danger font-size"></span>
+                    </div>
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="email">Email<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validateEmail()" required type="text" name="email" id="email" value="" class="form-control font-size" placeholder="your email">
+                      <span id="emailError" class="text-danger font-size"></span>
+
+                    </div>
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="phoneNumber">Phone number<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validatePhoneNumber()" required type="number" name="phoneNumber" id="phoneNumber" value="" class="form-control font-size" placeholder="your phone number">
+                      <span id="phoneNumberError" class="text-danger font-size"></span>
+
+                    </div>
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="building">Building/Appartment<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validateBuilding()" required type="text" name="building" id="building" value="" class="form-control font-size" placeholder="your building">
+                      <span id="buildingError" class="text-danger font-size"></span>
+
+                    </div>
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="houseNumber">House Number.<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validateHouseNumber()" required type="text" name="houseNumber" id="houseNumber" value="" class="form-control font-size" placeholder="your house Nnumer">
+                      <span id="houseNumberError" class="text-danger font-size"></span>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
+                <div class="col">
+                  <div class="col-12 font-size">
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="street">Street<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validateStreet()" type="text" name="street" id="street" class="form-control font-size" placeholder="your area">
+                      <span id="streetError" class="text-danger font-size"></span>
+
+                    </div>
+                    <div class="col py-2">
+                      <label class="font-size-bold" for="city">City<span class="text-danger font-size-bold">*</span></label>
+                      <input oninput="validateCity()" required type="text" name="city" id="city" value="" class="form-control font-size" placeholder="your city">
+                      <span id="cityError" class="text-danger font-size"></span>
+
+                    </div>
+                  </div>
+                  <div class="col py-2">
+                    <div class="d-flex">
+                      <div class="col-6">
+                        <label class="font-size-bold" for="area">Area<span class="text-danger font-size-bold">*</span></label>
+                        <input oninput="validateArea()" type="text" name="area" id="area" class="form-control font-size" placeholder="your area">
+                        <span id="areaError" class="text-danger font-size"></span>
+
+                      </div>
+                      <div class="col-6">
+                        <label class="font-size-bold" for="pincode">PIN Code<span class="text-danger font-size-bold">*</span></label>
+                        <input required type="number" onchange="validatePincode()" name="pincode" id="pincode" value="" class="form-control font-size" placeholder="Enter your pincode">
+                        <span id="pincodeError" class="text-danger font-size"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="d-flex">
+                      <div class="col-6">
+                        <label class=" font-size-bold" for="circle">Circle<span class="text-danger font-size-bold p-0 m-0">*</span></label>
+                        <select name="circle" id="circle" class="form-select font-size">
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class=" font-size-bold" for="region">Region<span class="text-danger font-size-bold">*</span></label>
+                        <select name="region" id="region" class="form-select font-size">
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col py-2">
+                    <div class="d-flex">
+                      <div class="col-6">
+                        <label class=" font-size-bold" for="division">Division<span class="text-danger font-size-bold">*</span></label>
+                        <select name="division" id="division" class="form-select font-size">
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class=" font-size-bold" for="location">Location<span class="text-danger font-size-bold">*</span></label>
+                        <select name="location" id="location" class="form-select font-size">
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col py-2">
+                    <div class="d-flex">
+                      <div class="col-6">
+                        <label class=" font-size-bold" for="district">District<span class="text-danger font-size-bold">*</span></label>
+                        <select name="district" id="district" class="form-select font-size">
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <label class=" font-size-bold" for="state">State<span class="text-danger font-size-bold">*</span></label>
+                        <select name="state" id="state" class="form-select font-size">
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col text-center py-2 d-flex justify-content-around">
+              <a href="/user-dashboard" class="btn btn-dark px-3 font-size" style="width: 150px;">cancel</a>
+              <button type="submit" class="btn btn-danger font-size" style="width: 150px;">confirm</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+  <script>
+    function validatePincode() {
+      let pincode = document.getElementById('pincode').value;
+      let pincodeError = document.getElementById('pincodeError');
+
+      return fetch('/user-get-details-by-pincode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pincode: pincode,
+          }),
+        })
+        .then(response => response.json())
+        .then(response => {
+          if (Array.isArray(response.data.result) && response.data.result.length > 0) {
+            const data = response.data.result[0];
+
+            clearSelect('circle');
+            clearSelect('region');
+            clearSelect('division');
+            clearSelect('location');
+            clearSelect('district');
+            clearSelect('state');
+
+            populateSelect('circle', data.CircleName);
+            populateSelect('region', data.RegionName);
+            populateSelect('division', data.DivisionName);
+            populateSelect('district', data.District);
+            populateSelect('state', data.StateName);
+
+            response.data.result.forEach(item => {
+              populateSelect('location', item.LocationName);
+            });
+
+            // Clear any previous error message
+            pincodeError.textContent = '';
+          } else {
+            // Display an error message when pincode is invalid
+            pincodeError.textContent = 'Please enter a valid pincode.';
+            console.error('Invalid pincode or no data:', response.data);
+          }
+        })
+        .catch(error => {
+          // Display an error message when there is an issue fetching data
+          pincodeError.textContent = 'Error fetching data. Please try again.';
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    function populateSelect(id, value) {
+      let selectElement = document.getElementById(id);
+      if (selectElement) {
+        let option = document.createElement('option');
+        option.value = value;
+        option.text = value;
+        selectElement.appendChild(option);
+      } else {
+        console.error(`Select element with id '${id}' not found.`);
+      }
+    }
+
+    function clearSelect(id) {
+      let selectElement = document.getElementById(id);
+      if (selectElement) {
+        selectElement.innerHTML = '';
+      } else {
+        console.error(`Select element with id '${id}' not found.`);
+      }
+    }
+
+    // validatePincode();
+  </script>
+  <script>
+    function validateFullName() {
+      let fullName = document.forms['addAddressForm']['fullName'].value
+      let nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!nameRegex.test(fullName)) {
+        document.getElementById('fullNameError').innerText = "Please enter a valid full name"
+      } else {
+        document.getElementById('fullNameError').innerText = ""
+      }
+    }
+
+    function validateEmail() {
+      let email = document.forms['addAddressForm']['email'].value
+      let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        document.getElementById('emailError').innerText = "Please enter a valid email"
+      } else {
+        document.getElementById('emailError').innerText = ""
+      }
+    }
+
+    function validatePhoneNumber() {
+      let phoneNumber = document.forms['addAddressForm']['phoneNumber'].value;
+      if (isNaN(phoneNumber) || phoneNumber <= 0) {
+        document.getElementById('phoneNumberError').innerText = "Please enter a valid phone number";
+      } else if (phoneNumber.length !== 10) {
+        document.getElementById('phoneNumberError').innerText = "Phone number must be in 10 digits";
+      } else {
+        document.getElementById('phoneNumberError').innerText = "";
+      }
+    }
+
+    function validateBuilding() {
+      let building = document.forms['addAddressForm']['building'].value
+      let buildingRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!buildingRegex.test(building)) {
+        document.getElementById('buildingError').innerText = "Please enter a valid building name"
+      } else {
+        document.getElementById('buildingError').innerText = ""
+      }
+    }
+
+    function validateHouseNumber() {
+      let houseNumber = document.forms['addAddressForm']['houseNumber'].value
+      let houseNumberRegex = /^[a-zA-Z0-9\s#\-]+$/;
+      if (!houseNumberRegex.test(houseNumber)) {
+        document.getElementById('houseNumberError').innerText = "Please enter a valid house number"
+      } else {
+        document.getElementById('houseNumberError').innerText = ""
+      }
+    }
+
+    function validateStreet() {
+      let street = document.forms['addAddressForm']['street'].value
+      let streetRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!streetRegex.test(street)) {
+        document.getElementById('streetError').innerText = "Please enter a valid street name"
+      } else {
+        document.getElementById('streetError').innerText = ""
+      }
+    }
+
+    function validateCity() {
+      let city = document.forms['addAddressForm']['city'].value
+      let cityRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!cityRegex.test(city)) {
+        document.getElementById('cityError').innerText = "Please enter a valid city name"
+      } else {
+        document.getElementById('cityError').innerText = ""
+      }
+    }
+
+    function validateArea() {
+      let area = document.forms['addAddressForm']['area'].value
+      let areaRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+      if (!areaRegex.test(area)) {
+        document.getElementById('areaError').innerText = "Please enter a valid city name"
+      } else {
+        document.getElementById('areaError').innerText = ""
+      }
+    }
+
+    function validateForm(event) {
+      console.log('functionCalled')
+      event.preventDefault();
+      validateFullName()
+      validateEmail()
+      validatePhoneNumber()
+      validateBuilding()
+      validateStreet()
+      validateCity()
+      validateArea()
+      let fullNameError = document.getElementById('fullNameError').innerText;
+      let emailError = document.getElementById('emailError').innerText;
+      let phoneNumberError = document.getElementById('phoneNumberError').innerText;
+      let buildingError = document.getElementById('buildingError').innerText;
+      let streetError = document.getElementById('streetError').innerText;
+      let cityError = document.getElementById('cityError').innerText;
+      let areaError = document.getElementById('areaError').innerText;
+      let submitButton = document.getElementById('submitButton');
+      if (!(fullNameError || emailError || phoneNumberError || buildingError || streetError || cityError || areaError)) {
+        document.forms['addAddressForm'].submit();
+      }
+    }
+  </script>
+
+
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

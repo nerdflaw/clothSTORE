@@ -1,0 +1,80 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-around">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border-1 border-end">
+          <img class="login-image img-fluid" src="/images/login.png" alt="Login page image">
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
+          <div class="loginDiv col-10">
+            <h4 class="text-center text-black font-size-bold-title">Please Login</h4>
+            <form id="loginForm" action="/user-login" method="POST">
+
+              <!-- existing email flashing start -->
+              <% if (message) { %>
+              <h6 id="flash" class=" text-center text-danger animate__animated animate__flash py-4 font-size"><%= message %></h6>
+              <% } %>
+              <% if (success) { %>
+              <h6 id="flash" class=" text-center text-success animate__animated animate__flash py-4 font-size"><%= success %></h6>
+              <% } %>
+              <!-- existing email flashing end -->
+
+              <div class="mb-3">
+                <label for="email" class="form-label text-black font-size">Email</label>
+                <input type="email" class="form-control bg-white text-black font-size" id="email" name="email" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label text-black font-size">Password</label>
+                <input type="password" class="form-control bg-white text-black font-size" id="password" name="password" required>
+              </div>
+
+              <!-- google login -->
+              <a class="text-decoration-none font-size-bold text-black" href="/auth/google">
+                <div class="container ">
+                  <div class="row border rounded-2">
+                    <div class="p-2 col d-flex justify-content-center align-items-center w-100 gap-2">
+                      <div class="d-flex justify-content-end">
+                        <img src="/images/google_icon.png" alt="" srcset="" style="width: auto; height: 20px;object-fit: contain;">
+                      </div>
+                      <p class="m-0 p-0">Login with Google</p>
+                    </div>
+                  </div>
+                </div>
+              </a>
+
+              <div class="text-center mb-3 d-flex flex-column justify-content-center align-items-center">
+                <button type="submit" class="btn btn-danger my-3 text-white font-size-bold w-25">Login</button>
+                <!-- forgot password -->
+                <a class="text-danger text-decoration-none my-3 font-size-bold" href="/user-forgot-password">Forgot your password?</a>
+                <p class="me-3 text-black font-size">Don`t have an account?
+                  <a href="user-signup" class="font-size-bold text-danger">Sign Up</a>
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <script>
+      setTimeout(function() {
+        document.getElementById('flash').style.display = 'none';
+      }, 3000);
+    </script>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

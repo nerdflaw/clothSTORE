@@ -1,0 +1,169 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard-wish-lists">My wish list</a>
+            </div>
+            <% if(locals?.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals?.user?.firstName %>&nbsp;<%= locals?.user?.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 p-2">
+          <div class="container">
+            <div class="row">
+              <div class="col-12 px-3 pb-3 border rounded-3">
+                <div class="row row-cols-1 row-cols-md-4 row-cols-lg-4 row-cols-xl-4">
+                  <% if(paginatedWishlistProduct?.length === 0){ %>
+                    <div class="w-100">
+                      <h6 class="text-danger font-size m-0 p-0 pt-3 animate__animated animate__flash "><em>You haven`t added a product to wish-list yet</em></h6>
+                    </div>
+                    <% } %>
+                  <% paginatedWishlistProduct?.forEach(flashsale=>{ %>
+                  <div class="col mt-3">
+                    <div class="card position-relative w-100">
+                      <div class="d-flex justify-content-center align-items-center flex-column position-relative ">
+                        <div class="col-12 m-0 p-0">
+                          <a class="text-decoration-none" href="/user-view-product-details/<%= flashsale?.productDetails?._id %>">
+                            <img src="/productImages/<%= flashsale?.productDetails?.images[1] %>" class="card-img-top img-fluid w-100 m-0 p-0" style="height: 250px; object-fit: cover;" alt="<%= flashsale?.productDetails?.title %>">
+                          </a>
+                          <h5 class="text-black font-size m-0 py-1 sumOfQuantities position-absolute bottom-0 start-0">
+                            <% if (flashsale?.sumOfQuantities > 10) { %>
+                            <span class="m-0 px-2 py-1" style="color: #ffffff; background-color: #24b311; font-weight: bold;">In stock</span>
+                            <% } else if (flashsale?.sumOfQuantities <= 10 && flashsale?.sumOfQuantities > 0) { %>
+                            <i class="fa-bounce fa-solid text-black">
+                              <span class="m-0 px-2 py-1" style="color: #000000; background-color: #f7d306; font-weight: bold;">Limited stock</span>
+                            </i>
+                            <% } else { %>
+                            <span class="m-0 px-2 py-1" style="color: #ffffff; background-color: #f70606; font-weight: bold;">Out of stock</span>
+                            <% } %>
+                          </h5>
+                          <div class="wish-list position-absolute top-0 end-0 pt-4 pe-4">
+                            <% const hasMatchingProduct = locals?.wishlists?.some(wishlist => wishlist?.product?.toString() === flashsale?.productDetails?._id.toString()); %>
+                            <button type="submit" class="border-0 wish-list-button" value="<%= flashsale?.productDetails?._id %>" style="background-color: transparent;">
+                              <% if(hasMatchingProduct){ %>
+                              <i class="fa-solid fa-heart fa-xl" style="color: #ff0000;"></i>
+                              <% } else {%>
+                              <i class="fa-solid fa-heart fa-xl" style="color: #000000;"></i>
+                              <% } %>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <div class="col text-truncate">
+                          <a class="text-decoration-none" href="/user-view-product-details/<%= flashsale?.productDetails?._id %>">
+                            <h5 class="card-title text-black product-item-title m-0 p-0"><%= flashsale?.productDetails?.title.charAt(0).toUpperCase() + flashsale?.productDetails?.title.slice(1) %></h5>
+                          </a>
+                        </div>
+                        <div class="row w-100 m-0 p-0">
+                          <div class="col-md m-0 p-0 d-flex justify-content-start align-items-center">
+                            <div class="star-rating">
+                              <% for (let i = 1; i <= 5; i++) { %>
+                              <% if (i <= flashsale?.averageRating) { %>
+                              <span class="fa fa-star fa-sm checked"></span>
+                              <% } else if (i - flashsale?.averageRating <= 0.5) { %>
+                              <span class="fa fa-star-half fa-sm checked"></span>
+                              <% } else { %>
+                              <span class="fa fa-star fa-sm"></span>
+                              <% } %>
+                              <% } %>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row w-100 m-0 p-0">
+                          <div class="col-md m-0  p-0 d-flex justify-content-start align-items-center">
+                            <span class="font-size text-primary">
+                              <%= flashsale?.averageRating !== null ? flashsale?.averageRating.toFixed(1) + ' Stars' : '0 Stars' %> |
+                              <%= flashsale?.countOfRatings !== null ? flashsale?.countOfRatings + ' Ratings' : '0 Ratings' %> %>
+                            </span>
+
+                          </div>
+                        </div>
+                        <div class="col text-truncate py-1">
+                          <p class="card-text text-secondary product-item-description m-0 p-0"><%= flashsale?.productDetails?.description.charAt(0).toUpperCase() + flashsale?.productDetails?.title.slice(1) %></p>
+                        </div>
+                        <div class="col w-100 d-flex align-items-center justify-content-between py-1">
+                          <h3 class="product-item-price m-0 p-0">&#8377. <%= flashsale?.productDetails?.mrp %></h3>
+                        </div>
+                        <form class="pt-2" action="/user-view-product-details/<%= flashsale?.productDetails?._id %>" method="get">
+                          <button class="btn btn-dark text-center w-100 text-white font-size">add to cart</button>
+                        </form>
+                      </div>
+                      <% if (flashsale?.productDetails?.discount) { %>
+                      <button class="border-0 bg-black font-size text-white position-absolute top-0 start-0 p-2" style="width: 50px; height: 50px; border-top-left-radius: 5px ;"><%= flashsale?.productDetails?.discount %>% OFF.</button>
+                      <% } %>
+                    </div>
+                  </div>
+                  <%}) %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 justify-content-center pb-2" style="display: flex;" id="pagination">
+          <% if (currentPage > 1) { %>
+          <div class="text-center border rounded-1 bg-light">
+            <a class="text-decoration-none" href="/user-dashboard-wish-lists?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-dark">&lt;</p>
+            </a>
+          </div>
+          <% } %>
+
+          <% for (let i = 1; i <= totalPages; i++) { %>
+          <% if (i === currentPage) { %>
+          <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-dark' : 'bg-light' %>">
+            <a class="text-decoration-none" href="/user-dashboard-wish-lists?page=<%= i %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-white"><%= i %></p>
+            </a>
+          </div>
+          <% } else { %>
+          <div class="text-center border rounded-1 bg-light">
+            <a class="text-decoration-none" href="/user-dashboard-wish-lists?page=<%= i %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+            </a>
+          </div>
+          <% } %>
+          <% } %>
+
+          <% if (currentPage < totalPages) { %>
+          <div class="text-center border rounded-1 bg-light">
+            <a class="text-decoration-none" href="/user-dashboard-wish-lists?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+              <p class="font-size px-3 py-2 m-0 text-dark">&gt;</p>
+            </a>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>
