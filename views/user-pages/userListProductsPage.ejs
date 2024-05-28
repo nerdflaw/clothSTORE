@@ -21,9 +21,9 @@
   </main>
 
   <section>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12">
+    <div class="container-fluid m-0 p-0">
+      <div class="row m-0 p-0">
+        <div class="col-12 m-0 p-0">
           <img class="img-fluid w-100" src=" /images/banner.jpg" alt="">
         </div>
       </div>
@@ -35,7 +35,7 @@
       <div class="row bg-black d-flex justify-content-around">
         <% brands.forEach((brand)=>{ %>
         <div class="col-sm-12 col-md-12 col-lg-2 py-4 text-center border-top border-white ">
-          <a href="user-view-brandwise/<%= brand._id %>" class="text-center text-white p-0 my-auto fs-4 fw-bold text-decoration-none"><%= brand.brand %></a>
+          <a href="user-view-brandwise/<%= brand._id %>" class="text-center text-white p-0 my-auto fs-4 fw-bold text-decoration-none"><%= brand?.brand?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')  %></a>
         </div>
         <% }) %>
       </div>
