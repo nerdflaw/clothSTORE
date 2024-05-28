@@ -15,13 +15,9 @@ const adminAuthentication = require('../middlewares/adminAuthenticationMiddlewar
 const errorHandlerMiddleware = require('../middlewares/errorHandlingMiddleware')
 const multerFile = require('../upload/upload');
 
-// router.get('/user-login', adminAccessControler.adminLogin_get)
-// router.post('/user-login', adminAccessControler.adminLogin_post)
 router.get('/admin-dashboard', adminDashboardControler.adminDashboard)
 router.get('/sales-report', adminDashboardControler.salesReport_get)
-router.get('/download-sales-report', adminDashboardControler.adminSalesReportDownload_get)
 router.get('/generate-chart', adminDashboardControler.showChartOnDashboard_get)
-router.get('/generate-sales-report', adminDashboardControler.adminGenerateSalesReportDownload_get)
 
 router.get('/admin-user-management', userControler.adminUserControler)
 router.post('/admin/block-user/:id', userControler.adminBlockUserControler);
@@ -114,8 +110,6 @@ router.post('/admin-change-order-status/:orderId',
 	errorHandlerMiddleware(orderControler.adminChangeOrderStatus_post))
 
 router.get('/admin-logout', adminAccessControler.adminLogout)
-
-// next week tasks
 
 router.get('/admin-transactions', (req, res) => {
 	res.render('admin-pages/adminTransactionsPage')

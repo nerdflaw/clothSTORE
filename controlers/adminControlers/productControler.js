@@ -198,7 +198,6 @@ const adminEnableProduct_post = async (req, res) => {
 		return res.status(400).render('admin-pages/404', { title: '404 Error' })
 	};
 	const updateStatus = await Product.updateOne({ _id: id }, { $set: { status: true } });
-	console.log(updateStatus)
 	req.flash('message', `Enabled successfully`)
 	return res.redirect('/admin-product-management');
 }

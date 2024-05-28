@@ -1,7 +1,6 @@
 const fetchUserMiddleware = (req, res, next) => {
 	try {
 		if (req.session.userLogged) {
-			// console.log('fetchUserMiddleware', req.session )
 			let fullName = `${req.session.firstName} ${req.session.lastName}`
 			const user = {
 				firstName: req.session.firstName,
@@ -12,7 +11,6 @@ const fetchUserMiddleware = (req, res, next) => {
 				phoneNumber: req.session.phoneNumber,
 			}
 			res.locals.user = user;
-			// console.log(user, '<- fetchUserMiddleware');
 		}
 		next();
 	} catch (error) {

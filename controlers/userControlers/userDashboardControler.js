@@ -64,9 +64,7 @@ const userDashboardAddressBook_get = async (req, res) => {
 					}
 				}
 			]);
-			console.log(result)
 			if (result.length === 0) {
-				console.log("No matching address found");
 				return res.status(404).json({ message: "Address not found" });
 			}
 			return res.json({ result });
@@ -79,7 +77,6 @@ const userDashboardAddressBook_get = async (req, res) => {
 		if (user) {
 			const userId = user._id;
 			const addresses = await Address.find({ userId: userId })
-			console.log(addresses)
 
 			res.render('user-pages/userDashboardEditAddressBookPage',
 				{
@@ -98,7 +95,6 @@ const userAddAddress_get = (req, res) => {
 		})
 };
 const userAddAddress_post = async (req, res) => {
-	console.log(req.body, 'req.body')
 	const findUser = await Address.findOne({ userId: req.session.userId });
 	if (findUser) {
 		const updatedAddress = await Address.updateOne(
@@ -109,14 +105,12 @@ const userAddAddress_post = async (req, res) => {
 				}
 			}
 		);
-		console.log(updatedAddress, 'updatedAddress');
 		return res.redirect('/user-dashboard-address-book?message=Address added successfully');
 	} else {
 		const createdAddress = await Address.create({
 			userId: new ObjectId(req.session.userId),
 			addresses: req.body
 		})
-		console.log(createdAddress, 'createdAddress')
 		res.redirect('/user-dashboard-address-book?message=Address added successfully');
 	}
 };
@@ -124,8 +118,6 @@ const userEditAddress_post = async (req, res) => {
 	const addressId = req.session.addressId
 	const userId = new ObjectId(req.session.userId);
 	const findUser = await Address.findOne({ userId: userId });
-	console.log(findUser, 'findUser');
-	console.log(req.session.userId, 'userId');
 	if (findUser) {
 		const existingAddress = findUser.addresses.find(address =>
 			address.fullName === req.body.fullName &&
@@ -177,7 +169,6 @@ const userEditAddress_post = async (req, res) => {
 					new: true
 				}
 			);
-			console.log(updatedAddress);
 			req.flash('message', 'Address updated successfully')
 			res.redirect('/user-dashboard-address-book');
 		}
@@ -192,7 +183,6 @@ const userDeleteAddress_post = async (req, res) => {
 		{ userId: new ObjectId(req.session.userId) },
 		{ $pull: { addresses: { _id: id } } },
 	)
-	console.log(address, 'deleted address')
 	return res.redirect('/user-dashboard-address-book?message=Address deleted successfully')
 };
 const userCheckOldPassword_post = async (req, res) => {
@@ -208,18 +198,15 @@ const userCheckOldPassword_post = async (req, res) => {
 	res.json({ success: true });
 };
 const userGetPincodeDatails_post = (req, res) => {
-	console.log(req.body, 'pincode');
 	const pincode = req.body.pincode;
 	const data = getPincodes(parseInt(pincode));
 	if (data) {
-		console.log(data)
 		return res.json({ data });
 	} else {
 		return res.json({ status: "Invalid pincode" });
 	}
 };
 const userSearch_get = async (req, res) => {
-	// console.log(req.query, 'query')
 	const searchKey = req.query.searchKey || '';
 
 	let currentPage = Number(req.query.page) || 1
@@ -326,11 +313,9 @@ const userSearch_get = async (req, res) => {
 		Brand.find({ status: true }),
 		Color.find({ status: true })
 	])
-	// console.log('searchResult', searchResult)
 
 	const totalPages = Math.ceil(searchResult.length / limit)
 	const paginatedSearchResult = searchResult.slice(skip, skip + limit)
-	// console.log(paginatedSearchResult)
 
 	return res.render('user-pages/userListSearchResultPage', {
 		categories, sizes, brands, colors,
@@ -340,7 +325,6 @@ const userSearch_get = async (req, res) => {
 };
 const userSearch_post = async (req, res) => {
 	const { brand, category, color, size, sort, searchKey } = req.body
-	// console.log(req.body)
 	let currentPage = Number(req.query.page) || 1
 	let limit = Number(req.query.limit) || 4
 	let skip = (currentPage - 1) * limit;
@@ -445,11 +429,9 @@ const userSearch_post = async (req, res) => {
 		Brand.find({ status: true }),
 		Color.find({ status: true })
 	])
-	// console.log('searchResult', searchResult)
 
 	const totalPages = Math.ceil(searchResult.length / limit)
 	const paginatedSearchResult = searchResult.slice(skip, skip + limit)
-	// console.log(paginatedSearchResult)
 
 	return res.render('user-pages/userListSearchResultPage', {
 		categories, sizes, brands, colors,
@@ -960,7 +942,6 @@ const userDashboardCart_get = async (req, res) => {
 		{ $sort: { createdAt: -1 } }
 	])
 
-	// console.log(userCartData, 'userCartData');
 
 	let totalIndividualTotal = 0
     let totalMrpWithoutTax = 0
@@ -988,20 +969,6 @@ const userDashboardCart_get = async (req, res) => {
 	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
 	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
-
-	// console.log (totalIndividualTotal);
-    // console.log (totalMrpWithoutTax);
-    // console.log (totalFirstDiscountAmount);
-    // console.log (totalAmountAfterfirstDiscount);  
-    // console.log (totalSeccondDiscountAmount);
-    // console.log (totalAmountAfterSecondDiscount);  
-    // console.log (totalGst);
-    // console.log (totalSgst);
-    // console.log (totalCgst);
-    // console.log (totalDiscount , 'total discount amount');
-    // console.log (totalDiscountPercentage , 'total discount percentage');
-    // console.log (roundOff , 'total roundOff');
-    // console.log (grandTotal , 'total with gst final ');
 
 	const totalPages = Math.ceil(userCartData.length / limit);
 	const paginatedCartProducts = userCartData.slice(skip, skip + limit);
@@ -1531,7 +1498,6 @@ const userDashboardReturns_get = async (req, res) => {
 		{ $sort: { 'orders.createdAt': -1 } },
 	]);
 
-	console.log(order,'order');
 	let totalIndividualTotal = 0
     let totalMrpWithoutTax = 0
     let totalFirstDiscountAmount = 0
@@ -2089,7 +2055,6 @@ const userDashboardCancellations_get = async (req, res) => {
 		{ $sort: { 'orders.createdAt': -1 } },
 	]);
 
-	console.log(order,'order');
 	let totalIndividualTotal = 0
     let totalMrpWithoutTax = 0
     let totalFirstDiscountAmount = 0
@@ -2265,11 +2230,9 @@ const userCancelCartProductOnPlaceorder_post = async (req, res) => {
 		{ userId: new ObjectId(req.session.userId) },
 		{ $pull: { cart: { _id: cartId } } }
 	);
-	console.log(updatedCart, 'updatedCart')
 	return res.json({ success: true, message: `${product} deleted successfully` })
 };
 const userChangeQuantity_post = async (req, res) => {
-	console.log(req.body, 'userChangeQuantity_post');
 	const updatedCart = await Cart.updateOne(
 		{
 			'_id': new ObjectId(req.body.cart),
@@ -2788,7 +2751,6 @@ const userCheckout_get = async (req, res) => {
 		},
 		{ $sort: { createdAt: -1 } }
 	])
-	//  console.log(cartDetails, 'cartDetails');
 	let totalIndividualTotal = 0
     let totalMrpWithoutTax = 0
     let totalFirstDiscountAmount = 0
@@ -2815,20 +2777,6 @@ const userCheckout_get = async (req, res) => {
 	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
 	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
-
-	// console.log (totalIndividualTotal);
-    // console.log (totalMrpWithoutTax);
-    // console.log (totalFirstDiscountAmount);
-    // console.log (totalAmountAfterfirstDiscount);  
-    // console.log (totalSeccondDiscountAmount);
-    // console.log (totalAmountAfterSecondDiscount);  
-    // console.log (totalGst);
-    // console.log (totalSgst);
-    // console.log (totalCgst);
-    // console.log (totalDiscount , 'total discount amount');
-    // console.log (totalDiscountPercentage , 'total discount percentage');
-    // console.log (roundOff , 'total roundOff');
-    // console.log (grandTotal , 'total with gst final ');
 
 	res.render('user-pages/userDashboardCheckoutPage',
 		{
@@ -3429,7 +3377,6 @@ const userDashboardOrders_get = async (req, res) => {
 	});
 };
 const userDownloadInvoice_get = async (req, res) => {
-	console.log(req.params.id , 'req.params.id')
 	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
 		return res.status(400).render('user-pages/404', { title: '404 Error' })
 	};
@@ -4809,9 +4756,7 @@ const userFilterOrderStatus_get = async (req, res) => {
 };
 const userFilterOrderStatus_post = async (req, res) => {
 	const uniqueStatusTypes = req.query.orderStatuses? req.query.orderStatuses.split(',') : [];
-	console.log(uniqueStatusTypes, 'userFilterOrderStatus_post');
 	const selectedFilter = req.body.orderStatusFilter
-	console.log(selectedFilter, 'userFilterOrderStatus_post');
 
 	let currentPage = Number(req.query.page) || 1;
 	let limit = Number(req.query.limit) || 1;
@@ -5411,7 +5356,6 @@ const userApplyCouponPlaceOrder_post = async (req, res) => {
 	return res.json({ success: true, message: 'Coupon applied successfully' });
 };
 const updateQuantityPlaceOrder_post = async (req, res) => {
-	console.log(req.body)
 	const updatedCart = await Cart.updateOne(
 		{
 			_id: new ObjectId(req.body.cart),
@@ -5424,21 +5368,16 @@ const updateQuantityPlaceOrder_post = async (req, res) => {
 		},
 		{ new: true }
 	);
-	console.log(updatedCart, 'updatedCart')
 
 	if (updatedCart) {
-		console.log('Quantity updated successfully');
 		return res.json({ success: true, message: 'Quantity updated successfully' });
 	} else {
-		console.log('Cart not found or not updated');
 		return res.status(404).json({ success: false, message: 'Cart not found or not updated' });
 	}
 
 };
 const userPlaceOrder_post = async (req, res) => {
 	const cartId = req.params.id;
-	console.log(req.params,'req.params')
-	console.log(req.body,'req.body')
 	if (!mongoose.Types.ObjectId.isValid(cartId)) {
 		return res.status(404).render('user-pages/404');
 	}
@@ -5476,7 +5415,6 @@ const userPlaceOrder_post = async (req, res) => {
 			},
 		},
 	]);
-	console.log(orderDetails, 'orderDetails')
 	const orderItems = orderDetails.map((item) => ({
 		productId: item.productId,
 		couponId: item.couponId,
@@ -5528,7 +5466,6 @@ const userPlaceOrder_post = async (req, res) => {
 			console.error(err);
 			res.status(500).json({ error: 'Unable to create order' });
 		} else {
-			console.log(order, 'order created in razorpay')
 			res.json({
 				order: order,
 				userDetails: req.session,
@@ -5539,7 +5476,6 @@ const userPlaceOrder_post = async (req, res) => {
 	});
 };
 const userRetryPayment_post = async (req, res) => {
-	console.log(req.body, 'retry payment')
 	const { orderId, keyId, amount} = req.body;
 	if (!mongoose.Types.ObjectId.isValid(orderId)) {
 		return res.status(404).render('user-pages/404');
@@ -5552,10 +5488,8 @@ const userRetryPayment_post = async (req, res) => {
 
 	razorpayInstance.orders.create(options, (err, order) => {
 		if (err) {
-			console.error(err);
 			res.status(500).json({ error: 'Unable to create order' });
 		} else {
-			console.log(order, 'order created in razorpay')
 			res.json({
 				status: true,
 				order: order,
@@ -5582,7 +5516,6 @@ const userVerifyPayment_post = (req, res) => {
 	}
 };
 const userChangePaymentStatus_post = async (req, res) => {
-	console.log(req.body, 'change payment')
 	if (!mongoose.Types.ObjectId.isValid(req?.body?.orderId)) {
 		return res.status(404).render('user-pages/404');
 	}
@@ -5648,7 +5581,6 @@ const userCancelWholeOrder_post = async (req, res) => {
 			}
 		}
 	);
-	console.log(cancelledOrder,'cancelledOrder')
 	if(cancelledOrder){
 		req.flash('message', `${req.query.orderName} cancelled successfully`);
 		return res.redirect(`/user-dashboard-orders?page=${req.query.page}`)

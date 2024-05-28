@@ -116,7 +116,6 @@ const adminOrderManagementSearch_get = async (req, res) => {
 	})
 };
 const adminViewOrderDetails_get = async (req, res) => {
-	console.log(req.params.id , 'req.params.id')
 	if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
 		return res.status(400).render('admin-pages/404', { title: '404 Error' })
 	};
@@ -626,7 +625,6 @@ const adminViewOrderDetails_get = async (req, res) => {
 			}
 		},
 	])
-	console.log(orderDetails, 'orderDetails')
 	let totalIndividualTotal = 0
     let totalMrpWithoutTax = 0
     let totalFirstDiscountAmount = 0
@@ -667,24 +665,7 @@ const adminChangeOrderStatus_post = async (req, res) => {
 	};
 	const id = req.params.orderId;
 	const newStatus = req.query.newStatus;
-	const currentOrderStatus = req.query.currentOrderStatus;
-
-	// const updatedOrder = await Order.findOneAndUpdate(
-	// 	{
-	// 		_id: new ObjectId(id),
-	// 		orderStatus: currentOrderStatus,
-	// 		"order.status": currentOrderStatus
-	// 	},
-	// 	{
-	// 		$set: {
-	// 			orderStatus: newStatus,
-	// 			"order.$.status": newStatus
-	// 		}
-	// 	},
-	// 	{ new : true}
-	// );
-	// console.log(updatedOrder, 'updatedOrder adminChangeOrderStatus_post')
-	
+	const currentOrderStatus = req.query.currentOrderStatus;	
 	const order = await Order.findOne({ _id : new ObjectId(id), orderStatus : currentOrderStatus });
 	if(!order){
 		return res.json({ status: 404, message: 'Somehting went wrong!. Try again.' });

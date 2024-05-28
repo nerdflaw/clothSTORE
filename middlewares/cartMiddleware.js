@@ -8,7 +8,6 @@ const fetchCartsMiddleware = async (req, res, next) => {
 
       if (carts) {
         res.locals.carts = carts;
-        // console.log('Cart found:', carts);
       }
     }
     next();

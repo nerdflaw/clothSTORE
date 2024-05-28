@@ -58,35 +58,9 @@
       </div>
     </div>
   </section>
-
-  <!-- <script>
-    function validateInput(input) {
-      // Remove any numbers from the input value
-      input.value = input.value.replace(/\d/g, '');
-    }
-  </script> -->
-
-  <!-- <script>
-    const countrySelect = document.getElementById('country');
   
-    const allCountries = Object.values(require('countries-list').countries);
-  
-    allCountries.forEach((country) => {
-      const option = document.createElement('option');
-      option.value = country.name;
-      option.text = country.name;
-      countrySelect.appendChild(option);
-    });
-  </script> -->
-  <!-- <script>
-    setTimeout(function() {
-      document.getElementById('flash').style.display = 'none';
-    }, 3000);
-  </script> -->
   <script>
     const wishlistButtons = document.querySelectorAll('.wish-list-button');
-    // console.log(wishlistButtons, 'wishlistButtons');
-
     wishlistButtons.forEach(button => {
       button.onclick = (event) => {
         event.preventDefault();

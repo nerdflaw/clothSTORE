@@ -54,7 +54,6 @@ const fetchGrandTotalMiddleware = async (req, res, next) => {
 				]
 			)
 			res.locals.grandTotal = grandTotal;
-			// console.log(grandTotal, 'grandTotal')
 		}
 		next();
 	} catch (error) {

@@ -299,8 +299,6 @@
         var selectElement = document.getElementById("colorSelect");
         var selectedColor = selectElement.options[selectElement.selectedIndex].value;
 
-        console.log("Selected Color: " + selectedColor);
-
         var productIdElement = document.getElementById("productId");
         var productIdValue = productIdElement.getAttribute("data-productId");
 
@@ -310,8 +308,6 @@
           fetch(url)
             .then(response => response.json())
             .then(data => {
-              // console.log("Data from the backend (Product Variants):", data.productVariants);
-              // console.log("Data from the backend (Size Details):", data.sizeDetails);
               productVariants = data.productVariants;
               updateSizeOptions(data.productVariants, data.sizeDetails);
             })
@@ -342,7 +338,6 @@
 
       sizeSelect.addEventListener("change", function() {
         var selectedSize = sizeSelect.options[sizeSelect.selectedIndex].value;
-        console.log("Selected Size: " + selectedSize);
 
         // Clear existing options in quantitySelect
         var quantitySelect = document.getElementById("quantitySelect");
@@ -370,14 +365,10 @@
       function addToCart(event) {
         event.preventDefault();
         var selectedColor = document.getElementById("colorSelect").value;
-        console.log(selectedColor, 'selectedColor');
         var selectedSize = document.getElementById("sizeSelect").value;
-        console.log(selectedSize, 'selectedSize');
         var selectedQuantity = document.getElementById("quantitySelect").value;
-        console.log(selectedQuantity, 'selectedQuantity');
         var productIdElement = document.getElementById("productId");
         var productIdValue = productIdElement.getAttribute("data-productId");
-        console.log(productIdValue, 'productIdValue');
 
         var data = {
           selectedColor: selectedColor,
@@ -385,7 +376,6 @@
           selectedQuantity: parseInt(selectedQuantity),
           productId: productIdValue
         };
-        console.log(data);
 
         var options = {
           method: 'POST',
@@ -403,7 +393,6 @@
             return response.json();
           })
           .then(data => {
-            console.log('Response from server:', data);
             // Redirect to home after successful response
             window.location.href = `/user-dashboard-cart`;
           })

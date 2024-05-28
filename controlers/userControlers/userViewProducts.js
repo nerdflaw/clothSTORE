@@ -53,8 +53,6 @@ const userViewProductDetails = async (req, res) => {
 		{ $match : { 'relatedProducts.status' : true}},
 		{ $limit: 6 }
 	]);
-	console.log(relatedProducts, 'relatedProducts');
-
 
 	const colorDetails = await Color.find({ status: true })
 	const sizeDetails = await Size.find({ status: true })
@@ -365,7 +363,6 @@ const userAddToCart_post = async (req, res) => {
 		if (matchingItem) {
 			// If a matching item is found, update the quantity
 			matchingItem.quantity += parseInt(req.body.selectedQuantity, 10);
-			console.log(matchingItem.quantity, 'matchingItem.quantity');
 			await Cart.updateOne(
 				{
 					userId: new ObjectId(req.session.userId),

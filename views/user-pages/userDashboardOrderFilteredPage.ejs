@@ -428,7 +428,6 @@
         async function sendData() {
           let formData = gatherFormData();
           orderId = formData.orderId
-          console.log(formData);
           if (formData) {
             try {
               const response = await sendRequest(formData);
@@ -460,7 +459,6 @@
         }
 
         function handleResponse(response) {
-          console.log('handleResponse', response);
           if (response.status) {
             handleOnlinePayment(response);
           }
@@ -476,7 +474,6 @@
             "image": "/images/clothStore_favicon.jpg",
             "order_id": online?.order?.id,
             "handler": function(response) {
-              console.log(response);
               paymentVerification(response, online)
             },
             "prefill": {

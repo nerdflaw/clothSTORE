@@ -264,7 +264,6 @@
 
               // Convert the cropped image to a File object
               let croppedImageFile = URLToFile(croppedImageData, index);
-              console.log(croppedImageFile, 'croppedImageFile');
 
               // Create a FileList indirectly using DataTransfer
               let dataTransfer = new DataTransfer();
@@ -272,12 +271,7 @@
 
               // Assign the FileList to the files property of the input element
               productImage.files = dataTransfer.files;
-              cropButton.style.display = 'none';
-
-              // Set the input value to the name of the cropped image file
-              // productImage.value = croppedImageFile.name;
-              
-              // console.log(productImage.files, 'inputImage.files')
+              cropButton.style.display = 'none';              
             }
 
             function cancelSelection(index) {
@@ -365,11 +359,8 @@
     let titleEl = document.getElementById('title');
     let message = document.getElementById('title-available');
     let targetButton = document.getElementById('target-button');
-    // let originalTitle = document.getElementById('original-title').value;
-    console.log(titleEl,message,targetButton );
 
     const sendDebounceTextToBackend = debounce(text => {
-      console.log('send -> ', text);
       let url = '/admin-add-product-check';
       fetch(url, {
           method: 'POST',
@@ -388,7 +379,6 @@
           }
         })
         .then(data => {
-          console.log('Response from backend:', data.status);
           if (data.status) {
             message.innerHTML = data.message;
             message.style.color = '#044604';
@@ -404,7 +394,6 @@
     });
 
     titleEl.addEventListener('input', (e) => {
-      console.log(e.target.value);
       sendDebounceTextToBackend(e.target.value);
     });
 

@@ -17,7 +17,6 @@ const blockedUserMiddleware = require('../middlewares/blockedUserMiddleware');
 router.use(passport.initialize());
 router.use(passport.session());
 
-// router.use(blockedUserMiddleware)
 router.get('/', adminAuthorization, userAccessControler.homepage)
 
 router.get('/user-list-flash-sales', userAccessControler.userListFlashSales_get)
@@ -80,8 +79,6 @@ router.post('/user-search', errorHandlerMiddleware(userDashboardControler.userSe
 router.get('/user-login', errorHandlerMiddleware(userAccessControler.userLogin_get))
 router.post('/user-login', errorHandlerMiddleware(userAccessControler.userLogin_post));
 
-//google authentication codes.
-// router.get('/user-login-google', errorHandlerMiddleware(userAccessControler.userLoginGoogle_get))
 //auth
 router.get('/auth/google', passport.authenticate('google', {
 	scope: ['email', 'profile']

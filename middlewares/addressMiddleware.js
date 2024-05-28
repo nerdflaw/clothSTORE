@@ -7,7 +7,6 @@ const fetchAddressesMiddleware = async (req, res, next) => {
     if(req.session.userLogged){
     const addresses = await Address.find({userId: new ObjectId(req.session.userId)});
     res.locals.addresses = addresses;
-    // console.log(addresses, 'addresses');
   }
     next();
   } catch (error) {

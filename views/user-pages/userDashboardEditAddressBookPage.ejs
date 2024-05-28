@@ -281,7 +281,6 @@
           location: document.getElementById('location'),
           district: document.getElementById('district'),
         };
-        console.log(formFields, 'formFields')
 
         function isRadioButtonChecked() {
           return Array.from(radioButtons).some(radioButton => radioButton.checked);
@@ -292,7 +291,6 @@
             if (this.checked) {
               const selectedAddressId = this.value;
               localStorage.setItem('selectedAddressId', selectedAddressId);
-              // console.log(selectedAddressId);
               const url = `/user-dashboard-address-book?id=${selectedAddressId}`;
               fetch(url)
                 .then((response) => response.json())
@@ -478,7 +476,6 @@
       }
 
       function validateForm(event) {
-        console.log('functionCalled')
         event.preventDefault();
         validateFullName()
         validateEmail()

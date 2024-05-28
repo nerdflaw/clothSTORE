@@ -149,8 +149,6 @@
     function validatePassword() {
       let newPassword = document.forms['dashboardForm']['newPassword'].value;
       let oldPassword = document.forms['dashboardForm']['oldPassword'].value;
-      console.log(newPassword)
-      console.log(oldPassword)
       let strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
       if (oldPassword === newPassword) {

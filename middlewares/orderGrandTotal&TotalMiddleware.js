@@ -68,8 +68,6 @@ const fetchOrderGrandTotalMiddleware = async (req, res, next) => {
         }
       ]);
 
-      // console.log(order, 'order from middleware')
-
       const individualOrderTotals = order.map(order => ({
         orderId: order._id,
         individualOrderTotal: order.individualOrderTotal

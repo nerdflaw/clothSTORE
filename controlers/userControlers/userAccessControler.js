@@ -260,7 +260,6 @@ const userSignUpOTP_post = async (req, res) => {
 				return res.redirect('/user-signup');
 			}
 			const generatedOTP = OTPgenerator
-			console.log('generatedOTP', generatedOTP)
 			const recipientEmail = email;
 			const expirationTime = 5 * 60 * 1000;
 			const expirationTimestamp = Date.now() + expirationTime;
@@ -290,7 +289,6 @@ const userSignUpOTPValidate_get = (req, res) => {
 const userSignUpOTPValidate_post = async (req, res) => {
 	const { otp1, otp2, otp3, otp4, otp5, otp6 } = req.body;
 	const userEnteredOTP = otp1 + otp2 + otp3 + otp4 + otp5 + otp6;
-	console.log('userEnteredOTP', userEnteredOTP);
 	if (otpStore1[userEnteredOTP] && otpStore1[userEnteredOTP] > Date.now()) {
 		const email = req.session.email
 		const createNewuser = await users.create({
@@ -300,10 +298,6 @@ const userSignUpOTPValidate_post = async (req, res) => {
 			password: req.session.hashedPassword
 		})
 		req.session.userId = createNewuser._id
-		// req.session.destroy()
-		// res.session.userLogged=true
-		console.log(createNewuser, 'createNewuser')
-		console.log(req.session.userId, 'req.session.userId')
 		res.redirect('/user-login?success=OTP validated successfully');
 	} else {
 		res.status(500).redirect('/user-signup-otp-validate?error= Invalid or expired OTP');

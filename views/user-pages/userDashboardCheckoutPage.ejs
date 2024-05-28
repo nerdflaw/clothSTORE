@@ -387,7 +387,6 @@
           });
 
           const result = await response.json();
-          console.log(result, 'result')
           if (result.success) {
             window.location.reload()
           } else {
@@ -462,7 +461,6 @@
 
         async function sendData() {
           let formData = gatherFormData();
-          console.log(formData);
           if (formData) {
             try {
               const response = await sendRequest(formData);
@@ -497,8 +495,6 @@
         }
 
         function handleResponse(response) {
-          console.log("Response place order on COD:", response);
-          console.log("Response place order on COD message:", response.message);
           if (response.paymentMode === 'COD') {
             location.replace("/user-dashboard-orders");
             toastMessage(response.message);
@@ -518,7 +514,6 @@
             "image": "/images/clothStore_favicon.jpg",
             "order_id": online?.order?.id,
             "handler": function(response) {
-              console.log(response);
               paymentVerification(response, online);
             },
             "prefill": {
