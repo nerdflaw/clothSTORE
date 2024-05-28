@@ -1,0 +1,56 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+  <% if (message) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        toastMessage("<%= message %>");
+      });
+    </script>
+    <% } %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-between p-2">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex flex-column justify-content-center align-items-center border rounded-3 p-5">
+          <p class="font-size-bold text-danger">Existing categories</p>
+          <ul class="d-flex flex-column align-items-start">
+            <% categories.forEach((data,index)=>{ %>
+            <li class="font-size m-0 py-1"><%= index+1 %>.&nbsp;<%= data.category %></li>
+            <% }) %>
+          </ul>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border rounded-3 p-5">
+          <div class="loginDiv col">
+            <h4 class="text-center text-black font-size-bold-title">Add a category</h4>
+            <form id="categoryForm" action="/admin-add-category" method="POST">
+              <div class="mb-3 form-group">
+                <label for="category" class="form-label text-black font-size">Category name</label>
+                <input type="text" class="form-control bg-whit text-black font-size availability-check" id="category" name="category" required>
+                <!-- <div class="text-danger font-size" id="validateErrors"></div> -->
+              </div>
+
+              <!-- <span id="errorMessage" class="error-message font-size text-danger">First letter must be uppercase, and the rest must be lowercase.</span> -->
+
+              <div class="d-flex justify-content-center align-items-center flex-wrap">
+                <div class="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
+                  <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-category-management">cancel</a>
+                </div>
+                <button type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold submitButton">add category</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

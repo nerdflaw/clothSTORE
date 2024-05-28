@@ -1,0 +1,63 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-between p-2">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex flex-column justify-content-center align-items-center border rounded-3 p-5">
+          <p class="font-size-bold text-danger">Existing coupons</p>
+
+          <% if (message) { %>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                toastMessage("<%= message %>");
+              });
+            </script>
+          <% } %>
+
+          <ul class="d-flex flex-column align-items-start">
+            <% coupons.forEach((data,index)=>{ %>
+            <li class="font-size m-0 py-1"><%= index+1 %>.&nbsp;<%= data.coupon %></li>
+            <% }) %>
+          </ul>
+        </div>
+
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border rounded-3 p-5">
+          <div class="loginDiv col">
+            <h4 class="text-center text-black font-size-bold-title">Add a coupon</h4>
+            <form id="couponForm" action="/admin-add-coupon" method="POST">
+              <div class="mb-3 form-group">
+                <label for="coupon" class="form-label text-black font-size">Coupon name</label>
+                <input type="text" class="form-control bg-white text-black font-size availability-check" id="coupon" name="coupon" required>
+              </div>
+
+              <div class="mb-3 form-group">
+                <label for="couponDiscount" class="form-label text-black font-size">Coupon value ( % )</label>
+                <input type="text" class="form-control bg-white text-black font-size availability-check" id="couponDiscount" name="couponDiscount" required>
+              </div>
+
+              <div class="d-flex justify-content-center align-items-center flex-wrap">
+                <div class="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
+                  <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-coupon-management">cancel</a>
+                </div>
+                <button type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold submitButton">add coupon</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

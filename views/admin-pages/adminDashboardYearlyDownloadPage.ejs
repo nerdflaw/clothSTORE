@@ -1,0 +1,163 @@
+<!-- including admin head -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center my-3">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/admin-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/sales-report?customRange=<%= customRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>"><%= customRange?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %> sales report</a>
+            </div>
+            <% if(locals?.admin){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size-bold text-end px-3">Admin</div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <% if (order?.length === 0) { %>
+  <div class="container-fluid">
+    <div class="row m-0 p-0">
+      <p class="m-0 p-0 text-black font-size-bold fst-italic">No data found</p>
+    </div>
+  </div>
+  <% } %>
+  <% if (order?.length > 0) { %>
+  <section>
+    <div class="container-fluid m-0 p-0">
+      <div class="row d-flex m-0 p-0">
+        <div class="col-12 m-0 p-0">
+          <div class="container-fluid">
+            <div class="row m-0 p-0 border rounded-3 my-3">
+              <% if (order?.length > 0) { %>
+              <div class="row m-0 p-3">
+                <div class="row m-0 p-0 table-responsive-md overflow-auto">
+                  <table class="table table-hover" id="sales-table">
+                    <thead>
+                      <tr class="font-size " style="vertical-align: middle;">
+                        <th class="text-primary font-sizebold text-center text-truncate" colspan="17">
+                          <%= customRange?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %> Sales Report
+                        </th>
+                      </tr>
+                      <tr class="font-size" style="vertical-align: middle;">
+                        <th class="text-white font-size-small bg-black text-center text-truncate">No.</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Year</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Product</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">MRP</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Tax</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Qty.</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Taxable</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">GST</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">SGST</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">CGST</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Disc. %</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Disc. Amt.</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Coup. %</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Coup. Amt.</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Total Disc. %</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Total Disc. Amt.</th>
+                        <th class="text-white font-size-small bg-black text-center text-truncate">Total</th>
+                      </tr>
+                    </thead>
+
+                    <tbody class="table-group-divider">
+                      <% order?.forEach((monthData, index) => { %>
+                      <% paginatedOrder?.forEach((element, index) => { %>
+                      <tr class="font-size m-0 p-0">
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= index + 1 %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= monthData?._id?.year %></td>
+                        <td class="text-black table-white font-size-small text-start text-truncate"><%= element?.product?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.mrp?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.taxRate * 100 %> %</td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.quantity?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.AmountAfterSecondDiscount?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.gst?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.sgst?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.cgst?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.discount %> %</td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.firstDiscountAmount?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.couponValue %> %</td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.seccondDiscountAmount?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.totalDiscountPercentage?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.totalDiscount?.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small text-end text-truncate"><%= element?.totalPrice?.toFixed(2)%></td>
+                      </tr>
+                      <% }) %>
+                      <tr>
+                        <% const totals = paginatedOrder?.reduce((acc, element) => {
+                          acc.totalMrpWithoutTax += parseFloat(element.mrpWithoutTax);
+                          acc.totalGst += parseFloat(element.gst);
+                          acc.totalSgst += parseFloat(element.sgst);
+                          acc.totalCgst += parseFloat(element.cgst);
+                          acc.totalDiscount += parseFloat(element.discount);
+                          acc.totalFirstDiscountAmount += parseFloat(element.firstDiscountAmount);
+                          acc.totalCouponValue += parseFloat(element.couponValue);
+                          acc.totalSecondDiscountAmount += parseFloat(element.seccondDiscountAmount);
+                          acc.totalTotalDiscountPercentage += parseFloat(element.totalDiscountPercentage);
+                          acc.totalTotalDiscount += parseFloat(element.totalDiscount);
+                          acc.totalTotalPrice += parseFloat(element.totalPrice);
+                          acc.totalMrp += parseFloat(element.mrp);
+                          acc.totalAmountAfterSecondDiscount += parseFloat(element.AmountAfterSecondDiscount);
+                          acc.totalQuantity += parseFloat(element.quantity);
+                          return acc;
+                        }, {
+                          totalMrpWithoutTax: 0,
+                          totalGst: 0,
+                          totalSgst: 0,
+                          totalCgst: 0,
+                          totalDiscount: 0,
+                          totalFirstDiscountAmount: 0,
+                          totalCouponValue: 0,
+                          totalSecondDiscountAmount: 0,
+                          totalTotalDiscountPercentage: 0,
+                          totalTotalDiscount: 0,
+                          totalTotalPrice: 0,
+                          totalMrp: 0,
+                          totalAmountAfterSecondDiscount: 0,
+                          totalQuantity: 0
+                        });
+                        %>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-start">Total</td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalMrp.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalQuantity.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalAmountAfterSecondDiscount.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalGst.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalSgst.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalCgst.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalFirstDiscountAmount.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalSecondDiscountAmount.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalTotalDiscount.toFixed(2) %></td>
+                        <td class="text-black table-white font-size-small-bold text-truncate text-end"><%= totals.totalTotalPrice.toFixed(2) %></td>
+                      </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </section>
+  <% } %>
+</body>
+
+</html>

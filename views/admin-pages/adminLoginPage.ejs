@@ -1,0 +1,54 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+
+  <section>
+    <div class="container-fluid">
+      <div class="row d-flex justify-content-around">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center border-2 border-end" style="height: 600px;">
+          <img class="login-image img-fluid" src="/images/login.png" alt="Login page image" style="width: 500px">
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
+          <div class="loginDiv" style="width: 500px;">
+            <h4 class="text-center text-black font-size-bold-title">Admin Login</h4>
+            <form id="loginForm" action="/user-login" method="POST">
+              <!-- existing email flashing start -->
+
+              <!-- existing email flashing end -->
+
+              <div class="mb-3">
+                <label for="email" class="form-label text-black font-size">Email</label>
+                <input type="email" class="form-control bg-whit text-black font-size" id="email" name="email" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label text-black font-size">Password</label>
+                <input type="password" class="form-control bg-white text-black font-size" id="password" name="password" required>
+              </div>
+              <div class="text-center mb-3">
+                <button type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold">Admin Login</button>
+              </div>
+            </form>
+            <hr class="text-dark">
+            <div class="d-flex flex-column justify-content-center align-items-center">
+              <p class="me-3 text-black font-size">Are you an user?</p>
+              <button type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold">
+                <a class="text-decoration-none text-white" href="/user-login">User login</a>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

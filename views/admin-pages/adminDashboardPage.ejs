@@ -1,0 +1,495 @@
+<!-- including admin head -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+
+  <section>
+    <div class="row d-flex m-0 p-0">
+      <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2 left-side-nav border-1 border-white m-0 p-0">
+        <%- include('../../partials/admin-partials/admin-sideBar.ejs') %>
+      </div>
+      <div class="col-sm-8 col-md-8 col-lg-9 col-xl-10 m-0 p-0">
+        <!-- Dashboard -->
+        <div class="container">
+          <div class="row m-0 p-0 border rounded-3 my-3">
+            <h6 class="text-primary p-3 m-0">Dashboard</h6>
+          </div>
+        </div>
+        <% if (sales.length == 0) { %>
+        <div>
+          <h6 class="text-black text-center font-size p-2 animate__animated animate__flash " colspan="5"><em>no data to show</em></h6>
+        </div>
+        <% } %>
+        <% if (sales.length > 0) { %>
+        <!-- top 10 -->
+        <div class="container">
+          <div class="row m-0 p-0 border rounded-3 my-3">
+            <div class="col-12 col-md-6 col-lg-4 p-3">
+              <h6 class="text-primary p-0 pb-3 m-0 text-center">Top 10 Brands</h6>
+              <div class="row m-0 p-0 border rounded-3 bg-light p-3">
+                <% mostOrderedBrand?.forEach((element, index) => { %>
+                <div class="col-12 col-sm-12 form-group d-flex justify-content-between align-items-center">
+                  <div class="col-2">
+                    <p class="text-black font-size m-0 p-0 text-end"><%= index+1 %></p>
+                  </div>
+                  <div class="col-1">
+                    <p class="text-black font-size m-0 p-0 text-start">.</p>
+                  </div>
+                  <div class="col-9">
+                    <p class="text-black font-size m-0 p-0 text-start"><%= element?.brand?.split(' ').map(word => word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase())?.join(' ') %></p>
+                  </div>
+                </div>
+                <% }) %>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 p-3">
+              <h6 class="text-primary p-0 pb-3 m-0 text-center">Top 10 Categories</h6>
+              <div class="row m-0 p-0 border rounded-3 bg-light p-3">
+                <% mostOrderedCategory?.forEach((element, index) => { %>
+                <div class="col-12 col-sm-12 form-group d-flex justify-content-between align-items-center">
+                  <div class="col-2">
+                    <p class="text-black font-size m-0 p-0 text-end"><%= index+1 %></p>
+                  </div>
+                  <div class="col-1">
+                    <p class="text-black font-size m-0 p-0 text-start">.</p>
+                  </div>
+                  <div class="col-9">
+                    <p class="text-black font-size m-0 p-0 text-start"><%= element?.category?.split(' ').map(word => word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase())?.join(' ') %></p>
+                  </div>
+                </div>
+                <% }) %>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 p-3">
+              <h6 class="text-primary p-0 pb-3 m-0 text-center">Top 10 Products</h6>
+              <div class="row m-0 p-0 border rounded-3 bg-light p-3">
+                <% mostOrderedProduct?.forEach((element, index) => { %>
+                <div class="col-12 col-sm-12 form-group d-flex justify-content-between align-items-center">
+                  <div class="col-2">
+                    <p class="text-black font-size m-0 p-0 text-end"><%= index+1 %></p>
+                  </div>
+                  <div class="col-1">
+                    <p class="text-black font-size m-0 p-0 text-start">.</p>
+                  </div>
+                  <div class="col-9">
+                    <p class="text-black font-size m-0 p-0 text-start"><%= element?.product?.split(' ').map(word => word?.charAt(0)?.toUpperCase() + word?.slice(1)?.toLowerCase())?.join(' ') %></p>
+                  </div>
+                </div>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- sales count  -->
+        <div class="container">
+          <div class="row m-0 p-0 border rounded-3 my-3">
+            <h6 class="text-primary p-3 m-0 border-bottom text-center">Financial Year <%= sales[0]?._id?.year %></h6>
+            <div class="col-12 col-md-6 col-lg-4 p-3">
+              <div class="row m-0 p-0 border rounded-3 bg-light">
+                <div class="col-12 col-sm-12 d-flex flex-column justify-content-center align-items-center form-group">
+                  <p class="text-black p-3 m-0 text-center font-size-bold">Total Orders</p>
+                  <p class="text-black p-3 m-0 text-center"><strong><%= sales[0]?.ordersCount %></strong> NOS.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 p-3">
+              <div class="row m-0 p-0 border rounded-3 bg-light">
+                <div class="col-12 col-sm-12 d-flex flex-column justify-content-center align-items-center form-group">
+                  <p class="text-black p-3 m-0 text-center font-size-bold">Total Sales</p>
+                  <p class="text-black p-3 m-0 text-center">&#8377; <strong><%= sales[0]?.totalOrderPrice?.toFixed(2) %></strong></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4 p-3">
+              <div class="row m-0 p-0 border rounded-3 bg-light">
+                <div class="col-12 col-sm-12 d-flex flex-column justify-content-center align-items-center form-group">
+                  <p class="text-black p-3 m-0 text-center font-size-bold">Total Discount</p>
+                  <p class="text-black p-3 m-0 text-center">&#8377; <strong><%= sales[0]?.totalDiscount.toFixed(2) %></strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row m-0 p-0 border rounded-3 my-3" id="myChartDiv" hidden>
+            <!-- charts -->
+            <div class="col-12 py-3">
+              <div class="row m-0 p-0">
+                <canvas id="myChart" style="height: 50vh; width: 100%;"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- charts  -->
+        <div class="container">
+          <div class="row m-0 p-0 border rounded-3 my-3">
+            <h6 class="text-primary p-3 m-0 border-bottom">Charts</h6>
+            <div class="col-12 col-md-6 col-lg-3 py-3">
+              <div class="row">
+                <div class="col-12 col-sm-12 d-flex justify-content-center align-items-center form-group">
+                  <button class="bg-black m-0 p-0 outline-none border-0 text-white font-size px-3 py-2 rounded-3" name="daily" id="daily" type="submit">Daily</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3 py-3">
+              <div class="row">
+                <div class="col-12 col-sm-12 d-flex justify-content-center align-items-center form-group">
+                  <button class="bg-black m-0 p-0 outline-none border-0 text-white font-size px-3 py-2 rounded-3" name="weekly" id="weekly" type="submit">Weekly</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3 py-3">
+              <div class="row">
+                <div class="col-12 col-sm-12 d-flex justify-content-center align-items-center form-group">
+                  <button class="bg-black m-0 p-0 outline-none border-0 text-white font-size px-3 py-2 rounded-3" name="monthly" id="monthly" type="submit">Monthly</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-3 py-3">
+              <div class="row">
+                <div class="col-12 col-sm-12 d-flex justify-content-center align-items-center form-group">
+                  <button class="bg-black m-0 p-0 outline-none border-0 text-white font-size px-3 py-2 rounded-3" name="yearly" id="yearly" type="submit">Yearly</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- sales report  -->
+        <div class="container">
+          <form id="salesReportForm" action="/sales-report" method="get">
+            <div class="row m-0 p-0 border rounded-3 my-3">
+              <h6 class="text-primary p-3 m-0 border-bottom">Sales Report</h6>
+              <!-- date range  -->
+              <div class="col-12 col-md-6 col-lg-3 py-3">
+                <div class="row">
+                  <div class="col-12 col-sm-12 d-flex justify-content-center align-items-center form-group">
+                    <select required class="w-100 border-0 outline-none rounded-3 font-size px-2 py-2 bg-black text-white" name="customRange" id="customRange">
+                      <option class="border-0 outline-none" selected disabled>Select a range</option>
+                      <option class="border-0 outline-none" value="daily">Daily</option>
+                      <option class="border-0 outline-none" value="weekly">Weekly</option>
+                      <option class="border-0 outline-none" value="monthly">Monthly</option>
+                      <option class="border-0 outline-none" value="yearly">Yearly</option>
+                      <option class="border-0 outline-none" value="custom">Custom date</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <!-- start date -->
+              <div class="col-12 col-md-6 col-lg-3 py-3 m-0" hidden id="startDateDiv">
+                <div class="row m-0 p-0">
+                  <div class="col-6 col-sm-4 d-flex justify-content-center align-items-center m-0 p-0">
+                    <label class="m-0 p-0 text-start text-black font-size-bold" for="startDate">Start date</label>
+                  </div>
+                  <div class="col-6 col-sm-8 d-flex justify-content-center align-items-center form-group">
+                    <input required type="date" name="startDate" id="startDate" class="border-0 bg-black text-white outline-none m-0 px-2 py-2 rounded-3 font-size">
+                    <style>
+                      input[type="date"]::-webkit-calendar-picker-indicator {
+                        filter: invert(1);
+                      }
+                    </style>
+                  </div>
+                </div>
+              </div>
+              <!-- end date -->
+              <div class="col-12 col-md-6 col-lg-3 py-3 m-0" hidden id="endDateDiv">
+                <div class="row m-0 p-0">
+                  <div class="col-6 col-sm-4 d-flex justify-content-center align-items-center m-0 p-0">
+                    <label class="m-0 p-0 text-start text-black font-size-bold" for="endDate">End date</label>
+                  </div>
+                  <div class="col-6 col-sm-8 d-flex justify-content-center align-items-center form-group">
+                    <input required type="date" name="endDate" id="endDate" class="border-0 bg-black text-white outline-none m-0 px-2 py-2 rounded-3 font-size">
+                    <style>
+                      input[type="date"]::-webkit-calendar-picker-indicator {
+                        filter: invert(1);
+                      }
+                    </style>
+                  </div>
+                </div>
+              </div>
+              <!-- submit button -->
+              <div class="col-12 col-md-6 col-lg-3 py-3">
+                <div class="row">
+                  <div class="col-12 d-flex justify-content-center align-items-center">
+                    <button type="submit" class="m-0 outline-none border-0 px-3 py-2 text-white bg-black rounded-3 text-center font-size">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <% } %>
+      </div>
+  </section>
+
+  <!-- Include Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+  <script>
+    let myChartDivEl = document.getElementById('myChartDiv');
+    let myChart;
+
+    document.getElementById('daily').addEventListener('click', (event) => {
+      event.preventDefault();
+      myChartDivEl.removeAttribute('hidden');
+      sendFetchRequest('daily');
+    });
+
+    document.getElementById('weekly').addEventListener('click', (event) => {
+      event.preventDefault();
+      myChartDivEl.removeAttribute('hidden');
+      sendFetchRequest('weekly');
+    });
+
+    document.getElementById('monthly').addEventListener('click', (event) => {
+      event.preventDefault();
+      myChartDivEl.removeAttribute('hidden');
+      sendFetchRequest('monthly');
+    });
+
+    document.getElementById('yearly').addEventListener('click', (event) => {
+      event.preventDefault();
+      myChartDivEl.removeAttribute('hidden');
+      sendFetchRequest('yearly');
+    });
+
+    function sendFetchRequest(reportType) {
+      const url = `/generate-chart?chart=${reportType}`;
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+
+          // Destroy existing chart if it exists
+          if (myChart) {
+            myChart.destroy();
+          }
+
+          // Prepare data for Chart.js based on report type
+          let chartData = {};
+          if (reportType === 'monthly') {
+            chartData = prepareMonthlyChartData(data);
+          } else if (reportType === 'weekly') {
+            chartData = prepareWeeklyChartData(data);
+          } else if (reportType === 'daily') {
+            chartData = prepareDailyChartData(data);
+          } else if (reportType === 'yearly') {
+            chartData = prepareYearlyChartData(data);
+          }
+
+          // Create a bar chart using Chart.js
+          var ctx = document.getElementById('myChart').getContext('2d');
+          myChart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching chart data:', error);
+        });
+    }
+
+    function prepareMonthlyChartData(data) {
+      var chartData = {
+        labels: [],
+        datasets: []
+      };
+
+      data.order.forEach(function(orderData) {
+        var label = orderData._id.month + '/' + orderData._id.year;
+        var salesData = orderData.salesData;
+        chartData.labels.push(label);
+        addSalesDataToChart(chartData, salesData);
+      });
+
+      return chartData;
+    }
+
+    function prepareWeeklyChartData(data) {
+      var chartData = {
+        labels: [],
+        datasets: []
+      };
+
+      data.order.forEach(function(orderData) {
+        var label = 'Week ' + orderData._id.week + ', ' + orderData._id.year;
+        var salesData = orderData.salesData;
+        chartData.labels.push(label);
+        addSalesDataToChart(chartData, salesData);
+      });
+
+      return chartData;
+    }
+
+    function prepareDailyChartData(data) {
+      var chartData = {
+        labels: [],
+        datasets: []
+      };
+
+      // Collect product names
+      var products = new Set();
+
+      data.order.forEach(function(orderData) {
+        var label = orderData._id.day + '/' + orderData._id.month + '/' + orderData._id.year;
+        chartData.labels.push(label);
+
+        orderData.salesData.forEach(function(sale) {
+          products.add(sale.product);
+        });
+      });
+
+      // Initialize datasets with all products
+      products.forEach(function(product) {
+        chartData.datasets.push({
+          label: product,
+          backgroundColor: getRandomColor(),
+          data: new Array(chartData.labels.length).fill(0)
+        });
+      });
+
+      // Fill in the data
+      data.order.forEach(function(orderData, index) {
+        orderData.salesData.forEach(function(sale) {
+          var datasetIndex = chartData.datasets.findIndex(dataset => dataset.label === sale.product);
+          if (datasetIndex !== -1) {
+            chartData.datasets[datasetIndex].data[index] = sale.totalPrice;
+          }
+        });
+      });
+
+      return chartData;
+    }
+
+    function prepareYearlyChartData(data) {
+      var chartData = {
+        labels: [],
+        datasets: []
+      };
+
+      data.order.forEach(function(orderData) {
+        var label = orderData._id.year;
+        var salesData = orderData.salesData;
+        chartData.labels.push(label);
+        addSalesDataToChart(chartData, salesData);
+      });
+
+      return chartData;
+    }
+
+    function addSalesDataToChart(chartData, salesData) {
+      salesData.forEach(function(sale) {
+        var datasetIndex = chartData.datasets.findIndex(function(dataset) {
+          return dataset.label === sale.product;
+        });
+
+        if (datasetIndex === -1) {
+          // New product found, create a new dataset
+          chartData.datasets.push({
+            label: sale.product,
+            backgroundColor: getRandomColor(),
+            data: [sale.totalPrice]
+          });
+        } else {
+          // Product already exists in datasets, update the sales data
+          chartData.datasets[datasetIndex].data.push(sale.totalPrice);
+        }
+      });
+    }
+
+    function getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+  </script>
+  <script>
+    function downloadPDF(fileName, fileType) {
+      const table = document.getElementById('sales-table');
+      if (fileType === 'pdf') {
+        // Initialize jsPDF
+        const doc = new jsPDF({
+          orientation: 'l',
+          unit: 'mm',
+          format: 'a4',
+          putOnlyUsedFonts: true
+        });
+
+        // Convert table to PDF
+        doc.autoTable({
+          html: table,
+          styles: {
+            font: 'helvetica',
+            fontSize: 10,
+            textColor: [0, 0, 0], // Black color for text
+            fontStyle: 'normal', // Normal font style
+            valign: 'middle', // Vertical alignment
+            halign: 'center', // Horizontal alignment
+          },
+          headStyles: {
+            fillColor: [0, 0, 0], // Black color for header background
+            textColor: [255, 255, 255], // White color for header text
+            fontStyle: 'bold' // Bold font style for headers
+          },
+          margin: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+          } // Remove margins
+        });
+
+        // Save the PDF
+        doc.save(fileName);
+      } else if (fileType === 'xlsx') {
+        // Export table to Excel
+        const wb = XLSX.utils.table_to_book(table, {
+          sheet: "Sheet1"
+        });
+        XLSX.writeFile(wb, fileName);
+      } else {
+        console.error('Invalid fileType. Supported types are "pdf" and "excel".');
+      }
+    }
+  </script>
+  <script>
+    document.getElementById('customRange').addEventListener('change', function() {
+      const startDateDiv = document.getElementById('startDateDiv');
+      const endDateDiv = document.getElementById('endDateDiv');
+      if (this.value === 'custom') {
+        startDateDiv.removeAttribute('hidden', false);
+        endDateDiv.removeAttribute('hidden', false);
+      } else {
+        startDateDiv.setAttribute('hidden', true);
+        endDateDiv.setAttribute('hidden', true);
+      }
+    });
+    let today = new Date();
+    let formattedDate = today.toISOString().substr(0, 10);
+    document.getElementById('endDate').value = formattedDate;
+    document.getElementById('startDate').value = formattedDate;
+  </script>
+  <!-- including admin footer -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

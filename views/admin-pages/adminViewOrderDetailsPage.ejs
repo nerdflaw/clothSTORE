@@ -1,0 +1,410 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center p-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 text-secondary text-start px-3 font-size">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size" href="/admin-order-management">Order management</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/view-order-details/<%= orderDetails[0]?._id %>">View order details</a>
+            </div>
+            <% if(locals.admin){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Admin</div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- toast message  -->
+  <div class="toast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+    <div class="toast-header bg-white">
+      <img src="/images/clothStore_favicon.jpg" style="width: 20px; height: 20px;" class="border rounded me-2">
+      <strong class="me-auto text-black">clothStore</strong>
+      <small id="toast-timestamp" class="text-black"></small>
+      <button type="button" class="btn-close font-size-bold" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body text-white font-size m-0 p-0 py-2">
+      You`re about to make a change
+    </div>
+    <div class="d-flex justify-content-between align-items-center">
+      <button type="button" id="confirmChangeBtn" class="btn-sm bg-white border-0 font-size-bold py-1 px-2 rounded-2 text-black">Confirm</button>
+      <button type="button" id="cancelChangeBtn" class="btn-sm bg-white border-0 font-size-bold py-1 px-2 rounded-2 text-black">Cancel</button>
+    </div>
+  </div>
+
+
+  <section>
+    <div class="row d-flex m-0 p-0">
+      <div class="col-sm-12 col-md-12 col-lg-3 col-xl-2 left-side-nav border-1 border-white m-0 p-0">
+        <%- include('../../partials/admin-partials/admin-sideBar.ejs') %>
+      </div>
+      <% if (message) { %>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          toastMessage("<%= message %>");
+        });
+      </script>
+      <% } %>
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-10 right-side-nav m-0 p-0 border">
+        <div class="row m-0 p-0" <% if (orderDetails[0]?.orderStatus === 'delivered') { %> hidden <% } %> >
+          <div class="col-md-12 m-0 px-3 pt-3">
+            <select class="w-100 border-1 rounded-3 font-size p-1 editOrder" data-status="<%= orderDetails[0]?.orderStatus %>" data-value="<%= orderDetails[0]?._id %>" name="editOrder" id="editOrder<%= orderDetails[0]?._id  %>">
+              <% switch(orderDetails[0]?.orderStatus) { 
+                  case 'pending': %>
+              <option class="border-0 outline-none" selected disabled>Pending</option>
+              <option class="border-0 outline-none" value="placed">Placed</option>
+              <% break; 
+                  case 'cancelled': %>
+              <option class="border-0 outline-none" selected disabled>Cancelled</option>
+              <% break; 
+                  case 'placed': %>
+              <option class="border-0 outline-none" selected disabled>Placed</option>
+              <option class="border-0 outline-none" value="shipped">Shipped</option>
+              <% break; 
+                  case 'shipped': %>
+              <option class="border-0 outline-none" selected disabled>Shipped</option>
+              <option class="border-0 outline-none" value="delivered">Delivered</option>
+              <% break; 
+                  case 'delivered': %>
+              <option class="border-0 outline-none" selected disabled>Delivered</option>
+              <% break; 
+                  case 'returned': %>
+              <option class="border-0 outline-none" selected disabled>Returned</option>
+              <% break; 
+                } %>
+            </select>
+          </div>
+        </div>
+
+        <div class="row m-0 px-3 py-2 border rounded-3 mx-3 mt-3">
+          <div class="col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0 text-black text-center font-size-bold">Order ID : &nbsp;</p>
+            <% const orderID = "clothSTORE_" + orderDetails[0]._id.toString().slice(-8); %>
+            <p class="m-0 p-0 text-success text-center font-size-bold"><%= orderID %></p>
+          </div>
+          <div class="col-md-12 col-lg-2 d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0 text-black text-center font-size-bold">Order total : &nbsp;</p>
+            <p class="m-0 p-0 text-success text-center font-size-bold"><%= grandTotal?.toFixed(2)%></p>
+          </div>
+          <div class="col-md-12 col-lg-3 d-flex justify-content-center align-items-center">
+            <p class="m-0 p-0 text-black text-center font-size-bold">Order Status : &nbsp;</p>
+            <% if (orderDetails[0]?.orderStatus) { %>
+            <% const status = orderDetails[0]?.orderStatus.toLowerCase(); %>
+            <% if (status === 'cancelled') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #d80614;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'delivered') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #01cf38;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'placed') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #ac0081;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'shipped') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #e2aa02;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'pending') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #001c9b;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } else if (status === 'returned') { %>
+            <p class="border-0 font-size-bold m-0 p-0" style="color: #00ddff;">
+              <%= orderDetails[0]?.orderStatus?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+            </p>
+            <% } %>
+            <% } %>
+          </div>
+          <div class="col-md-12 col-lg-4 d-flex justify-content-center align-items-center">
+            <% const createdAt = orderDetails[0]?.createdAt %>
+            <% const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' } %>
+            <% const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true } %>
+            <% const formattedDate = createdAt.toLocaleDateString('en-US', dateOptions).replace(',', '') %>
+            <% const formattedTime = createdAt.toLocaleTimeString('en-US', timeOptions) %>
+            <p class="m-0 p-0 text-black text-center font-size-bold">Date & Time : &nbsp;</p>
+            <p class="m-0 p-0 text-black text-center font-size-bold"><%= formattedDate %> - <%= formattedTime %></p>
+          </div>
+        </div>
+
+        <div class="row m-0 p-0 border rounded-3 mx-3 my-3">
+          <div class="col-md-12 col-lg-6 m-0 p-0">
+            <% orderDetails?.forEach((elem, index) => { %>
+            <div class="row p-3 m-3 border rounded-3">
+    <p class="font-size-bold pb-2 text-primary m-0 fst-italic"><%= index+1 %>. Product details<span class="font-size-bold">&gt;&gt;</span> </p>
+
+              <div class="col-sm-12 col-md-12 col-lg-12 m-0 mb-3 p-0 d-flex justify-content-center align-items-start">
+                <img class="m-0 p-0 img-fluid border-0 rounded-3" style="object-fit: cover; width: auto; height: 200px;" src="/productImages/<%= elem?.images[0] %>" alt="">
+              </div>
+              <div class="col-sm-12 col-md-12 col-lg-12 d-flex">
+                <div class="col-4">
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Name</p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Color</p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Size</p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Quantity</p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Status</p>
+                  <% if (elem?.couponName!== null && elem?.couponName !== undefined) { %>
+                  <p class="m-0 p-0 my-1 text-success text-start font-size-bold">Coupon applied</p>
+                  <% } else { %>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Coupon applied</p>
+                  <% } %>
+                  <% if (elem?.couponCode!== null && elem?.couponCode !== undefined) { %>
+                  <p class="m-0 p-0 my-1 text-success text-start font-size-bold">Coupon Code</p>
+                  <% } else { %>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Coupon Code</p>
+                  <% } %>
+                  <% if (elem?.couponValue!== 0 && elem?.couponValue !== undefined) { %>
+                  <p class="m-0 p-0 my-1 text-success text-start font-size-bold">Coupon Discount</p>
+                  <% } else { %>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">Coupon Discount</p>
+                  <% } %>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">MRP</p>
+                </div>
+                <div class="col-1">
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                </div>
+                <div class="col-7">
+                  <p class="m-0 p-0 my-1 text-black text-start font-size"><%= elem.title?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %></p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size"><%= elem.color %></p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size"><%= elem.size %></p>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size"><%= elem.quantity %> NOS.</p>
+                  <% if (elem.status) { %>
+                  <% const status = elem.status.toLowerCase(); %>
+                  <% if (status === 'cancelled') { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #d80614; background-color: #f8d7da;">
+                    <%= elem?.status?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } else if (status === 'delivered') { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #01cf38; background-color: #bfffce;">
+                    <%= elem?.status?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } else if (status === 'placed') { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ac0081; background-color: #ffb5ed;">
+                    <%= elem?.status?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } else if (status === 'shipped') { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #e2aa02; background-color: #ffebaa;">
+                    <%= elem?.status?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } else if (status === 'pending') { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #001c9b; background-color: #cdd6ff;">
+                    <%= elem?.status?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } else if (status === 'returned') { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3""
+                                style=" color: #00ddff; background-color: #d8f3f7;">
+                    <%= elem?.status?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } %>
+                  <% } %>
+                  <% if (elem?.couponName !== null && elem?.couponName !== undefined) { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ff00dd; background-color: #ffcef8;">
+                    <%= elem?.couponName?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %>
+                  </p>
+                  <% } else { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ff0000; background-color: #fdc0c0;">
+                    Nill
+                  </p>
+                  <% } %>
+                  <% if (elem?.couponCode !== null && elem?.couponCode !== undefined) { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ff00dd; background-color: #ffcef8;">
+                    <%= elem?.couponCode %>
+                  </p>
+                  <% } else { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ff0000; background-color: #fdc0c0;">
+                    Nill
+                  </p>
+                  <% } %>
+                  <% if (elem?.couponValue !== 0 && elem?.couponValue !== undefined) { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ff00dd; background-color: #ffcef8;">
+                    <%= elem?.couponValue %> %
+                  </p>
+                  <% } else { %>
+                  <p class="m-0 p-0 my-1 px-2 text-start font-size border-0 rounded-3" style="color: #ff0000; background-color: #fdc0c0;">
+                    Nill
+                  </p>
+                  <% } %>
+                  <p class="m-0 p-0 my-1 text-black text-start font-size">&#8377;&nbsp;<%= elem.mrp %></p>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+<div class="col-md-12 col-lg-6 m-0 p-0">
+  <% if (orderDetails && orderDetails.length > 0) { %>
+    <% const firstOrder = orderDetails[0]; %>
+    <% if (firstOrder && firstOrder.addressData && firstOrder.addressData.addresses && firstOrder.addressData.addresses.length > 0) { %>
+      <% const address = firstOrder.addressData.addresses.find(element => element._id.toString() === firstOrder.addressId.toString()); %>
+      <% if (address) { %>
+        <div class="row p-3 m-3 border rounded-3">
+    <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Address details<span class="font-size-bold">&gt;&gt;</span> </p>
+
+          <div class="col-sm-6 col-md-6 col-lg-4">
+            <p class="m-0 p-0 text-black font-size text-start">Full Name</p>
+            <p class="m-0 p-0 text-black font-size text-start">Phone Number</p>
+            <p class="m-0 p-0 text-black font-size text-start">Email</p>
+            <p class="m-0 p-0 text-black font-size text-start">Building</p>
+            <p class="m-0 p-0 text-black font-size text-start">House Number</p>
+            <p class="m-0 p-0 text-black font-size text-start">Country</p>
+            <p class="m-0 p-0 text-black font-size text-start">State</p>
+            <p class="m-0 p-0 text-black font-size text-start">District</p>
+            <p class="m-0 p-0 text-black font-size text-start">City</p>
+            <p class="m-0 p-0 text-black font-size text-start">Division</p>
+            <p class="m-0 p-0 text-black font-size text-start">Region</p>
+            <p class="m-0 p-0 text-black font-size text-start">Area</p>
+            <p class="m-0 p-0 text-black font-size text-start">Location</p>
+            <p class="m-0 p-0 text-black font-size text-start">Street</p>
+            <p class="m-0 p-0 text-black font-size text-start">Circle</p>
+            <p class="m-0 p-0 text-black font-size text-start">Pincode</p>
+          </div>
+          <div class="col-sm-1 col-md-1 col-lg-1">
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+            <p class="m-0 p-0 text-black text-center font-size">:</p>
+          </div>
+          <div class="col-sm-5 col-md-5 col-lg-7">
+            <p class="m-0 p-0 text-black font-size text-start"><%= address?.fullName%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.phoneNumber%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.email%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.building%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.houseNumber%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.country%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.state%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.district%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.city%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.division%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.region%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.area%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.location%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.street%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.circle%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.pincode%></p>
+          </div>
+        </div>
+      <% } %>
+    <% } %>
+  <% } %>
+  <div class="row p-3 m-3 border rounded-3">
+    <p class="font-size-bold pb-2 text-primary m-0 fst-italic">GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
+
+    <div class="col-sm-6 col-md-6 col-lg-4">
+      <p class="m-0 p-0 text-black font-size text-start">Total Price</p>
+      <p class="m-0 p-0 text-black font-size text-start">GST @ 18%</p>
+      <p class="m-0 p-0 text-black font-size text-start">SGST @ 9%</p>
+      <p class="m-0 p-0 text-black font-size text-start">CGST @ 9%</p>
+      <p class="m-0 p-0 text-black font-size text-start">Discount %</p>
+      <p class="m-0 p-0 text-black font-size text-start">Discount Amt.</p>
+      <p class="m-0 p-0 text-black font-size text-start">Round-off</p>
+    <p class="font-size-bold pb-2 text-primary m-0 fst-italic text-start">Grand total</p>
+
+    </div>
+    <div class="col-sm-1 col-md-1 col-lg-1">
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+      <p class="m-0 p-0 text-black text-center font-size">:</p>
+    </div>
+    <div class="col-sm-5 col-md-5 col-lg-7">
+      <p class="m-0 p-0 text-black font-size text-start"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
+      <p class="m-0 p-0 text-black font-size text-start"><%= totalGst?.toFixed(2) %></p>
+      <p class="m-0 p-0 text-black font-size text-start"><%= totalSgst?.toFixed(2)  %></p>
+      <p class="m-0 p-0 text-black font-size text-start"><%= totalCgst?.toFixed(2)  %></p>
+      <p class="m-0 p-0 text-black font-size text-start"><%= totalDiscountPercentage?.toFixed(2)%></p>
+      <p class="m-0 p-0 text-black font-size text-start"><%= totalDiscount?.toFixed(2) %></p>
+      <p class="m-0 p-0 text-black font-size text-start"><%= roundOff?.toFixed(2) %></p>
+    <p class="font-size-bold pb-2 text-primary m-0 fst-italic text-start">&#8377;&nbsp;<%= grandTotal?.toFixed(2)%></p>
+
+    </div>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section>
+    <script>
+      document.querySelectorAll('select.editOrder').forEach(function(select) {
+        select.addEventListener('change', function() {
+          var toast = new bootstrap.Toast(document.getElementById('confirmationToast'));
+          toast.show();
+        });
+
+        document.getElementById('cancelChangeBtn').addEventListener('click', function() {
+          var toast = new bootstrap.Toast(document.getElementById('confirmationToast'));
+          toast.hide();
+        });
+
+        document.getElementById('confirmChangeBtn').addEventListener('click', function() {
+          window.location.reload()
+          getSelectedStatus(select);
+        });
+      });
+
+      function getSelectedStatus(select) {
+        var orderId = select.getAttribute('data-value');
+        var newStatus = select.value.toLowerCase();
+        var currentOrderStatus = select.getAttribute('data-status').toLowerCase();
+        if (orderId) {
+          const url = `/admin-change-order-status/${orderId}?newStatus=${newStatus}&currentOrderStatus=${currentOrderStatus}`;
+
+          fetch(url, {
+              method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+              window.location.href = `/view-order-details/${orderId}?message=Order status changed successfully`
+            })
+            .catch(error => {
+              console.error('Error updating order status:', error);
+            });
+        }
+      }
+    </script>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+
+</body>
+
+</html>

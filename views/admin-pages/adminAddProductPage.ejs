@@ -1,0 +1,387 @@
+<!-- including admin head  -->
+<%- include('../../partials/admin-partials/admin-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/admin-partials/admin-nav.ejs') %>
+  <section>
+    <div class="container-fluid">
+      <div class="row border-1 border-bottom">
+        <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center px-5 py-3">
+          <h4 class="text-center text-black font-size-bold-title m-0">Add a product</h4>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 px-5 py-3 d-flex flex-column justify-content-center align-items-center">
+          <label for="product" class="form-label text-danger font-size-bold">All Products</label>
+          <select class="form-select bg-white text-danger font-size-bold" id="product" name="product" required>
+            <option class="text-black" value="" disabled selected>see all products</option>
+            <% products.forEach(product =>{ %>
+            <option class="text-black" value="<%= product._id %>"><%= product.title %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <form class="p-0 m-0" id="productForm" action="/admin-add-product" method="POST" enctype="multipart/form-data">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="px-5 pt-3 col-xl-6 d-flex flex-column justify-content-start m-0">
+
+          <% if (message) { %>
+          <h6 id="flash" class="text-center text-danger animate__animated animate__flash font-size"><%= message %></h6>
+          <% } %>
+
+          <div class="mb-3 form-group">
+            <div class="d-flex justify-content-between align-items-center">
+              <label for="title" class="form-label text-black font-size">Title</label>
+              <span id="title-available1" class="font-size-bold"></span>
+            </div>
+            <input type="text" class="form-control bg-white text-black font-size" id="title" name="title">
+          </div>
+          <div class="mb-3">
+            <label for="brand" class="form-label text-black font-size">Brand</label>
+            <select class="form-select bg-white text-black font-size" id="brand" name="brand" required>
+              <option value="" disabled selected>Select a Brand</option>
+              <% brands.forEach(brand=>{ %>
+              <option value="<%= brand._id %>"><%= brand.brand %></option>
+              <% }) %>
+              <% if(brands.length > 0){ %>
+              <% } else { %>
+              <option value="" disabled selected>no brands found</option>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="category" class="form-label text-black font-size">Category</label>
+            <select class="form-select bg-white text-black font-size" id="category" name="category" required>
+              <option value="" disabled selected>Select a category</option>
+              <% categories.forEach(data =>{ %>
+              <option value="<%= data._id %>"><%= data.category %></option>
+              <% }); %>
+              <% if(categories.length > 0){ %>
+              <% } else { %>
+              <option value="" disabled selected>no categories found</option>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="mb-3 form-group">
+            <label for="description" class="form-label text-black font-size">Description</label>
+            <input type="text" class="form-control bg-white text-black font-size" id="description" name="description" required>
+          </div>
+
+          <div class="mb-3 form-group">
+            <label for="mrp" class="form-label text-black font-size">MRP</label>
+            <input type="text" class="form-control bg-white text-black font-size" id="mrp" name="mrp" required>
+          </div>
+
+          <div class="mb-3 d-flex justify-content-end">
+            <button onclick="addVariant()" type="button" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold">Add Variant</button>
+          </div>
+          <div class="container" id="variants-container">
+            <div class="row variant border rounded-3 mb-3">
+              <div class="col-sm-4 col-md-4 py-2">
+                <select class="form-select bg-white text-black font-size" name="color[]" required>
+                  <option value="" disabled selected>Select a color</option>
+                  <% colors.forEach(color => { %>
+                  <option value="<%= color._id %>"><%= color.color %></option>
+                  <% }); %>
+                  <% if (colors.length === 0) { %>
+                  <option value="" disabled selected>No colors found</option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="col-sm-4 col-md-4 py-2">
+                <select class="form-select bg-white text-black font-size" name="size[]" required>
+                  <option value="" disabled selected>Select a size</option>
+                  <% sizes.forEach(size => { %>
+                  <option value="<%= size._id %>"><%= size.size %></option>
+                  <% }); %>
+                  <% if (sizes.length === 0) { %>
+                  <option value="" disabled selected>No sizes found</option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="col-sm-3 col-md-3 py-2">
+                <input oninput="validateInputQty(this)" type="text" placeholder="Enter quantity" class="form-control bg-white text-black font-size quantity m-0" id="quantity" name="quantity[]" required>
+              </div>
+              <div class="col-sm-1 col-md-1 py-2 text-center">
+                <button type="button" onclick="removeVariant(this)" class="btn border-0 delete-variant">
+                  <i class="fa-solid fa-trash-can text-danger"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-5 pt-4 col-xl-6 d-flex flex-column justify-content-start m-0">
+
+
+          <% for (let index = 1; index < 5; index++) { %>
+          <div id="previewImageContainer<%= index %>" style="display: none;">
+            <div class="mb-3 col-12 w-100 d-flex justify-content-center align-items-center position-relative border rounded-3">
+              <img id="previewImage<%= index %>" src="#" style="width: 200px; height:200px; object-fit: contain;" class="img-fluid p-2">
+              <i class="fa-solid fa-crop-simple position-absolute bottom-0 start-0 text-white bg-dark border-0 rounded-2
+              d-flex justify-content-center align-items-center" id="cropImageButton<%= index %>" onclick="cropImage('<%= index %>')" data-bs-toggle="tooltip" data-bs-placement="top" title="Crop Image" style="width: 40px; height: 40px;"></i>
+              <i class="fa-solid fa-xmark position-absolute bottom-0 end-0 text-white bg-dark border-0 rounded-2
+              d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Cancel Image" id="cancelImageButton<%= index %>" onclick="cancelImage('<%= index %>')"></i>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="productImage<%= index %>" class="form-label text-black font-size">Product Image <%= index %></label>
+            <input type="file" class="form-control bg-white text-black font-size" onchange="showPreview('<%= index %>')" id="productImage<%= index %>" name="productImage<%= index %>" accept="image/*" required>
+          </div>
+          <% } %>
+
+          <script>
+            // Create an array to store Cropper instances
+            var croppers = [];
+
+            function showPreview(index) {
+              let previewImage = document.getElementById('previewImage' + index);
+              let inputField = document.getElementById('productImage' + index);
+              let inputImage = document.getElementById('productImage' + index).files[0];
+              let previewImageContainer = document.getElementById('previewImageContainer' + index);
+              let cropImageButton = document.getElementById('cropImageButton' + index)
+
+              if (inputImage) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                  previewImage.src = e.target.result;
+                  cropImageButton.style.display = 'block'
+                  cropImageButton.classList.add('d-flex')
+                  previewImageContainer.style.display = 'block';
+
+                  // Create a new Cropper instance for the current image
+                  var cropper = new Cropper(previewImage, {
+                    aspectRatio: NaN,
+                    viewMode: 0,
+                    background: false
+                  });
+
+                  // Push the Cropper instance to the array
+                  croppers[index - 1] = cropper;
+                };
+
+                reader.readAsDataURL(inputImage);
+              }
+            }
+
+            function cropImage(index) {
+              var cropper = croppers[index - 1];
+              let inputImage = document.getElementById('productImage' + index);
+              let cancelImageButton = document.getElementById('cancelImageButton' + index)
+              let cropImageButton = document.getElementById('cropImageButton' + index)
+              let previewImage = document.getElementById('previewImage' + index);
+              // let productImage = document.querySelector('#productImage' + index);
+              var croppedImageData = cropper.getCroppedCanvas().toDataURL('image/png');
+
+              if (cropper) {
+                cropper.destroy();
+              }
+
+              previewImage.src = croppedImageData;
+              inputImage.setAttribute('disabled', true);
+              cropImageButton.style.display = 'none'
+              cropImageButton.classList.remove('d-flex')
+
+              // Convert the cropped image to a File object
+              let croppedImageFile = URLToFile(croppedImageData, index);
+
+              // Create a FileList indirectly using DataTransfer
+              let dataTransfer = new DataTransfer();
+              dataTransfer.items.add(croppedImageFile);
+
+              // Assign the FileList to the files property of the input element
+              inputImage.files = dataTransfer.files;
+
+              // Set the input value to the name of the cropped image file
+              inputImage.value = croppedImageFile.name;
+
+            }
+
+            let URLToFile = (url, index) => {
+              let arr = url.split(',');
+              let mime = arr[0].match(/:(.*?);/);
+              let data = arr[1];
+              let dataString = atob(data);
+              let length = dataString.length;
+              let dataArr = new Uint8Array(length);
+              while (length--) {
+                dataArr[length] = dataString.charCodeAt(length);
+              }
+              let file = new File([dataArr], `croppedImage${index}.jpg`, {
+                type: mime
+              });
+              return file;
+            };
+
+            function cancelImage(index) {
+              let previewImage = document.getElementById('previewImage' + index);
+              let previewImageContainer = document.getElementById('previewImageContainer' + index);
+              let productImage = document.getElementById('productImage' + index);
+
+              // Reset the input value to clear the selected file
+              productImage.value = '';
+
+              // Hide the preview container
+              previewImageContainer.style.display = 'none';
+
+              // Destroy the Cropper instance to release resources
+              var cropper = croppers[index - 1];
+              if (cropper) {
+                cropper.destroy();
+              }
+              productImage.removeAttribute('disabled')
+            }
+          </script>
+
+          <!-- <div class="mb-3">
+            <label for="productImage2" class="form-label text-black font-size">Product Image 2</label>
+            <input type="file" class="form-control bg-white text-black font-size" id="productImage2" name="productImage2" accept="image/*" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="productImage3" class="form-label text-black font-size">Product Image 3</label>
+            <input type="file" class="form-control bg-white text-black font-size" id="productImage3" name="productImage3" accept="image/*" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="productImage4" class="form-label text-black font-size">Product Image 4</label>
+            <input type="file" class="form-control bg-white text-black font-size" id="productImage4" name="productImage4" accept="image/*" required>
+          </div> -->
+
+          <div class="container m-0 p-0">
+            <div class="row w-100 font-size m-0 d-flex justify-content-between align-items-center">
+              <div class="form-check col-lg-6 d-flex justify-content-center align-items-center border rounded-1 py-2">
+                <input type="checkbox" class="form-check-input m-0 p-0" id="flashsale" name="flashsale">
+                <label class="form-check-label ps-1" for="flashsale">Flash sale</label>
+              </div>
+              <div class="form-check col-lg-6 d-flex justify-content-center align-items-center border rounded-1 py-2">
+                <input type="checkbox" class="form-check-input m-0 p-0" id="featured" name="featured">
+                <label class="form-check-label ps-1" for="featured">Featured</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 d-flex justify-content-around align-items-center flex-wrap">
+            <div class="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
+              <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-product-management">cancel</a>
+            </div>
+            <div class="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
+              <button type="submit" id="target-button1" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold submitButton">add product</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <section>
+    <script>
+      function addVariant() {
+        const container = document.getElementById('variants-container');
+        const newVariant = container.children[0].cloneNode(true);
+        container.appendChild(newVariant);
+
+        // Enable delete button for all variants except the first one
+        const deleteButtons = container.querySelectorAll('.delete-variant');
+        deleteButtons.forEach((button, index) => {
+          button.disabled = index === 0;
+        });
+
+      }
+
+      function removeVariant(button) {
+        const container = document.getElementById('variants-container');
+        const variantToRemove = button.closest('.variant');
+
+        if (container.contains(variantToRemove) && container.children.length > 1) {
+          container.removeChild(variantToRemove);
+
+          // Enable delete button for all variants except the first one after removal
+          const deleteButtons = container.querySelectorAll('.delete-variant');
+          deleteButtons.forEach((button, index) => {
+            button.disabled = index === 0;
+          });
+        }
+      }
+
+      function validateInputQty(inputElement) {
+        inputElement.value = inputElement.value.replace(/\D/g, ''); // Remove non-digit characters
+
+        const inputValue = parseInt(inputElement.value);
+
+        if (isNaN(inputValue) || inputValue < 0) {
+          // Mark as invalid
+          inputElement.classList.remove('valid');
+          inputElement.classList.add('invalid');
+        } else {
+          // Replace zero with an empty string
+          inputElement.value = inputValue === 0 ? '' : inputValue.toString();
+
+          // Mark as valid
+          inputElement.classList.remove('invalid');
+          inputElement.classList.add('valid');
+        }
+      }
+    </script>
+    <!-- product availability check  debouncing for title -->
+    <script>
+      let titleEl = document.getElementById('title');
+      let message = document.getElementById('title-available1');
+      let targetButton = document.getElementById('target-button1');
+
+      const sendDebounceTextToBackend = debounce(text => {
+        let url = '/admin-add-product-check';
+        fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({
+              text
+            }),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Network response was not ok.');
+            }
+          })
+          .then(data => {
+            if (data.status) {
+              message.innerHTML = data.message;
+              message.style.color = '#044604';
+            } else {
+              message.innerHTML = data.message;
+              message.style.color = 'red';
+              targetButton.setAttribute('disabled', 'disabled');
+            }
+          })
+          .catch(error => {
+            console.error('Error sending data to backend:', error);
+          });
+      });
+
+      titleEl.addEventListener('input', (e) => {
+        sendDebounceTextToBackend(e.target.value);
+      });
+
+      function debounce(callback, delay = 1000) {
+        let timeout;
+        return (...args) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => callback(...args), delay);
+        };
+      }
+    </script>
+  </section>
+  <!-- including admin footer  -->
+  <%- include('../../partials/admin-partials/admin-footer.ejs') %>
+</body>
+
+</html>
