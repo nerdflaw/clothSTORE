@@ -45,7 +45,7 @@ router.get('/user-dashboard-address-book', userAuthentication, errorHandlerMiddl
 router.get('/user-dashboard-cart', userAuthentication, errorHandlerMiddleware(userDashboardControler.userDashboardCart_get))
 // router.get('/user-dashboard-payment-options', errorHandlerMiddleware(userDashboardControler.userDashboardPaymentOptions_get))
 router.get('/user-dashboard-orders', errorHandlerMiddleware(userDashboardControler.userDashboardOrders_get))
-router.get('/generate-invoice/:id', errorHandlerMiddleware(userDashboardControler.userGenerateInvoice_get))
+// router.get('/generate-invoice/:id', errorHandlerMiddleware(userDashboardControler.userGenerateInvoice_get))
 router.get('/user-download-Invoice/:id', errorHandlerMiddleware(userDashboardControler.userDownloadInvoice_get))
 router.get('/user-filter-order-status', errorHandlerMiddleware(userDashboardControler.userFilterOrderStatus_get))
 router.post('/user-filter-order-status', errorHandlerMiddleware(userDashboardControler.userFilterOrderStatus_post))

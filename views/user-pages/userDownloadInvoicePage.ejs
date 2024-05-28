@@ -11,7 +11,12 @@
         });
       </script>
       <% } %>
-      <div class="col-12 right-side-nav m-0 p-0 px-3">
+      <div class="col-12 d-flex justify-content-end align-items-center mt-2">
+        <% const timeStamp = new Date().getTime(); %>
+        <% const fileName = `clothSTORE_${orderDetails[0]._id.toString().slice(-8)}_${timeStamp}` %>
+        <a onclick="downloadPDF('<%= fileName  %>')"  class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-bounce fa-solid fa-download pe-2 text-primary"></i>Download Invoice</a>
+      </div>
+      <div class="col-12 right-side-nav m-0 p-0 px-3" id="invoive-contents" >
         <!-- invoice heading  -->
         <div class="row m-0 p-0 py-2 border rounded-3 mt-3">
           <div class="col-md-12 d-flex justify-content-center align-items-center">
@@ -319,6 +324,33 @@
           </div>
         </div>
       </div>
+  </section>
+  <section>
+    <!-- CDN of html2pdf library  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script>
+
+      function downloadPDF(fileName) {
+        var element = document.getElementById('invoive-contents');
+        var opt = {
+          margin: 0.5,
+          filename: `${fileName}.pdf`,
+          image: {
+            type: 'jpeg',
+            quality: 0.98
+          },
+          html2canvas: {
+            scale: 2
+          },
+          jsPDF: {
+            unit: 'in',
+            format: 'A4',
+            orientation: 'landscape'
+          }
+        };
+        html2pdf().set(opt).from(element).save();
+      }
+    </script>
   </section>
 </body>
 

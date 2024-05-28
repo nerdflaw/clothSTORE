@@ -42,7 +42,7 @@
                 <% const fileName = `clothSTORE_${customRange}_${timeStamp}`%>
                 <a onclick="downloadExcel('<%= fileName  %>')" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-3 text-decoration-none me-2" style="cursor: pointer;">
                   <i class="fa-solid fa-bounce fa-xl fa-file-excel pe-2 text-primary"></i>Download Excel</a>
-                <a href="/generate-sales-report?customRange=<%= customRange %>&startDate=<%= startDate %>&endDate=<%= endDate %>&fileType=pdf" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-3 text-decoration-none " style="cursor: pointer;">
+                <a onclick="downloadPDF('<%= fileName  %>')" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-3 text-decoration-none btn_print " style="cursor: pointer;">
                   <i class="fa-solid fa-bounce fa-xl fa-file-pdf pe-2 text-primary"></i>Download PDF</a>
               </div>
             </div>
@@ -213,12 +213,35 @@
 </body>
 <!-- CDN of xlsx library  -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- CDN of html2pdf library  -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 <script>
   function downloadExcel(fileName) {
     var wb = XLSX.utils.table_to_book(document.getElementById('sales-table'), {
       sheet: "Sales Report"
     });
     XLSX.writeFile(wb, `${fileName}.xlsx`);
+  }
+
+  function downloadPDF(fileName) {
+    var element = document.getElementById('sales-table');
+    var opt = {
+      margin: 0.5,
+      filename: `${fileName}.pdf`,
+      image: {
+        type: 'jpeg',
+        quality: 0.98
+      },
+      html2canvas: {
+        scale: 2
+      },
+      jsPDF: {
+        unit: 'in',
+        format: 'A4',
+        orientation: 'landscape'
+      }
+    };
+    html2pdf().set(opt).from(element).save();
   }
 </script>
 
