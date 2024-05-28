@@ -5,12 +5,19 @@
 
   <!-- including admin nav  -->
   <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+  <% if (message) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        toastMessage("<%= message %>");
+      });
+    </script>
+    <% } %>
 
   <section>
     <div class="container-fluid">
       <div class="row d-flex justify-content-between p-2">
         <div class="col-sm-12 col-md-12 col-lg-6 d-flex flex-column justify-content-center align-items-center border rounded-3 p-5">
-          <p class="font-size-bold text-danger">Existing size</p>
+          <p class="font-size-bold text-danger">Existing sizes</p>
           <ul class="d-flex flex-column align-items-start">
             <% sizes.forEach((data,index)=>{ %>
             <li class="font-size m-0 py-1"><%= index+1 %>.&nbsp;<%= data.size %></li>
@@ -29,7 +36,7 @@
 
               <div class="d-flex justify-content-center align-items-center flex-wrap">
                 <div class="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
-                  <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-product-management">cancel</a>
+                  <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-size-management">cancel</a>
                 </div>
                 <button type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold submitButton">add size</button>
               </div>

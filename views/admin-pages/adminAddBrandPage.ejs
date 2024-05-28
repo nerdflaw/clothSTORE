@@ -5,6 +5,13 @@
 
   <!-- including admin nav  -->
   <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+  <% if (message) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        toastMessage("<%= message %>");
+      });
+    </script>
+    <% } %>
 
   <section>
     <div class="container-fluid">
@@ -29,7 +36,7 @@
 
               <div class="d-flex justify-content-center align-items-center flex-wrap">
                 <div class="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
-                  <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-product-management">cancel</a>
+                  <a class="btn btn-dark my-3 px-5 py-2 text-white font-size-bold" href="/admin-brand-management">cancel</a>
                 </div>
                 <button type="submit" class="btn btn-danger my-3 px-5 py-2 text-white font-size-bold submitButton">add brand</button>
               </div>

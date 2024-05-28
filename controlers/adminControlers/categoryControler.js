@@ -2,12 +2,6 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Category = require('../../models/category')
 
-// adminCategoryManagement
-// adminAddCategory_get, adminAddCategory_post
-// adminDeleteCategory
-// adminEditCategory_get, adminEditCategory_post
-// adminEnableCategory_post, adminDisableCategory_post
-
 const adminCategoryManagement = async (req, res) => {
 	const i = 0
 	const categoryDetails = await Category.find()
@@ -15,8 +9,7 @@ const adminCategoryManagement = async (req, res) => {
 		{
 			categoryDetails,
 			i,
-			message: req.query.message,
-			item: req.query.item,
+			message: req.flash('message')
 		})
 }
 
@@ -24,7 +17,7 @@ const adminAddCategory_get = async (req, res) => {
 	const categories = await Category.find()
 	res.render('admin-pages/adminAddCategoryPage',
 		{
-			message: req.query.message,
+			message:req.flash('message'),
 			categories
 		})
 }
@@ -44,19 +37,6 @@ const adminAddCategory_post = async (req, res) => {
 	}
 }
 
-const adminDeleteCategory = async (req, res) => {
-	const id = req.params.id;
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(404).render('admin-pages/404');
-	}
-	const findbyId = await Category.find({ _id: id })
-	const category = findbyId[0];
-	const deletedCategory = category.category;
-	const deleted = await Category.deleteOne({ _id: id });
-	req.flash('message', `Category ${category} deleted successfully`)
-	res.redirect('/admin-category-management')
-}
-
 const adminEditCategory_get = async (req, res) => {
 	const id = req.params.id;
 	if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -70,7 +50,7 @@ const adminEditCategory_get = async (req, res) => {
 	res.render('admin-pages/adminEditCategoryPage',
 		{
 			editCategory,
-			message: req.query.message
+			message: req.flash('message')
 		}
 	);
 }
@@ -124,7 +104,6 @@ module.exports = {
 	adminCategoryManagement,
 	adminAddCategory_get,
 	adminAddCategory_post,
-	adminDeleteCategory,
 	adminEditCategory_get,
 	adminEditCategory_post,
 	adminEnableCategory_post,

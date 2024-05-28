@@ -38,7 +38,6 @@
               <th class="table-white text-black bg-light text-center" scope="col">Status</th>
               <th class="table-white text-black bg-light text-center" scope="col">Action</th>
               <th class="table-white text-black bg-light text-center" scope="col">Edit</th>
-              <th class="table-white text-black bg-light text-center" scope="col">Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -83,11 +82,6 @@
               <td class="text-black table-white text-start">
                 <form action="/admin-edit-color/<%- data._id %>" method="get" class="text-center">
                   <button type="submit" class="text-white font-size btn btn-primary px-3 py-0" onclick="return confirm('Are you sure you want to edit <%=data.color%>?')">edit</button>
-                </form>
-              </td>
-              <td class="text-black table-white text-start">
-                <form action="/admin-delete-color/<%- data._id %>" method="get" class="text-center">
-                  <button type="submit" class="text-white font-size btn btn-danger px-3 py-0" onclick="return confirm('Are you sure you want to delete <%=data.color%>?')">delete</button>
                 </form>
               </td>
             </tr>

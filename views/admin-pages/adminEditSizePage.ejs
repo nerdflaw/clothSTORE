@@ -5,6 +5,13 @@
 
   <!-- including admin nav  -->
   <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+  <% if (message) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        toastMessage("<%= message %>");
+      });
+    </script>
+    <% } %>
 
   <section>
     <div class="container-fluid">

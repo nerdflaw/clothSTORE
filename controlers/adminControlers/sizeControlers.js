@@ -45,17 +45,6 @@ const adminAddSize_post = async (req, res) => {
 	}
 }
 
-const adminDeleteSize = async (req, res) => {
-	const id = req.params.id;
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(400).render('admin-pages/404', { title: '404 Error' })
-	};
-	const findbyId = await Size.find({ _id: id })
-	const deleted = await Size.deleteOne({ _id: id });
-	req.flash('message', `size ${findbyId[0]?.size} deletion successfull)`)
-	res.redirect('/admin-size-management');
-}
-
 const adminEditSize_get = async (req, res) => {
 	const id = req.params.id;
 	if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -125,7 +114,6 @@ module.exports = {
 	adminSizeManagement,
 	adminAddSize_get,
 	adminAddSize_post,
-	adminDeleteSize,
 	adminEditSize_get,
 	adminEditSize_post,
 	adminEnableSize_post,

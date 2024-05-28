@@ -4230,40 +4230,6 @@ const userDownloadInvoice_get = async (req, res) => {
 		}
 	)
 }
-// const userGenerateInvoice_get = async (req, res )=> {
-// 	const id = req.params.id;
-// 	console.log(req.params.id , 'req.params.id')
-// 	const executablePath = 'C:/Program Files/Google/Chrome/Application/chrome.exe';
-// 	console.log(executablePath , 'executablePath')
-// 	const browser = await puppeteer.launch({
-// 		headless : true,
-// 		executablePath : '/usr/bin/chromium-browser'
-// 	});
-// 	const page = await browser.newPage();
-// 	await page.goto(`${req.protocol}://${req.get('host')}/user-download-Invoice/${id}`, {
-// 		waitUntil : 'networkidle0',
-// 		timeout: 60000
-// 	})
-// 	await page.setViewport({
-// 		width : 1680,
-// 		height : 1050
-// 	})
-// 	const dateValue = new Date();
-// 	const clothStore = `clothStore_${id.toString().slice(-8)}_${dateValue.getTime()}`;
-// 	const pdfPath = path.join(__dirname, '../../public/files', `${clothStore}.pdf`);
-// 	const pdfn = await page.pdf({
-// 		path: pdfPath,
-// 		printBackground : true,
-// 		format: "A4",
-//         landscape: true
-// 	})
-// 	await browser.close();
-// 	res.download( pdfPath , (error)=>{
-// 		if(error){
-// 			console.log(error);
-// 		}
-// 	})
-// }
 const userFilterOrderStatus_get = async (req, res) => {
 	const uniqueStatusTypes = req.query.orderStatuses? req.query.orderStatuses.split(',') : [];
 	const selectedFilter = req.query.selectedFilter || '';
@@ -5790,7 +5756,6 @@ module.exports = {
 	userSearch_get,
 	userSearch_post,
 	userDashboardOrders_get,
-	// userGenerateInvoice_get,
 	userDownloadInvoice_get,
 	userFilterOrderStatus_get,
 	userFilterOrderStatus_post,

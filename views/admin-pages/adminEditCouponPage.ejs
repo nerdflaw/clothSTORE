@@ -14,7 +14,7 @@
         </div>
         <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
           <div class="loginDiv" style="width: 500px;">
-            <h4 class="text-center text-black font-size-bold-title">Edit color</h4>
+            <h4 class="text-center text-black font-size-bold-title">Edit a coupon</h4>
 
             <% if (message) { %>
               <script>
@@ -30,7 +30,7 @@
                 <input value="<%-editCoupon.coupon%>" type="text" class="form-control bg-white text-black font-size availability-check" id="coupon" name="coupon" required>
               </div>
               <div class="mb-3 form-group">
-                <label for="couponDiscount" class="form-label text-black font-size">Coupon name</label>
+                <label for="couponDiscount" class="form-label text-black font-size">Coupon value ( % )</label>
                 <input value="<%-editCoupon.couponValue%>" type="text" class="form-control bg-white text-black font-size availability-check" id="couponDiscount" name="couponDiscount" required>
               </div>
               <div class="mb-3 form-group" hidden>

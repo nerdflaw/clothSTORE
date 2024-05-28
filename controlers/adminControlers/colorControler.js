@@ -3,12 +3,6 @@ const mongoose = require('mongoose')
 const Color = require('../../models/color')
 const flash = require('connect-flash');
 
-// adminColorManagement
-// adminAddColor_get, adminAddColor_post
-// adminDeleteColor
-// adminEditColor_get, adminEditColor_post
-// adminEnableColor_post, adminDisableColor_post
-
 const adminColorManagement = async (req, res) => {
 	const i = 0
 	const colorDetails = await Color.find()
@@ -43,20 +37,6 @@ const adminAddColor_post = async (req, res) => {
 		req.flash('message', `New color ${color} added successfully`);
 		res.redirect('/admin-color-management');
 	}
-}
-
-const adminDeleteColor = async (req, res) => {
-
-	const id = req.params.id;
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(400).render('admin-pages/404.ejs');
-	}
-	const findbyId = await Color.find({ _id: id })
-	const color = findbyId[0];
-	const deletedColor = color.color;
-	const deleted = await Color.deleteOne({ _id: id });
-	req.flash('message', `Color ${color} deleted successfully`)
-	res.redirect('/admin-color-management');
 }
 
 const adminEditColor_get = async (req, res) => {
@@ -126,7 +106,6 @@ module.exports = {
 	adminColorManagement,
 	adminAddColor_get,
 	adminAddColor_post,
-	adminDeleteColor,
 	adminEditColor_get,
 	adminEditColor_post,
 	adminEnableColor_post,

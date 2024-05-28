@@ -5,6 +5,13 @@
 
   <!-- including admin nav  -->
   <%- include('../../partials/admin-partials/admin-nav-login.ejs') %>
+  <% if (message) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        toastMessage("<%= message %>");
+      });
+    </script>
+    <% } %>
 
   <section>
     <div class="container-fluid">
@@ -14,12 +21,7 @@
         </div>
         <div class="col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center">
           <div class="loginDiv" style="width: 500px;">
-            <h4 class="text-center text-black font-size-bold-title">Edit a category</h4>
-
-            <% if (message) { %>
-            <h6 id="flash" class="text-center text-danger animate__animated animate__flash font-size"><%= message %></h6>
-            <% } %>
-
+            <h4 class="text-center text-black font-size-bold-title">Edit a brand</h4>
             <form id="validateForms" action="/admin-edit-brand/<%-editBrand._id%>" method="POST">
               <div class="mb-3">
                 <label for="brand" class="form-label text-black font-size">Brand name</label>

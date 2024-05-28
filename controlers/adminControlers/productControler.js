@@ -103,18 +103,6 @@ const adminAddProductCheck_get = async (req, res) => {
 	}
 };
 
-const adminDeleteProduct = async (req, res) => {
-	const id = req.params.id;
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(400).render('admin-pages/404', { title: '404 Error' })
-	};
-	const findbyId = await Product.find({ _id: id })
-	const product = findbyId[0];
-	const deleted = await Product.deleteOne({ _id: id });
-	req.flash('message', `Category ${product.title} deletion successfull`)
-	res.redirect('/admin-product-management');
-}
-
 const adminEditProduct_get = async (req, res) => {
 	const id = req.params.id;
 	const editProduct = await Product.findOne({ _id: id });
@@ -230,10 +218,8 @@ module.exports = {
 	adminAddProduct_get,
 	adminAddProduct_post,
 	adminAddProductCheck_get,
-	adminDeleteProduct,
 	adminEditProduct_get,
 	adminEditProduct_post,
 	adminEnableProduct_post,
 	adminDisableProduct_post
-
 }

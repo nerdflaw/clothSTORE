@@ -47,10 +47,6 @@ router.post('/admin-add-product',
 
 router.post('/admin-add-product-check', errorHandlerMiddleware(productControler.adminAddProductCheck_get));
 
-router.get('/admin-delete-product/:id',
-	adminAuthentication,
-	errorHandlerMiddleware(productControler.adminDeleteProduct));
-
 router.get('/admin-edit-product/:id',
 	adminAuthentication,
 	errorHandlerMiddleware(productControler.adminEditProduct_get));
@@ -71,7 +67,6 @@ router.post('/admin/disable-product/:id', productControler.adminDisableProduct_p
 router.get('/admin-brand-management', brandControler.adminBrandManagement)
 router.get('/admin-add-brand', brandControler.adminAddBrand_get)
 router.post('/admin-add-brand', brandControler.adminAddBrand_post);
-router.get('/admin-delete-brand/:id', brandControler.adminDeleteBrand);
 router.get('/admin-edit-brand/:id', brandControler.adminEditBrand_get);
 router.post('/admin-edit-brand/:id', brandControler.adminEditBrand_post);
 router.post('/admin/enable-brand/:id', brandControler.adminEnableBrand_post);
@@ -80,7 +75,6 @@ router.post('/admin/disable-brand/:id', brandControler.adminDisableBrand_post);
 router.get('/admin-category-management', categoryControler.adminCategoryManagement)
 router.get('/admin-add-category', categoryControler.adminAddCategory_get)
 router.post('/admin-add-category', categoryControler.adminAddCategory_post);
-router.get('/admin-delete-category/:id', categoryControler.adminDeleteCategory);
 router.get('/admin-edit-category/:id', categoryControler.adminEditCategory_get);
 router.post('/admin-edit-category/:id', categoryControler.adminEditCategory_post);
 router.post('/admin/enable-category/:id', categoryControler.adminEnableCategory_post);
@@ -90,7 +84,6 @@ router.get('/admin-color-management', adminColorControler.adminColorManagement)
 router.get('/admin-add-color', adminColorControler.adminAddColor_get)
 router.post('/admin-add-color', adminColorControler.adminAddColor_post);
 router.get('/admin-add-criteria-check', availabilityCheckControler.adminCriteriaCheck_get);
-router.get('/admin-delete-color/:id', adminColorControler.adminDeleteColor);
 router.get('/admin-edit-color/:id', adminColorControler.adminEditColor_get);
 router.post('/admin-edit-color/:id', adminColorControler.adminEditColor_post);
 router.post('/admin/enable-color/:id', adminColorControler.adminEnableColor_post);
@@ -99,7 +92,6 @@ router.post('/admin/disable-color/:id', adminColorControler.adminDisableColor_po
 router.get('/admin-size-management', sizeControlers.adminSizeManagement)
 router.get('/admin-add-size', sizeControlers.adminAddSize_get)
 router.post('/admin-add-size', sizeControlers.adminAddSize_post);
-router.get('/admin-delete-size/:id', sizeControlers.adminDeleteSize);
 router.get('/admin-edit-size/:id', sizeControlers.adminEditSize_get);
 router.post('/admin-edit-size/:id', sizeControlers.adminEditSize_post);
 router.post('/admin/enable-size/:id', sizeControlers.adminEnableSize_post);

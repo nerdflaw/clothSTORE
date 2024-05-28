@@ -2,6 +2,25 @@
 <%- include('../../partials/user-partials/user-head.ejs') %>
 
 <body>
+    <!-- including admin nav  -->
+    <%- include('../../partials/user-partials/user-nav.ejs') %>
+    <main>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12 d-flex flex-column justify-content-center align-items-center p-2">
+            <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+              <div class="col-sm-12 col-md-12 col-lg-6 text-secondary text-start px-3 font-size">
+                <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+                <span class="font-size-bold">&gt;</span>
+                <a class="text-black text-decoration-none font-size" href="/user-dashboard-orders">My orders</a>
+                <span class="font-size-bold">&gt;</span>
+                <a class="text-black text-decoration-none font-size-bold" href="/user-download-Invoice/<%= orderDetails[0]?._id %>">Download invoice</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   <section>
     <div class="row d-flex m-0 p-0">
       <% if (message) { %>
@@ -11,7 +30,7 @@
         });
       </script>
       <% } %>
-      <div class="col-12 d-flex justify-content-end align-items-center mt-2">
+      <div class="col-12 d-flex justify-content-end align-items-center">
         <% const timeStamp = new Date().getTime(); %>
         <% const fileName = `clothSTORE_${orderDetails[0]._id.toString().slice(-8)}_${timeStamp}` %>
         <a onclick="downloadPDF('<%= fileName  %>')"  class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-bounce fa-solid fa-download pe-2 text-primary"></i>Download Invoice</a>

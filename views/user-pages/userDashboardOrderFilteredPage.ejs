@@ -58,10 +58,10 @@
                     </form>
                     <% } %>
                     <% if (paginatedOrder[0]?.orders[0]?.paymentStatus === 'paid') { %>
-                    <div class="col-12 d-flex justify-content-end align-items-center">
-                      <a href="/generate-invoice/<%= paginatedOrder[0]?.orders[0]?._id %>" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-bounce fa-solid fa-download pe-2 text-primary"></i>Download Invoice</a>
-                    </div>
-                    <% } %>
+                      <div class="col-12 d-flex justify-content-end align-items-center">
+                        <a href="/user-download-Invoice/<%= paginatedOrder[0]?._id %>" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-solid fa-eye fa-bounce pe-2 text-primary"></i>View Invoice</a>
+                      </div>
+                      <% } %>
                   </div>
                 </div>
               </div>

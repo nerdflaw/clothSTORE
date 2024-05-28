@@ -3,11 +3,6 @@ const mongoose = require('mongoose')
 const Brand = require('../../models/brand')
 const flash = require('connect-flash');
 
-// adminCategoryManagement
-// adminAddCategory_get, adminAddCategory_post
-// adminDeleteCategory
-// adminEditCategory_get, adminEditCategory_post
-// adminEnableCategory_post, adminDisableCategory_post
 
 const adminBrandManagement = async (req, res) => {
 	const i = 0
@@ -44,18 +39,6 @@ const adminAddBrand_post = async (req, res) => {
 		req.flash('message', 'New brand added successfully')
 		res.redirect('/admin-brand-management');
 	}
-}
-
-const adminDeleteBrand = async (req, res) => {
-	const id = req.params.id;
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(404).render('admin-pages/404');
-	}
-	const findbyId = await Brand.find({ _id: id })
-	const brand = findbyId[0];
-	const deletedBrand = brand.brand;
-	const deleted = await Brand.deleteOne({ _id: id });
-	res.redirect('/admin-brand-management?message=Brand deletion successfull&item=' + encodeURIComponent(deletedBrand));
 }
 
 const adminEditBrand_get = async (req, res) => {
@@ -99,7 +82,7 @@ const adminEditBrand_post = async (req, res) => {
 		req.flash('message', 'Something went wrong, try agin')
 		return res.redirect(`/admin-edit-brand/${id}`);
 	}
-	res.flash('message', 'Brand editing successful')
+	req.flash('message', 'Brand editing successful')
 	res.redirect(`/admin-brand-management`);
 };
 
@@ -126,7 +109,6 @@ module.exports = {
 	adminBrandManagement,
 	adminAddBrand_get,
 	adminAddBrand_post,
-	adminDeleteBrand,
 	adminEditBrand_get,
 	adminEditBrand_post,
 	adminEnableBrand_post,
