@@ -1,8 +1,9 @@
 const adminAuthorization = (req, res, next) => {
-	if (req.session && req.session.adminLogged) {
-		return res.redirect('/admin-dashboard')
+	if (!req.session.adminLogged) {
+		next();
+	}else{
+		return res.redirect('/admin-dashboard');
 	}
-	next();
 };
 
 module.exports = adminAuthorization;

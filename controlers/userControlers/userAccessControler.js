@@ -16,7 +16,7 @@ const { ObjectId } = require('mongodb');
 // setting admin credential
 const credential = {
 	email: 'admin@gmail.com',
-	password: 'admin'
+	password: 'adminPass'
 };
 
 // homepage,

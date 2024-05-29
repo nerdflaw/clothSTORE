@@ -15,13 +15,19 @@ const adminAuthentication = require('../middlewares/adminAuthenticationMiddlewar
 const errorHandlerMiddleware = require('../middlewares/errorHandlingMiddleware')
 const multerFile = require('../upload/upload');
 
-router.get('/admin-dashboard', adminDashboardControler.adminDashboard)
-router.get('/sales-report', adminDashboardControler.salesReport_get)
-router.get('/generate-chart', adminDashboardControler.showChartOnDashboard_get)
+// adminAuthorization
+// if user is logged in redirect to user's dashboard else goto next route
 
-router.get('/admin-user-management', userControler.adminUserControler)
-router.post('/admin/block-user/:id', userControler.adminBlockUserControler);
-router.post('/admin/unblock-user/:id', userControler.adminUnblockUserControler);
+// adminAuthentication
+// if user is logged in next process else redirect to login page
+
+router.get('/admin-dashboard', adminAuthentication, adminDashboardControler.adminDashboard)
+router.get('/sales-report',adminAuthentication, adminDashboardControler.salesReport_get)
+router.get('/generate-chart',adminAuthentication, adminDashboardControler.showChartOnDashboard_get)
+
+router.get('/admin-user-management',adminAuthentication, userControler.adminUserControler)
+router.post('/admin/block-user/:id',adminAuthentication, userControler.adminBlockUserControler);
+router.post('/admin/unblock-user/:id',adminAuthentication, userControler.adminUnblockUserControler);
 
 router.get('/admin-product-management',
 	adminAuthentication,
@@ -41,7 +47,7 @@ router.post('/admin-add-product',
 	]),
 	errorHandlerMiddleware(productControler.adminAddProduct_post));
 
-router.post('/admin-add-product-check', errorHandlerMiddleware(productControler.adminAddProductCheck_get));
+router.post('/admin-add-product-check',adminAuthentication, errorHandlerMiddleware(productControler.adminAddProductCheck_get));
 
 router.get('/admin-edit-product/:id',
 	adminAuthentication,
@@ -57,79 +63,59 @@ router.post('/admin-edit-product/:id',
 	  ]),
 	productControler.adminEditProduct_post);
 
-router.post('/admin/enable-product/:id', productControler.adminEnableProduct_post);
-router.post('/admin/disable-product/:id', productControler.adminDisableProduct_post);
+router.post('/admin/enable-product/:id',adminAuthentication, productControler.adminEnableProduct_post);
+router.post('/admin/disable-product/:id',adminAuthentication, productControler.adminDisableProduct_post);
 
-router.get('/admin-brand-management', brandControler.adminBrandManagement)
-router.get('/admin-add-brand', brandControler.adminAddBrand_get)
-router.post('/admin-add-brand', brandControler.adminAddBrand_post);
-router.get('/admin-edit-brand/:id', brandControler.adminEditBrand_get);
-router.post('/admin-edit-brand/:id', brandControler.adminEditBrand_post);
-router.post('/admin/enable-brand/:id', brandControler.adminEnableBrand_post);
-router.post('/admin/disable-brand/:id', brandControler.adminDisableBrand_post);
+router.get('/admin-brand-management',adminAuthentication, brandControler.adminBrandManagement)
+router.get('/admin-add-brand',adminAuthentication, brandControler.adminAddBrand_get)
+router.post('/admin-add-brand',adminAuthentication, brandControler.adminAddBrand_post);
+router.get('/admin-edit-brand/:id',adminAuthentication, brandControler.adminEditBrand_get);
+router.post('/admin-edit-brand/:id',adminAuthentication, brandControler.adminEditBrand_post);
+router.post('/admin/enable-brand/:id',adminAuthentication, brandControler.adminEnableBrand_post);
+router.post('/admin/disable-brand/:id',adminAuthentication, brandControler.adminDisableBrand_post);
 
-router.get('/admin-category-management', categoryControler.adminCategoryManagement)
-router.get('/admin-add-category', categoryControler.adminAddCategory_get)
-router.post('/admin-add-category', categoryControler.adminAddCategory_post);
-router.get('/admin-edit-category/:id', categoryControler.adminEditCategory_get);
-router.post('/admin-edit-category/:id', categoryControler.adminEditCategory_post);
-router.post('/admin/enable-category/:id', categoryControler.adminEnableCategory_post);
-router.post('/admin/disable-category/:id', categoryControler.adminDisableCategory_post);
+router.get('/admin-category-management',adminAuthentication, categoryControler.adminCategoryManagement)
+router.get('/admin-add-category',adminAuthentication, categoryControler.adminAddCategory_get)
+router.post('/admin-add-category',adminAuthentication, categoryControler.adminAddCategory_post);
+router.get('/admin-edit-category/:id',adminAuthentication, categoryControler.adminEditCategory_get);
+router.post('/admin-edit-category/:id',adminAuthentication, categoryControler.adminEditCategory_post);
+router.post('/admin/enable-category/:id',adminAuthentication, categoryControler.adminEnableCategory_post);
+router.post('/admin/disable-category/:id',adminAuthentication, categoryControler.adminDisableCategory_post);
 
-router.get('/admin-color-management', adminColorControler.adminColorManagement)
-router.get('/admin-add-color', adminColorControler.adminAddColor_get)
-router.post('/admin-add-color', adminColorControler.adminAddColor_post);
-router.get('/admin-add-criteria-check', availabilityCheckControler.adminCriteriaCheck_get);
-router.get('/admin-edit-color/:id', adminColorControler.adminEditColor_get);
-router.post('/admin-edit-color/:id', adminColorControler.adminEditColor_post);
-router.post('/admin/enable-color/:id', adminColorControler.adminEnableColor_post);
-router.post('/admin/disable-color/:id', adminColorControler.adminDisableColor_post);
+router.get('/admin-color-management',adminAuthentication, adminColorControler.adminColorManagement)
+router.get('/admin-add-color',adminAuthentication, adminColorControler.adminAddColor_get)
+router.post('/admin-add-color',adminAuthentication, adminColorControler.adminAddColor_post);
+router.get('/admin-add-criteria-check',adminAuthentication, availabilityCheckControler.adminCriteriaCheck_get);
+router.get('/admin-edit-color/:id',adminAuthentication, adminColorControler.adminEditColor_get);
+router.post('/admin-edit-color/:id',adminAuthentication, adminColorControler.adminEditColor_post);
+router.post('/admin/enable-color/:id',adminAuthentication, adminColorControler.adminEnableColor_post);
+router.post('/admin/disable-color/:id',adminAuthentication, adminColorControler.adminDisableColor_post);
 
-router.get('/admin-size-management', sizeControlers.adminSizeManagement)
-router.get('/admin-add-size', sizeControlers.adminAddSize_get)
-router.post('/admin-add-size', sizeControlers.adminAddSize_post);
-router.get('/admin-edit-size/:id', sizeControlers.adminEditSize_get);
-router.post('/admin-edit-size/:id', sizeControlers.adminEditSize_post);
-router.post('/admin/enable-size/:id', sizeControlers.adminEnableSize_post);
-router.post('/admin/disable-size/:id', sizeControlers.adminDisableSize_post);
+router.get('/admin-size-management',adminAuthentication, sizeControlers.adminSizeManagement)
+router.get('/admin-add-size',adminAuthentication, sizeControlers.adminAddSize_get)
+router.post('/admin-add-size',adminAuthentication, sizeControlers.adminAddSize_post);
+router.get('/admin-edit-size/:id',adminAuthentication, sizeControlers.adminEditSize_get);
+router.post('/admin-edit-size/:id',adminAuthentication, sizeControlers.adminEditSize_post);
+router.post('/admin/enable-size/:id',adminAuthentication, sizeControlers.adminEnableSize_post);
+router.post('/admin/disable-size/:id',adminAuthentication, sizeControlers.adminDisableSize_post);
 
-router.get('/admin-coupon-management', couponControler.adminCouponManagement)
-router.get('/admin-add-coupon', couponControler.adminAddCoupon_get)
-router.post('/admin-add-coupon', couponControler.adminAddCoupon_post);
-router.get('/admin-edit-coupon/:id', couponControler.adminEditCoupon_get);
-router.post('/admin-edit-coupon/:id', couponControler.adminEditCoupon_post);
-router.post('/admin/enable-coupon/:id', couponControler.adminEnableCoupon_post);
-router.post('/admin/disable-coupon/:id', couponControler.adminDisableCoupon_post);
+router.get('/admin-coupon-management',adminAuthentication, couponControler.adminCouponManagement)
+router.get('/admin-add-coupon',adminAuthentication, couponControler.adminAddCoupon_get)
+router.post('/admin-add-coupon',adminAuthentication, couponControler.adminAddCoupon_post);
+router.get('/admin-edit-coupon/:id',adminAuthentication, couponControler.adminEditCoupon_get);
+router.post('/admin-edit-coupon/:id',adminAuthentication, couponControler.adminEditCoupon_post);
+router.post('/admin/enable-coupon/:id',adminAuthentication, couponControler.adminEnableCoupon_post);
+router.post('/admin/disable-coupon/:id',adminAuthentication, couponControler.adminDisableCoupon_post);
 
-router.get('/admin-order-management', orderControler.adminOrderManagement);
-router.get('/admin-order-management-search', orderControler.adminOrderManagementSearch_get);
-router.get('/view-order-details/:id', orderControler.adminViewOrderDetails_get);
+router.get('/admin-order-management',adminAuthentication, orderControler.adminOrderManagement);
+router.get('/admin-order-management-search',adminAuthentication, orderControler.adminOrderManagementSearch_get);
+router.get('/view-order-details/:id',adminAuthentication, orderControler.adminViewOrderDetails_get);
 
 router.post('/admin-change-order-status/:orderId',
-	// adminAuthentication,
+	adminAuthentication,
 	errorHandlerMiddleware(orderControler.adminChangeOrderStatus_post))
 
-router.get('/admin-logout', adminAccessControler.adminLogout)
-
-router.get('/admin-transactions', (req, res) => {
-	res.render('admin-pages/adminTransactionsPage')
-})
-
-router.get('/admin-manage-admin', (req, res) => {
-	res.render('admin-pages/adminManageAdminPage')
-})
-
-router.get('/admin-add-brand', (req, res) => {
-	res.render('admin-pages/adminAddBrandPage')
-})
-
-router.get('/admin-add-banner', (req, res) => {
-	res.render('admin-pages/adminAddBannerPage')
-})
-
-router.get('/admin-add-coupon', (req, res) => {
-	res.render('admin-pages/adminAddCouponPage')
-})
+router.get('/admin-logout',adminAuthentication, adminAccessControler.adminLogout)
 
 // Rendering 404 error page
 router.use((req, res) => {

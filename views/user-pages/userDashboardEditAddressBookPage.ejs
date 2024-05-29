@@ -17,7 +17,7 @@
               <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard-address-book">My address book</a>
             </div>
             <% if(locals.user){ %>
-              <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
             <% } %>
           </div>
         </div>
@@ -38,13 +38,15 @@
             <div class="col d-flex justify-content-between border rounded-3">
               <div class="col p-2">
                 <p class="text-center fs-6 fw-bold m-0">Address book</p>
-                <div>
-                  <% if (message) { %>
-                  <h6 id="flash" class="m-0 p-0 text-center text-success animate__animated animate__flash font-size"><%= message %></h6>
-                  <% } %>
-                </div>
               </div>
             </div>
+            <% if (message) { %>
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                toastMessage("<%= message %>");
+              });
+            </script>
+            <% } %>
 
             <div class="row">
               <% if(addresses.length > 0){ %>
@@ -115,142 +117,138 @@
               <% } %>
             </div>
 
-            <% addresses.forEach(address => { %>
-            <% if (address.addresses.length === 0) { %>
-            <div class="col-12">
-              <h6 class="font-size p-2 text-danger"><em>You haven't added an address yet</em></h6>
-            </div>
-            <% } else { %>
-            <form action="/user-edit-address" name="editForm" onsubmit="validateForm(event)" method="post">
-              <div class="row" id="addressFields">
-                <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
-                  <div class="col">
-                    <div class="col font-size">
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="country">Country<span class="text-danger font-size-bold">*</span></label>
-                        <select name="country" id="country" class="form-select font-size">
-                          <% countryData.forEach(country => { %>
-                          <% if (country.code === 'in') { %>
-                          <option value="<%= country.name.name %>" selected><%= country.name.name %> - <%= country.code.toUpperCase() %></option>
-                          <% } else { %>
-                          <option value="<%= country.name.name %>"><%= country.name.name %> - <%= country.code.toUpperCase() %></option>
-                          <% } %>
-                          <% }); %>
-                        </select>
-                      </div>
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="fullName">Full name (First name and Last name)<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validateFullName()" required type="text" name="fullName" id="fullName" value="" class="form-control font-size" placeholder="your full name">
-                        <span id="fullNameError" class="text-danger font-size"></span>
-                      </div>
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="email">Email<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validateEmail()" required type="text" name="email" id="email" value="" class="form-control font-size" placeholder="your email">
-                        <span id="emailError" class="text-danger font-size"></span>
-
-                      </div>
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="phoneNumber">Phone number<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validatePhoneNumber()" required type="number" name="phoneNumber" id="phoneNumber" value="" class="form-control font-size" placeholder="your phone number">
-                        <span id="phoneNumberError" class="text-danger font-size"></span>
-
-                      </div>
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="building">Building/Appartment<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validateBuilding()" required type="text" name="building" id="building" value="" class="form-control font-size" placeholder="your building">
-                        <span id="buildingError" class="text-danger font-size"></span>
-
-                      </div>
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="houseNumber">House Number.<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validateHouseNumber()" required type="text" name="houseNumber" id="houseNumber" value="" class="form-control font-size" placeholder="your house Nnumer">
-                        <span id="houseNumberError" class="text-danger font-size"></span>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
-                  <div class="col">
-                    <div class="col-12 font-size">
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="street">Street<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validateStreet()" type="text" name="street" id="street" class="form-control font-size" placeholder="your area">
-                        <span id="streetError" class="text-danger font-size"></span>
-
-                      </div>
-                      <div class="col py-2">
-                        <label class="font-size-bold" for="city">City<span class="text-danger font-size-bold">*</span></label>
-                        <input oninput="validateCity()" required type="text" name="city" id="city" value="" class="form-control font-size" placeholder="your city">
-                        <span id="cityError" class="text-danger font-size"></span>
-
-                      </div>
-                    </div>
-                    <div class="col py-2">
-                      <div class="d-flex">
-                        <div class="col-6">
-                          <label class="font-size-bold" for="area">Area<span class="text-danger font-size-bold">*</span></label>
-                          <input oninput="validateArea()" type="text" name="area" id="area" class="form-control font-size" placeholder="your area">
-                          <span id="areaError" class="text-danger font-size"></span>
-
-                        </div>
-                        <div class="col-6">
-                          <label class="font-size-bold" for="pincode">PIN Code<span class="text-danger font-size-bold">*</span></label>
-                          <input required type="number" onchange="validatePincode()" name="pincode" id="pincode" value="" class="form-control font-size" placeholder="Enter your pincode">
-                          <span id="pincodeError" class="text-danger font-size"></span>
-                        </div>
-                      </div>
-                    </div>
+            <% addresses?.forEach(address => { %>
+            <% if (address.addresses.length > 0) { %>
+              <form action="/user-edit-address" name="editForm" onsubmit="validateForm(event)" method="post">
+                <div class="row" id="addressFields">
+                  <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
                     <div class="col">
-                      <div class="d-flex">
-                        <div class="col-6">
-                          <label class=" font-size-bold" for="circle">Circle<span class="text-danger font-size-bold p-0 m-0">*</span></label>
-                          <select name="circle" id="circle" class="form-select font-size">
+                      <div class="col font-size">
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="country">Country<span class="text-danger font-size-bold">*</span></label>
+                          <select name="country" id="country" class="form-select font-size">
+                            <% countryData.forEach(country => { %>
+                            <% if (country.code === 'in') { %>
+                            <option value="<%= country.name.name %>" selected><%= country.name.name %> - <%= country.code.toUpperCase() %></option>
+                            <% } else { %>
+                            <option value="<%= country.name.name %>"><%= country.name.name %> - <%= country.code.toUpperCase() %></option>
+                            <% } %>
+                            <% }); %>
                           </select>
                         </div>
-                        <div class="col-6">
-                          <label class=" font-size-bold" for="region">Region<span class="text-danger font-size-bold">*</span></label>
-                          <select name="region" id="region" class="form-select font-size">
-                          </select>
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="fullName">Full name (First name and Last name)<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validateFullName()" required type="text" name="fullName" id="fullName" value="" class="form-control font-size" placeholder="your full name">
+                          <span id="fullNameError" class="text-danger font-size"></span>
+                        </div>
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="email">Email<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validateEmail()" required type="text" name="email" id="email" value="" class="form-control font-size" placeholder="your email">
+                          <span id="emailError" class="text-danger font-size"></span>
+  
+                        </div>
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="phoneNumber">Phone number<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validatePhoneNumber()" required type="number" name="phoneNumber" id="phoneNumber" value="" class="form-control font-size" placeholder="your phone number">
+                          <span id="phoneNumberError" class="text-danger font-size"></span>
+  
+                        </div>
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="building">Building/Appartment<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validateBuilding()" required type="text" name="building" id="building" value="" class="form-control font-size" placeholder="your building">
+                          <span id="buildingError" class="text-danger font-size"></span>
+  
+                        </div>
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="houseNumber">House Number.<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validateHouseNumber()" required type="text" name="houseNumber" id="houseNumber" value="" class="form-control font-size" placeholder="your house Nnumer">
+                          <span id="houseNumberError" class="text-danger font-size"></span>
+  
                         </div>
                       </div>
                     </div>
-                    <div class="col py-2">
-                      <div class="d-flex">
-                        <div class="col-6">
-                          <label class=" font-size-bold" for="division">Division<span class="text-danger font-size-bold">*</span></label>
-                          <select name="division" id="division" class="form-select font-size">
-                          </select>
+                  </div>
+                  <div class="col-sm-12 col-md-12 col-lg-6 d-flex">
+                    <div class="col">
+                      <div class="col-12 font-size">
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="street">Street<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validateStreet()" type="text" name="street" id="street" class="form-control font-size" placeholder="your area">
+                          <span id="streetError" class="text-danger font-size"></span>
+  
                         </div>
-                        <div class="col-6">
-                          <label class=" font-size-bold" for="location">Location<span class="text-danger font-size-bold">*</span></label>
-                          <select name="location" id="location" class="form-select font-size">
-                          </select>
+                        <div class="col py-2">
+                          <label class="font-size-bold" for="city">City<span class="text-danger font-size-bold">*</span></label>
+                          <input oninput="validateCity()" required type="text" name="city" id="city" value="" class="form-control font-size" placeholder="your city">
+                          <span id="cityError" class="text-danger font-size"></span>
+  
                         </div>
                       </div>
-                    </div>
-                    <div class="col py-2">
-                      <div class="d-flex">
-                        <div class="col-6">
-                          <label class=" font-size-bold" for="district">District<span class="text-danger font-size-bold">*</span></label>
-                          <select name="district" id="district" class="form-select font-size">
-                          </select>
+                      <div class="col py-2">
+                        <div class="d-flex">
+                          <div class="col-6">
+                            <label class="font-size-bold" for="area">Area<span class="text-danger font-size-bold">*</span></label>
+                            <input oninput="validateArea()" type="text" name="area" id="area" class="form-control font-size" placeholder="your area">
+                            <span id="areaError" class="text-danger font-size"></span>
+  
+                          </div>
+                          <div class="col-6">
+                            <label class="font-size-bold" for="pincode">PIN Code<span class="text-danger font-size-bold">*</span></label>
+                            <input required type="number" onchange="validatePincode()" name="pincode" id="pincode" value="" class="form-control font-size" placeholder="Enter your pincode">
+                            <span id="pincodeError" class="text-danger font-size"></span>
+                          </div>
                         </div>
-                        <div class="col-6">
-                          <label class=" font-size-bold" for="state">State<span class="text-danger font-size-bold">*</span></label>
-                          <select name="state" id="state" class="form-select font-size">
-                          </select>
+                      </div>
+                      <div class="col">
+                        <div class="d-flex">
+                          <div class="col-6">
+                            <label class=" font-size-bold" for="circle">Circle<span class="text-danger font-size-bold p-0 m-0">*</span></label>
+                            <select name="circle" id="circle" class="form-select font-size">
+                            </select>
+                          </div>
+                          <div class="col-6">
+                            <label class=" font-size-bold" for="region">Region<span class="text-danger font-size-bold">*</span></label>
+                            <select name="region" id="region" class="form-select font-size">
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col py-2">
+                        <div class="d-flex">
+                          <div class="col-6">
+                            <label class=" font-size-bold" for="division">Division<span class="text-danger font-size-bold">*</span></label>
+                            <select name="division" id="division" class="form-select font-size">
+                            </select>
+                          </div>
+                          <div class="col-6">
+                            <label class=" font-size-bold" for="location">Location<span class="text-danger font-size-bold">*</span></label>
+                            <select name="location" id="location" class="form-select font-size">
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col py-2">
+                        <div class="d-flex">
+                          <div class="col-6">
+                            <label class=" font-size-bold" for="district">District<span class="text-danger font-size-bold">*</span></label>
+                            <select name="district" id="district" class="form-select font-size">
+                            </select>
+                          </div>
+                          <div class="col-6">
+                            <label class=" font-size-bold" for="state">State<span class="text-danger font-size-bold">*</span></label>
+                            <select name="state" id="state" class="form-select font-size">
+                            </select>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col text-center py-2 d-flex justify-content-around">
-                <a href="/user-dashboard" class="btn btn-dark px-3 font-size" style="width: 150px;">cancel</a>
-                <button type="submit" id="submitButton" class="btn btn-danger font-size" style="width: 150px;">confirm</button>
-              </div>
-            </form>
+                <div class="col text-center py-2 d-flex justify-content-around">
+                  <a href="/user-dashboard-address-book" class="btn btn-dark px-3 font-size" style="width: 150px;">cancel</a>
+                  <button type="submit" id="submitButton" class="btn btn-danger font-size" style="width: 150px;">confirm</button>
+                </div>
+              </form>
             <% }; %>
             <% }); %>
 
@@ -437,7 +435,9 @@
 
       function validateHouseNumber() {
         let houseNumber = document.forms['editForm']['houseNumber'].value
-        let houseNumberRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+        // let houseNumberRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+        let houseNumberRegex = /^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9]*)*$/;
+
         if (!houseNumberRegex.test(houseNumber)) {
           document.getElementById('houseNumberError').innerText = "Please enter a valid house number"
         } else {

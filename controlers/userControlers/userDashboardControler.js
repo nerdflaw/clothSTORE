@@ -21,7 +21,7 @@ const { ObjectId } = mongoose.Types;
 const bcrypt = require('bcrypt')
 const flash = require('connect-flash')
 const getPincodes = require('get-indian-places-on-pincodes')
-const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET} = process.env;
+const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
 const razorpayInstance = new Razorpay({
 	key_id: RAZORPAY_KEY_ID,
 	key_secret: RAZORPAY_KEY_SECRET,
@@ -77,7 +77,6 @@ const userDashboardAddressBook_get = async (req, res) => {
 		if (user) {
 			const userId = user._id;
 			const addresses = await Address.find({ userId: userId })
-
 			res.render('user-pages/userDashboardEditAddressBookPage',
 				{
 					countryData,
@@ -97,21 +96,46 @@ const userAddAddress_get = (req, res) => {
 const userAddAddress_post = async (req, res) => {
 	const findUser = await Address.findOne({ userId: req.session.userId });
 	if (findUser) {
-		const updatedAddress = await Address.updateOne(
-			{ userId: req.session.userId },
-			{
-				$push: {
-					addresses: req.body
+		const existingAddress = findUser.addresses.find(address =>
+			address.fullName === req.body.fullName &&
+			address.phoneNumber === req.body.phoneNumber &&
+			address.email === req.body.email &&
+			address.building === req.body.building &&
+			address.houseNumber === req.body.houseNumber &&
+			address.country === req.body.country &&
+			address.pincode === parseInt(req.body.pincode) &&
+			address.street === req.body.street &&
+			address.city === req.body.city &&
+			address.state === req.body.state &&
+			address.area === req.body.area &&
+			address.circle === req.body.circle &&
+			address.region === req.body.region &&
+			address.division === req.body.division &&
+			address.location === req.body.location &&
+			address.district === req.body.district)
+
+		if (existingAddress) {
+			req.flash('message', 'Address already exists')
+			return res.redirect('/user-dashboard-address-book');
+		}else {
+			const updatedAddress = await Address.updateOne(
+				{ userId: req.session.userId },
+				{
+					$push: {
+						addresses: req.body
+					}
 				}
-			}
-		);
-		return res.redirect('/user-dashboard-address-book?message=Address added successfully');
-	} else {
+			);
+			req.flash('message', 'Address added successfully')
+			res.redirect('/user-dashboard-address-book');
+		}
+	}else {
 		const createdAddress = await Address.create({
 			userId: new ObjectId(req.session.userId),
 			addresses: req.body
 		})
-		res.redirect('/user-dashboard-address-book?message=Address added successfully');
+		req.flash('message', 'Address added successfully')
+		res.redirect('/user-dashboard-address-book');
 	}
 };
 const userEditAddress_post = async (req, res) => {
@@ -179,10 +203,11 @@ const userDeleteAddress_post = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(id)) {
 		return res.status(404).render('user-pages/404');
 	}
+
 	const address = await Address.updateOne(
 		{ userId: new ObjectId(req.session.userId) },
-		{ $pull: { addresses: { _id: id } } },
-	)
+		{ $pull: { addresses: { _id:new ObjectId(id) } } }
+	  )
 	return res.redirect('/user-dashboard-address-book?message=Address deleted successfully')
 };
 const userCheckOldPassword_post = async (req, res) => {
@@ -243,13 +268,13 @@ const userSearch_get = async (req, res) => {
 	let filterQuery = {}
 
 	filterQuery['productDetails.status'] = true;
-	filterQuery['productDetails.title']= { $regex: searchKey, $options: "i" }
+	filterQuery['productDetails.title'] = { $regex: searchKey, $options: "i" }
 
 	if (brandsArr.length > 0) {
-		filterQuery['productDetails.brandName'] = {$in : brandsArr};
+		filterQuery['productDetails.brandName'] = { $in: brandsArr };
 	}
 	if (categoriesArr.length > 0) {
-		filterQuery['productDetails.categoryName'] = {$in : categoriesArr};
+		filterQuery['productDetails.categoryName'] = { $in: categoriesArr };
 	}
 	if (colorsArr.length > 0) {
 		filterQuery['productDetails.variants.color'] = { $in: colorsArr };
@@ -359,13 +384,13 @@ const userSearch_post = async (req, res) => {
 	let filterQuery = {}
 
 	filterQuery['productDetails.status'] = true;
-	filterQuery['productDetails.title']= { $regex: searchKey, $options: "i" }
+	filterQuery['productDetails.title'] = { $regex: searchKey, $options: "i" }
 
 	if (brandsArr.length > 0) {
-		filterQuery['productDetails.brandName'] = {$in : brandsArr};
+		filterQuery['productDetails.brandName'] = { $in: brandsArr };
 	}
 	if (categoriesArr.length > 0) {
-		filterQuery['productDetails.categoryName'] = {$in : categoriesArr};
+		filterQuery['productDetails.categoryName'] = { $in: categoriesArr };
 	}
 	if (colorsArr.length > 0) {
 		filterQuery['productDetails.variants.color'] = { $in: colorsArr };
@@ -944,30 +969,30 @@ const userDashboardCart_get = async (req, res) => {
 
 
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 
 	userCartData.forEach(cartItem => {
 		totalIndividualTotal += cartItem.individualTotal
-		totalMrpWithoutTax += cartItem.mrpWithoutTax 
-		totalFirstDiscountAmount += cartItem.firstDiscountAmount 
-		totalAmountAfterfirstDiscount += cartItem.AmountAfterfirstDiscount   
-		totalSeccondDiscountAmount += cartItem.seccondDiscountAmount 
-		totalAmountAfterSecondDiscount += cartItem.AmountAfterSecondDiscount   
-		totalGst += cartItem.gst 
-		totalSgst += cartItem.sgst 
+		totalMrpWithoutTax += cartItem.mrpWithoutTax
+		totalFirstDiscountAmount += cartItem.firstDiscountAmount
+		totalAmountAfterfirstDiscount += cartItem.AmountAfterfirstDiscount
+		totalSeccondDiscountAmount += cartItem.seccondDiscountAmount
+		totalAmountAfterSecondDiscount += cartItem.AmountAfterSecondDiscount
+		totalGst += cartItem.gst
+		totalSgst += cartItem.sgst
 		totalCgst += cartItem.cgst
 	});
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	const totalPages = Math.ceil(userCartData.length / limit);
@@ -975,7 +1000,7 @@ const userDashboardCart_get = async (req, res) => {
 	res.render('user-pages/userDashboardCartPage',
 		{
 			userCartData, totalAmountAfterSecondDiscount, totalGst,
-			totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff , grandTotal,
+			totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
 			paginatedCartProducts, sizes, colors,
 			message: req.flash('message'),
 			currentPage, limit, totalPages
@@ -1005,8 +1030,8 @@ const userDashboardReturns_get = async (req, res) => {
 				paymentStatus: "$paymentStatus",
 				createdAt: "$createdAt",
 				updatedAt: "$updatedAt",
-				wholeOrderId :'$_id',
-				singleOrderId :'$order._id',
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
 			}
 		},
 		{
@@ -1054,7 +1079,7 @@ const userDashboardReturns_get = async (req, res) => {
 				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
 				couponCode: { $ifNull: ['$couponData.couponCode', null] },
 				couponName: { $ifNull: ['$couponData.coupon', null] }
-				
+
 			}
 		},
 		{
@@ -1471,20 +1496,20 @@ const userDashboardReturns_get = async (req, res) => {
 				paymentStatus: 1,
 				createdAt: 1,
 				updatedAt: 1,
-				mrp:1,
-				couponValue : 1,
-				couponCode : 1,
-				couponName : 1,
+				mrp: 1,
+				couponValue: 1,
+				couponCode: 1,
+				couponName: 1,
 				discount: 1,
 				status: 1,
 				title: "$productData.title",
 				images: "$productData.images",
-				productDetailsReview : "$productData.review",
+				productDetailsReview: "$productData.review",
 				color: "$colorData.color",
 				size: "$sizeData.size",
 				productId: 1,
-				wholeOrderId : 1,
-				singleOrderId : 1,
+				wholeOrderId: 1,
+				singleOrderId: 1,
 				quantity: 1
 			}
 		},
@@ -1494,37 +1519,37 @@ const userDashboardReturns_get = async (req, res) => {
 				orders: { $push: "$$ROOT" }
 			}
 		},
-		{ $match : { 'orders.orderStatus' : 'returned'}},
+		{ $match: { 'orders.orderStatus': 'returned' } },
 		{ $sort: { 'orders.createdAt': -1 } },
 	]);
 
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 
 	order.forEach(orderItem => {
-		orderItem.orders.forEach(orderItmes =>{
+		orderItem.orders.forEach(orderItmes => {
 			totalIndividualTotal += orderItmes.individualTotal
-			totalMrpWithoutTax += orderItmes.mrpWithoutTax 
-			totalFirstDiscountAmount += orderItmes.firstDiscountAmount 
-			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount   
-			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount 
-			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount   
-			totalGst += orderItmes.gst 
-			totalSgst += orderItmes.sgst 
+			totalMrpWithoutTax += orderItmes.mrpWithoutTax
+			totalFirstDiscountAmount += orderItmes.firstDiscountAmount
+			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount
+			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount
+			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount
+			totalGst += orderItmes.gst
+			totalSgst += orderItmes.sgst
 			totalCgst += orderItmes.cgst
 		})
 	});
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	const totalPages = Math.ceil(order.length / limit);
@@ -1537,7 +1562,7 @@ const userDashboardReturns_get = async (req, res) => {
 		limit,
 		totalPages,
 		totalAmountAfterSecondDiscount, totalGst,
-		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff , grandTotal,
+		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
 	});
 };
 const userDashboardCancellations_get = async (req, res) => {
@@ -1562,8 +1587,8 @@ const userDashboardCancellations_get = async (req, res) => {
 				paymentStatus: "$paymentStatus",
 				createdAt: "$createdAt",
 				updatedAt: "$updatedAt",
-				wholeOrderId :'$_id',
-				singleOrderId :'$order._id',
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
 			}
 		},
 		{
@@ -1611,7 +1636,7 @@ const userDashboardCancellations_get = async (req, res) => {
 				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
 				couponCode: { $ifNull: ['$couponData.couponCode', null] },
 				couponName: { $ifNull: ['$couponData.coupon', null] }
-				
+
 			}
 		},
 		{
@@ -2028,20 +2053,20 @@ const userDashboardCancellations_get = async (req, res) => {
 				paymentStatus: 1,
 				createdAt: 1,
 				updatedAt: 1,
-				mrp:1,
-				couponValue : 1,
-				couponCode : 1,
-				couponName : 1,
+				mrp: 1,
+				couponValue: 1,
+				couponCode: 1,
+				couponName: 1,
 				discount: 1,
 				status: 1,
 				title: "$productData.title",
 				images: "$productData.images",
-				productDetailsReview : "$productData.review",
+				productDetailsReview: "$productData.review",
 				color: "$colorData.color",
 				size: "$sizeData.size",
 				productId: 1,
-				wholeOrderId : 1,
-				singleOrderId : 1,
+				wholeOrderId: 1,
+				singleOrderId: 1,
 				quantity: 1
 			}
 		},
@@ -2051,37 +2076,37 @@ const userDashboardCancellations_get = async (req, res) => {
 				orders: { $push: "$$ROOT" }
 			}
 		},
-		{ $match : { 'orders.orderStatus' : 'cancelled'}},
+		{ $match: { 'orders.orderStatus': 'cancelled' } },
 		{ $sort: { 'orders.createdAt': -1 } },
 	]);
 
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 
 	order.forEach(orderItem => {
-		orderItem.orders.forEach(orderItmes =>{
+		orderItem.orders.forEach(orderItmes => {
 			totalIndividualTotal += orderItmes.individualTotal
-			totalMrpWithoutTax += orderItmes.mrpWithoutTax 
-			totalFirstDiscountAmount += orderItmes.firstDiscountAmount 
-			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount   
-			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount 
-			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount   
-			totalGst += orderItmes.gst 
-			totalSgst += orderItmes.sgst 
+			totalMrpWithoutTax += orderItmes.mrpWithoutTax
+			totalFirstDiscountAmount += orderItmes.firstDiscountAmount
+			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount
+			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount
+			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount
+			totalGst += orderItmes.gst
+			totalSgst += orderItmes.sgst
 			totalCgst += orderItmes.cgst
 		})
 	});
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	const totalPages = Math.ceil(order.length / limit);
@@ -2094,7 +2119,7 @@ const userDashboardCancellations_get = async (req, res) => {
 		limit,
 		totalPages,
 		totalAmountAfterSecondDiscount, totalGst,
-		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff , grandTotal,
+		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
 	});
 };
 const userDashboardWishists_get = async (req, res) => {
@@ -2752,38 +2777,38 @@ const userCheckout_get = async (req, res) => {
 		{ $sort: { createdAt: -1 } }
 	])
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 
 	cartDetails.forEach(cartItem => {
 		totalIndividualTotal += cartItem.individualTotal
-		totalMrpWithoutTax += cartItem.mrpWithoutTax 
-		totalFirstDiscountAmount += cartItem.firstDiscountAmount 
-		totalAmountAfterfirstDiscount += cartItem.AmountAfterfirstDiscount   
-		totalSeccondDiscountAmount += cartItem.seccondDiscountAmount 
-		totalAmountAfterSecondDiscount += cartItem.AmountAfterSecondDiscount   
-		totalGst += cartItem.gst 
-		totalSgst += cartItem.sgst 
+		totalMrpWithoutTax += cartItem.mrpWithoutTax
+		totalFirstDiscountAmount += cartItem.firstDiscountAmount
+		totalAmountAfterfirstDiscount += cartItem.AmountAfterfirstDiscount
+		totalSeccondDiscountAmount += cartItem.seccondDiscountAmount
+		totalAmountAfterSecondDiscount += cartItem.AmountAfterSecondDiscount
+		totalGst += cartItem.gst
+		totalSgst += cartItem.sgst
 		totalCgst += cartItem.cgst
 	});
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	res.render('user-pages/userDashboardCheckoutPage',
 		{
 			totalAmountAfterSecondDiscount, totalGst,
-			totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff , grandTotal,
+			totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
 			message: req.flash('message'),
-			cartDetails, allCoupons , RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
+			cartDetails, allCoupons, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
 		})
 };
 const userDashboardOrders_get = async (req, res) => {
@@ -2808,8 +2833,8 @@ const userDashboardOrders_get = async (req, res) => {
 				paymentStatus: "$paymentStatus",
 				createdAt: "$createdAt",
 				updatedAt: "$updatedAt",
-				wholeOrderId :'$_id',
-				singleOrderId :'$order._id',
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
 				userId: "$userId"
 			}
 		},
@@ -2856,7 +2881,7 @@ const userDashboardOrders_get = async (req, res) => {
 				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
 				couponCode: { $ifNull: ['$couponData.couponCode', null] },
 				couponName: { $ifNull: ['$couponData.coupon', null] }
-				
+
 			}
 		},
 		{
@@ -3273,22 +3298,22 @@ const userDashboardOrders_get = async (req, res) => {
 				paymentStatus: 1,
 				createdAt: 1,
 				updatedAt: 1,
-				mrp:1,
-				couponValue : 1,
-				couponCode : 1,
-				couponName : 1,
+				mrp: 1,
+				couponValue: 1,
+				couponCode: 1,
+				couponName: 1,
 				discount: 1,
 				status: 1,
 				title: "$productData.title",
 				images: "$productData.images",
-				productDetailsReview : "$productData.review",
+				productDetailsReview: "$productData.review",
 				color: "$colorData.color",
 				size: "$sizeData.size",
 				productId: 1,
-				wholeOrderId : 1,
-				singleOrderId : 1,
+				wholeOrderId: 1,
+				singleOrderId: 1,
 				quantity: 1,
-				userId :1
+				userId: 1
 			}
 		},
 		{
@@ -3313,14 +3338,14 @@ const userDashboardOrders_get = async (req, res) => {
 	const totalPages = Math.ceil(order.length / limit);
 	const paginatedOrder = order.slice(skip, skip + limit);
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 	let statusArr = [];
 	let pendingArr = [];
 	let placedArr = [];
@@ -3329,15 +3354,15 @@ const userDashboardOrders_get = async (req, res) => {
 	let deliveredArr = [];
 
 	paginatedOrder.forEach(orderItem => {
-		orderItem.orders.forEach(orderItmes =>{
+		orderItem.orders.forEach(orderItmes => {
 			totalIndividualTotal += orderItmes.individualTotal
-			totalMrpWithoutTax += orderItmes.mrpWithoutTax 
-			totalFirstDiscountAmount += orderItmes.firstDiscountAmount 
-			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount   
-			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount 
-			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount   
-			totalGst += orderItmes.gst 
-			totalSgst += orderItmes.sgst 
+			totalMrpWithoutTax += orderItmes.mrpWithoutTax
+			totalFirstDiscountAmount += orderItmes.firstDiscountAmount
+			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount
+			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount
+			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount
+			totalGst += orderItmes.gst
+			totalSgst += orderItmes.sgst
 			totalCgst += orderItmes.cgst
 			statusArr.push(orderItmes.status)
 		})
@@ -3348,9 +3373,9 @@ const userDashboardOrders_get = async (req, res) => {
 	placedArr = statusArr.filter(status => status === 'placed');
 	deliveredArr = statusArr.filter(status => status === 'delivered');
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	res.render('user-pages/userDashboardOrderPage', {
@@ -3368,11 +3393,11 @@ const userDashboardOrders_get = async (req, res) => {
 		RAZORPAY_KEY_ID,
 		totalAmountAfterSecondDiscount,
 		totalGst,
-		totalSgst, 
-		totalCgst, 
-		totalDiscount, 
-		totalDiscountPercentage, 
-		roundOff , 
+		totalSgst,
+		totalCgst,
+		totalDiscount,
+		totalDiscountPercentage,
+		roundOff,
 		grandTotal,
 	});
 };
@@ -3461,7 +3486,7 @@ const userDownloadInvoice_get = async (req, res) => {
 				individualTotal: {
 					$multiply: ["$mrp", "$quantity"]
 				},
-				
+
 				mrpWithoutTax: {
 					$multiply: [
 						{ $multiply: ["$mrp", "$quantity"] },
@@ -3865,245 +3890,245 @@ const userDownloadInvoice_get = async (req, res) => {
 					]
 				},
 				totalDiscount: {
-				  $subtract: [
-					{ $multiply: ["$mrp", "$quantity"] },
-					{
-					  $add: [
+					$subtract: [
+						{ $multiply: ["$mrp", "$quantity"] },
 						{
-						  $subtract: [
-							{
-							  $subtract: [
+							$add: [
 								{
-								  $multiply: [
-									{ $multiply: ["$mrp", "$quantity"] },
-									{ $divide: [100, 118] }
-								  ]
-								},
-								{
-								  $multiply: [
-									{
-									  $multiply: [
-										{ $multiply: ["$mrp", "$quantity"] },
-										{ $divide: [100, 118] }
-									  ]
-									},
-									{ $divide: ["$discount", 100] }
-								  ]
-								}
-							  ]
-							},
-							{
-							  $multiply: [
-								{
-								  $subtract: [
-									{
-									  $multiply: [
-										{ $multiply: ["$mrp", "$quantity"] },
-										{ $divide: [100, 118] }
-									  ]
-									},
-									{
-									  $multiply: [
+									$subtract: [
 										{
-										  $multiply: [
-											{ $multiply: ["$mrp", "$quantity"] },
-											{ $divide: [100, 118] }
-										  ]
-										},
-										{ $divide: ["$discount", 100] }
-									  ]
-									}
-								  ]
-								},
-								{ $divide: ["$couponValue", 100] }
-							  ]
-							}
-						  ]
-						},
-						{
-						  $multiply: [
-							{ $divide: [18, 100] },
-							{
-							  $subtract: [
-								{
-								  $subtract: [
-									{
-									  $multiply: [
-										{ $multiply: ["$mrp", "$quantity"] },
-										{ $divide: [100, 118] }
-									  ]
-									},
-									{
-									  $multiply: [
-										{
-										  $multiply: [
-											{ $multiply: ["$mrp", "$quantity"] },
-											{ $divide: [100, 118] }
-										  ]
-										},
-										{ $divide: ["$discount", 100] }
-									  ]
-									}
-								  ]
-								},
-								{
-								  $multiply: [
-									{
-									  $subtract: [
-										{
-										  $multiply: [
-											{ $multiply: ["$mrp", "$quantity"] },
-											{ $divide: [100, 118] }
-										  ]
-										},
-										{
-										  $multiply: [
-											{
-											  $multiply: [
-												{ $multiply: ["$mrp", "$quantity"] },
-												{ $divide: [100, 118] }
-											  ]
-											},
-											{ $divide: ["$discount", 100] }
-										  ]
-										}
-									  ]
-									},
-									{ $divide: ["$couponValue", 100] }
-								  ]
-								}
-							  ]
-							}
-						  ]
-						}
-					  ]
-					}
-				  ]
-				},
-				totalDiscountPercentage: {
-				  $multiply: [
-					{
-					  $divide: [
-						{
-						  $subtract: [
-							{ $multiply: ["$mrp", "$quantity"] },
-							{
-							  $add: [
-								{
-								  $subtract: [
-									{
-									  $subtract: [
-										{
-										  $multiply: [
-											{ $multiply: ["$mrp", "$quantity"] },
-											{ $divide: [100, 118] }
-										  ]
-										},
-										{
-										  $multiply: [
-											{
-											  $multiply: [
-												{ $multiply: ["$mrp", "$quantity"] },
-												{ $divide: [100, 118] }
-											  ]
-											},
-											{ $divide: ["$discount", 100] }
-										  ]
-										}
-									  ]
-									},
-									{
-									  $multiply: [
-										{
-										  $subtract: [
-											{
-											  $multiply: [
-												{ $multiply: ["$mrp", "$quantity"] },
-												{ $divide: [100, 118] }
-											  ]
-											},
-											{
-											  $multiply: [
+											$subtract: [
 												{
-												  $multiply: [
-													{ $multiply: ["$mrp", "$quantity"] },
-													{ $divide: [100, 118] }
-												  ]
-												},
-												{ $divide: ["$discount", 100] }
-											  ]
-											}
-										  ]
-										},
-										{ $divide: ["$couponValue", 100] }
-									  ]
-									}
-								  ]
-								},
-								{
-								  $multiply: [
-									{ $divide: [18, 100] },
-									{
-									  $subtract: [
-										{
-										  $subtract: [
-											{
-											  $multiply: [
-												{ $multiply: ["$mrp", "$quantity"] },
-												{ $divide: [100, 118] }
-											  ]
-											},
-											{
-											  $multiply: [
-												{
-												  $multiply: [
-													{ $multiply: ["$mrp", "$quantity"] },
-													{ $divide: [100, 118] }
-												  ]
-												},
-												{ $divide: ["$discount", 100] }
-											  ]
-											}
-										  ]
-										},
-										{
-										  $multiply: [
-											{
-											  $subtract: [
-												{
-												  $multiply: [
-													{ $multiply: ["$mrp", "$quantity"] },
-													{ $divide: [100, 118] }
-												  ]
-												},
-												{
-												  $multiply: [
-													{
-													  $multiply: [
+													$multiply: [
 														{ $multiply: ["$mrp", "$quantity"] },
 														{ $divide: [100, 118] }
-													  ]
-													},
-													{ $divide: ["$discount", 100] }
-												  ]
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
 												}
-											  ]
-											},
-											{ $divide: ["$couponValue", 100] }
-										  ]
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
 										}
-									  ]
-									}
-								  ]
+									]
+								},
+								{
+									$multiply: [
+										{ $divide: [18, 100] },
+										{
+											$subtract: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{
+													$multiply: [
+														{
+															$subtract: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{
+																	$multiply: [
+																		{
+																			$multiply: [
+																				{ $multiply: ["$mrp", "$quantity"] },
+																				{ $divide: [100, 118] }
+																			]
+																		},
+																		{ $divide: ["$discount", 100] }
+																	]
+																}
+															]
+														},
+														{ $divide: ["$couponValue", 100] }
+													]
+												}
+											]
+										}
+									]
 								}
-							  ]
-							}
-						  ]
-						},
-						{ $multiply: ["$mrp", "$quantity"] }
-					  ]
-					}, 100
-				  ]
+							]
+						}
+					]
+				},
+				totalDiscountPercentage: {
+					$multiply: [
+						{
+							$divide: [
+								{
+									$subtract: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{
+											$add: [
+												{
+													$subtract: [
+														{
+															$subtract: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{
+																	$multiply: [
+																		{
+																			$multiply: [
+																				{ $multiply: ["$mrp", "$quantity"] },
+																				{ $divide: [100, 118] }
+																			]
+																		},
+																		{ $divide: ["$discount", 100] }
+																	]
+																}
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$subtract: [
+																		{
+																			$multiply: [
+																				{ $multiply: ["$mrp", "$quantity"] },
+																				{ $divide: [100, 118] }
+																			]
+																		},
+																		{
+																			$multiply: [
+																				{
+																					$multiply: [
+																						{ $multiply: ["$mrp", "$quantity"] },
+																						{ $divide: [100, 118] }
+																					]
+																				},
+																				{ $divide: ["$discount", 100] }
+																			]
+																		}
+																	]
+																},
+																{ $divide: ["$couponValue", 100] }
+															]
+														}
+													]
+												},
+												{
+													$multiply: [
+														{ $divide: [18, 100] },
+														{
+															$subtract: [
+																{
+																	$subtract: [
+																		{
+																			$multiply: [
+																				{ $multiply: ["$mrp", "$quantity"] },
+																				{ $divide: [100, 118] }
+																			]
+																		},
+																		{
+																			$multiply: [
+																				{
+																					$multiply: [
+																						{ $multiply: ["$mrp", "$quantity"] },
+																						{ $divide: [100, 118] }
+																					]
+																				},
+																				{ $divide: ["$discount", 100] }
+																			]
+																		}
+																	]
+																},
+																{
+																	$multiply: [
+																		{
+																			$subtract: [
+																				{
+																					$multiply: [
+																						{ $multiply: ["$mrp", "$quantity"] },
+																						{ $divide: [100, 118] }
+																					]
+																				},
+																				{
+																					$multiply: [
+																						{
+																							$multiply: [
+																								{ $multiply: ["$mrp", "$quantity"] },
+																								{ $divide: [100, 118] }
+																							]
+																						},
+																						{ $divide: ["$discount", 100] }
+																					]
+																				}
+																			]
+																		},
+																		{ $divide: ["$couponValue", 100] }
+																	]
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{ $multiply: ["$mrp", "$quantity"] }
+							]
+						}, 100
+					]
 				},
 				addressData: { $arrayElemAt: ["$addressData", 0] },
 				paymentMode: 1,
@@ -4130,15 +4155,15 @@ const userDownloadInvoice_get = async (req, res) => {
 		},
 	])
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
-    let totalQuantity = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
+	let totalQuantity = 0
 
 	orderDetails.forEach(orderItem => {
 		totalIndividualTotal += orderItem.individualTotal
@@ -4153,32 +4178,33 @@ const userDownloadInvoice_get = async (req, res) => {
 		totalQuantity += orderItem.quantity
 	});
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	return res.render('user-pages/userDownloadInvoicePage',
-		{   orderDetails, message : req.query.messages,
+		{
+			orderDetails, message: req.query.messages,
 			totalIndividualTotal,
 			totalMrpWithoutTax,
 			totalFirstDiscountAmount,
-			totalAmountAfterfirstDiscount,  
+			totalAmountAfterfirstDiscount,
 			totalSeccondDiscountAmount,
-			totalAmountAfterSecondDiscount,  
+			totalAmountAfterSecondDiscount,
 			totalGst,
 			totalSgst,
 			totalCgst,
-			totalDiscount, 
-			totalDiscountPercentage, 
-			roundOff, 
+			totalDiscount,
+			totalDiscountPercentage,
+			roundOff,
 			grandTotal,
 			totalQuantity
 		}
 	)
 }
 const userFilterOrderStatus_get = async (req, res) => {
-	const uniqueStatusTypes = req.query.orderStatuses? req.query.orderStatuses.split(',') : [];
+	const uniqueStatusTypes = req.query.orderStatuses ? req.query.orderStatuses.split(',') : [];
 	const selectedFilter = req.query.selectedFilter || '';
 	let currentPage = Number(req.query.page) || 1;
 	let limit = Number(req.query.limit) || 1;
@@ -4200,8 +4226,8 @@ const userFilterOrderStatus_get = async (req, res) => {
 				paymentStatus: "$paymentStatus",
 				createdAt: "$createdAt",
 				updatedAt: "$updatedAt",
-				wholeOrderId :'$_id',
-				singleOrderId :'$order._id',
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
 				userId: "$userId"
 			}
 		},
@@ -4248,7 +4274,7 @@ const userFilterOrderStatus_get = async (req, res) => {
 				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
 				couponCode: { $ifNull: ['$couponData.couponCode', null] },
 				couponName: { $ifNull: ['$couponData.coupon', null] }
-				
+
 			}
 		},
 		{
@@ -4665,22 +4691,22 @@ const userFilterOrderStatus_get = async (req, res) => {
 				paymentStatus: 1,
 				createdAt: 1,
 				updatedAt: 1,
-				mrp:1,
-				couponValue : 1,
-				couponCode : 1,
-				couponName : 1,
+				mrp: 1,
+				couponValue: 1,
+				couponCode: 1,
+				couponName: 1,
 				discount: 1,
 				status: 1,
 				title: "$productData.title",
 				images: "$productData.images",
-				productDetailsReview : "$productData.review",
+				productDetailsReview: "$productData.review",
 				color: "$colorData.color",
 				size: "$sizeData.size",
 				productId: 1,
-				wholeOrderId : 1,
-				singleOrderId : 1,
+				wholeOrderId: 1,
+				singleOrderId: 1,
 				quantity: 1,
-				userId :1
+				userId: 1
 			}
 		},
 		{
@@ -4689,22 +4715,22 @@ const userFilterOrderStatus_get = async (req, res) => {
 				orders: { $push: "$$ROOT" }
 			}
 		},
-		{ $match : { 'orders.orderStatus': selectedFilter}},
+		{ $match: { 'orders.orderStatus': selectedFilter } },
 
 		{ $sort: { 'orders.createdAt': -1 } },
 	]);
 	const totalPages = Math.ceil(order.length / limit);
 	const paginatedOrder = order.slice(skip, skip + limit);
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
 
-	let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 	let statusArr = [];
 	let pendingArr = [];
 	let placedArr = [];
@@ -4713,15 +4739,15 @@ const userFilterOrderStatus_get = async (req, res) => {
 	let deliveredArr = [];
 
 	paginatedOrder.forEach(orderItem => {
-		orderItem.orders.forEach(orderItmes =>{
+		orderItem.orders.forEach(orderItmes => {
 			totalIndividualTotal += orderItmes.individualTotal
-			totalMrpWithoutTax += orderItmes.mrpWithoutTax 
-			totalFirstDiscountAmount += orderItmes.firstDiscountAmount 
-			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount   
-			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount 
-			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount   
-			totalGst += orderItmes.gst 
-			totalSgst += orderItmes.sgst 
+			totalMrpWithoutTax += orderItmes.mrpWithoutTax
+			totalFirstDiscountAmount += orderItmes.firstDiscountAmount
+			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount
+			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount
+			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount
+			totalGst += orderItmes.gst
+			totalSgst += orderItmes.sgst
 			totalCgst += orderItmes.cgst
 			statusArr.push(orderItmes.status)
 		})
@@ -4732,9 +4758,9 @@ const userFilterOrderStatus_get = async (req, res) => {
 	placedArr = statusArr.filter(status => status === 'placed');
 	deliveredArr = statusArr.filter(status => status === 'delivered');
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	res.render('user-pages/userDashboardOrderFilteredPage', {
@@ -4749,13 +4775,13 @@ const userFilterOrderStatus_get = async (req, res) => {
 		currentPage,
 		limit,
 		totalPages,
-		RAZORPAY_KEY_ID,selectedFilter,
+		RAZORPAY_KEY_ID, selectedFilter,
 		totalAmountAfterSecondDiscount, totalGst,
-		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff , grandTotal,
+		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
 	});
 };
 const userFilterOrderStatus_post = async (req, res) => {
-	const uniqueStatusTypes = req.query.orderStatuses? req.query.orderStatuses.split(',') : [];
+	const uniqueStatusTypes = req.query.orderStatuses ? req.query.orderStatuses.split(',') : [];
 	const selectedFilter = req.body.orderStatusFilter
 
 	let currentPage = Number(req.query.page) || 1;
@@ -4778,8 +4804,8 @@ const userFilterOrderStatus_post = async (req, res) => {
 				paymentStatus: "$paymentStatus",
 				createdAt: "$createdAt",
 				updatedAt: "$updatedAt",
-				wholeOrderId :'$_id',
-				singleOrderId :'$order._id',
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
 				userId: "$userId"
 			}
 		},
@@ -4826,7 +4852,7 @@ const userFilterOrderStatus_post = async (req, res) => {
 				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
 				couponCode: { $ifNull: ['$couponData.couponCode', null] },
 				couponName: { $ifNull: ['$couponData.coupon', null] }
-				
+
 			}
 		},
 		{
@@ -5243,22 +5269,22 @@ const userFilterOrderStatus_post = async (req, res) => {
 				paymentStatus: 1,
 				createdAt: 1,
 				updatedAt: 1,
-				mrp:1,
-				couponValue : 1,
-				couponCode : 1,
-				couponName : 1,
+				mrp: 1,
+				couponValue: 1,
+				couponCode: 1,
+				couponName: 1,
 				discount: 1,
 				status: 1,
 				title: "$productData.title",
 				images: "$productData.images",
-				productDetailsReview : "$productData.review",
+				productDetailsReview: "$productData.review",
 				color: "$colorData.color",
 				size: "$sizeData.size",
 				productId: 1,
-				wholeOrderId : 1,
-				singleOrderId : 1,
+				wholeOrderId: 1,
+				singleOrderId: 1,
 				quantity: 1,
-				userId :1
+				userId: 1
 			}
 		},
 		{
@@ -5267,21 +5293,21 @@ const userFilterOrderStatus_post = async (req, res) => {
 				orders: { $push: "$$ROOT" }
 			}
 		},
-		{ $match : { 'orders.orderStatus': selectedFilter}},
+		{ $match: { 'orders.orderStatus': selectedFilter } },
 		{ $sort: { 'orders.createdAt': -1 } }
 	]);
 
 	const totalPages = Math.ceil(order.length / limit);
 	const paginatedOrder = order.slice(skip, skip + limit);
 	let totalIndividualTotal = 0
-    let totalMrpWithoutTax = 0
-    let totalFirstDiscountAmount = 0
-    let totalAmountAfterfirstDiscount = 0  
-    let totalSeccondDiscountAmount = 0
-    let totalAmountAfterSecondDiscount = 0  
-    let totalGst = 0
-    let totalSgst = 0
-    let totalCgst = 0
+	let totalMrpWithoutTax = 0
+	let totalFirstDiscountAmount = 0
+	let totalAmountAfterfirstDiscount = 0
+	let totalSeccondDiscountAmount = 0
+	let totalAmountAfterSecondDiscount = 0
+	let totalGst = 0
+	let totalSgst = 0
+	let totalCgst = 0
 	let statusArr = [];
 	let pendingArr = [];
 	let placedArr = [];
@@ -5290,15 +5316,15 @@ const userFilterOrderStatus_post = async (req, res) => {
 	let deliveredArr = [];
 
 	paginatedOrder.forEach(orderItem => {
-		orderItem.orders.forEach(orderItmes =>{
+		orderItem.orders.forEach(orderItmes => {
 			totalIndividualTotal += orderItmes.individualTotal
-			totalMrpWithoutTax += orderItmes.mrpWithoutTax 
-			totalFirstDiscountAmount += orderItmes.firstDiscountAmount 
-			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount   
-			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount 
-			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount   
-			totalGst += orderItmes.gst 
-			totalSgst += orderItmes.sgst 
+			totalMrpWithoutTax += orderItmes.mrpWithoutTax
+			totalFirstDiscountAmount += orderItmes.firstDiscountAmount
+			totalAmountAfterfirstDiscount += orderItmes.AmountAfterfirstDiscount
+			totalSeccondDiscountAmount += orderItmes.seccondDiscountAmount
+			totalAmountAfterSecondDiscount += orderItmes.AmountAfterSecondDiscount
+			totalGst += orderItmes.gst
+			totalSgst += orderItmes.sgst
 			totalCgst += orderItmes.cgst
 			statusArr.push(orderItmes.status)
 		})
@@ -5309,9 +5335,9 @@ const userFilterOrderStatus_post = async (req, res) => {
 	placedArr = statusArr.filter(status => status === 'placed');
 	deliveredArr = statusArr.filter(status => status === 'delivered');
 
-	let totalDiscount = totalIndividualTotal - ( totalAmountAfterSecondDiscount + totalGst )
-	let totalDiscountPercentage = ( totalDiscount / totalIndividualTotal ) * 100
-	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount )
+	let totalDiscount = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst)
+	let totalDiscountPercentage = (totalDiscount / totalIndividualTotal) * 100
+	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
 	res.render('user-pages/userDashboardOrderFilteredPage', {
@@ -5326,13 +5352,13 @@ const userFilterOrderStatus_post = async (req, res) => {
 		currentPage,
 		limit,
 		totalPages,
-		RAZORPAY_KEY_ID,selectedFilter,
+		RAZORPAY_KEY_ID, selectedFilter,
 		totalAmountAfterSecondDiscount, totalGst,
-		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff , grandTotal,
+		totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
 	});
 };
 const userRemoveCouponPlaceOrder_post = async (req, res) => {
-	const { cartId, couponId} = req.body
+	const { cartId, couponId } = req.body
 	const removeCoupon = await Cart.updateOne(
 		{ _id: new ObjectId(cartId), cart: { $exists: true } },
 		{
@@ -5396,10 +5422,10 @@ const userPlaceOrder_post = async (req, res) => {
 		},
 		{
 			$lookup: {
-				from : "products",
-				localField : "productId",
-				foreignField : "_id",
-				as : "productDetails"
+				from: "products",
+				localField: "productId",
+				foreignField: "_id",
+				as: "productDetails"
 			}
 		},
 		{
@@ -5411,7 +5437,7 @@ const userPlaceOrder_post = async (req, res) => {
 				categoryId: { $arrayElemAt: ["$productDetails.categoryName", 0] },
 				colorId: 1,
 				sizeId: 1,
-				quantity : 1
+				quantity: 1
 			},
 		},
 	]);
@@ -5476,12 +5502,12 @@ const userPlaceOrder_post = async (req, res) => {
 	});
 };
 const userRetryPayment_post = async (req, res) => {
-	const { orderId, keyId, amount} = req.body;
+	const { orderId, keyId, amount } = req.body;
 	if (!mongoose.Types.ObjectId.isValid(orderId)) {
 		return res.status(404).render('user-pages/404');
 	}
 	const options = {
-		amount: parseInt( amount),
+		amount: parseInt(amount),
 		currency: "INR",
 		receipt: orderId
 	};
@@ -5510,9 +5536,9 @@ const userVerifyPayment_post = (req, res) => {
 
 	const isValid = verifyPayment.verifyPaymentSignature(orderId, paymentId, razorpaySignature, secret);
 	if (isValid) {
-		return res.json({ placedOrderDetails : placedOrderDetails, status: true, message: 'Payment successfull' })
+		return res.json({ placedOrderDetails: placedOrderDetails, status: true, message: 'Payment successfull' })
 	} else {
-		return res.json({ placedOrderDetails : placedOrderDetails, status: false, message: 'Payment failed, try again!' })
+		return res.json({ placedOrderDetails: placedOrderDetails, status: false, message: 'Payment failed, try again!' })
 	}
 };
 const userChangePaymentStatus_post = async (req, res) => {
@@ -5521,49 +5547,49 @@ const userChangePaymentStatus_post = async (req, res) => {
 	}
 	const orderId = req?.body?.orderId
 	const updatePaymentStatus = await Order.findOneAndUpdate(
-        { _id: new ObjectId(orderId) },
-        { $set: { paymentStatus: req?.body?.status } },
-        { new: true }
-    );
+		{ _id: new ObjectId(orderId) },
+		{ $set: { paymentStatus: req?.body?.status } },
+		{ new: true }
+	);
 	if (updatePaymentStatus) {
-        res.json({ status : true, message: 'Payment status updated successfully', paymentStatus: updatePaymentStatus?.paymentStatus, });
-    } else {
+		res.json({ status: true, message: 'Payment status updated successfully', paymentStatus: updatePaymentStatus?.paymentStatus, });
+	} else {
 		return res.status(404).render('user-pages/404');
-    }
+	}
 };
 const userCancelSingleOrder_post = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(req.query.single)) {
 		return res.status(404).render('user-pages/404');
 	}
-    const updatedOrder = await Order.updateOne(
-        {
-            userId: new ObjectId(req.session.userId),
-            'order._id': new ObjectId(req.query.single)
-        },
-        {
-            $set: {
-                'order.$.status': "cancelled"
-            }
-        }
-    );
-    const allOrders = await Order.findOne({
-        userId: new ObjectId(req.session.userId),
-    });
-    const allOrdersCancelled = allOrders.order.every(order => order.status === 'cancelled');
-    if (allOrdersCancelled) {
-        await Order.updateOne(
-            {
-                userId: new ObjectId(req.session.userId)
-            },
-            {
-                $set: {
-                    orderStatus: "cancelled"
-                }
-            }
-        );
-    }
-    req.flash('message', `${req.query.product} cancelled successfully`);
-    return res.redirect(`/user-dashboard-orders?page=${req.query.page}`);
+	const updatedOrder = await Order.updateOne(
+		{
+			userId: new ObjectId(req.session.userId),
+			'order._id': new ObjectId(req.query.single)
+		},
+		{
+			$set: {
+				'order.$.status': "cancelled"
+			}
+		}
+	);
+	const allOrders = await Order.findOne({
+		userId: new ObjectId(req.session.userId),
+	});
+	const allOrdersCancelled = allOrders.order.every(order => order.status === 'cancelled');
+	if (allOrdersCancelled) {
+		await Order.updateOne(
+			{
+				userId: new ObjectId(req.session.userId)
+			},
+			{
+				$set: {
+					orderStatus: "cancelled"
+				}
+			}
+		);
+	}
+	req.flash('message', `${req.query.product} cancelled successfully`);
+	return res.redirect(`/user-dashboard-orders?page=${req.query.page}`);
 };
 const userCancelWholeOrder_post = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(req.query.orderId)) {
@@ -5577,11 +5603,11 @@ const userCancelWholeOrder_post = async (req, res) => {
 		{
 			$set: {
 				"order.$[].status": "cancelled",
-				 orderStatus: "cancelled"
+				orderStatus: "cancelled"
 			}
 		}
 	);
-	if(cancelledOrder){
+	if (cancelledOrder) {
 		req.flash('message', `${req.query.orderName} cancelled successfully`);
 		return res.redirect(`/user-dashboard-orders?page=${req.query.page}`)
 	}
@@ -5598,11 +5624,11 @@ const userReturnWholeOrder_post = async (req, res) => {
 		{
 			$set: {
 				"order.$[].status": newStatus,
-				 orderStatus: newStatus
+				orderStatus: newStatus
 			}
 		}
 	);
-	if(returnedOrder) {
+	if (returnedOrder) {
 		req.flash('message', `${orderName} returned successfully`);
 		return res.redirect(`/user-dashboard-orders?page=${page}`)
 	}
@@ -5617,16 +5643,38 @@ const userAddAddressOnPayment_get = (req, res) => {
 const userAddAddressOnPayment_post = async (req, res) => {
 	const findUser = await Address.findOne({ userId: req.session.userId });
 	if (findUser) {
-		const updatedAddress = await Address.updateOne(
-			{ userId: req.session.userId },
-			{
-				$push: {
-					addresses: req.body
+		const existingAddress = findUser.addresses.find(address =>
+			address.fullName === req.body.fullName &&
+			address.phoneNumber === req.body.phoneNumber &&
+			address.email === req.body.email &&
+			address.building === req.body.building &&
+			address.houseNumber === req.body.houseNumber &&
+			address.country === req.body.country &&
+			address.pincode === parseInt(req.body.pincode) &&
+			address.street === req.body.street &&
+			address.city === req.body.city &&
+			address.state === req.body.state &&
+			address.area === req.body.area &&
+			address.circle === req.body.circle &&
+			address.region === req.body.region &&
+			address.division === req.body.division &&
+			address.location === req.body.location &&
+			address.district === req.body.district)
+		if (existingAddress) {
+			req.flash('message', 'Address already successfully')
+			return res.redirect('/user-checkout');
+		} else {
+			const updatedAddress = await Address.updateOne(
+				{ userId: req.session.userId },
+				{
+					$push: {
+						addresses: req.body
+					}
 				}
-			}
-		);
-		req.flash('message', 'new address added successfully')
-		return res.redirect('/user-checkout');
+			);
+			req.flash('message', 'new address added successfully')
+			return res.redirect('/user-checkout');
+		}
 	} else {
 		const createdAddress = await Address.create({
 			userId: new ObjectId(req.session.userId),
