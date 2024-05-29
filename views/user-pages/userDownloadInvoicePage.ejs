@@ -255,7 +255,8 @@
                     <td class="text-black font-size text-center align-middle text-truncate">
                       <img class="m-0 p-0 img-fluid border-0" style="object-fit: cover; width: auto; height: 50px;" src="/productImages/<%= elem?.images[0] %>" alt="">
                     </td>
-                    <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.title?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ') %></td>
+                    <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.title?.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ').slice(0, 12) %>
+                    </td>
                     <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.size %></td>
                     <td class="text-black font-size text-start align-middle text-truncate"><%= elem?.color %></td>
                     <td class="text-black font-size text-end align-middle text-truncate"><%= elem?.mrp %></td>
