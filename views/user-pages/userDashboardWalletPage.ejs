@@ -1,0 +1,85 @@
+<!-- including admin head  -->
+<%- include('../../partials/user-partials/user-head.ejs') %>
+
+<body>
+
+  <!-- including admin nav  -->
+  <%- include('../../partials/user-partials/user-nav.ejs') %>
+
+  <main>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 d-flex flex-column justify-content-center align-items-center px-2 pt-2">
+          <div class="col-12 border rounded-3 d-flex justify-content-between align-items-center p-2 flex-wrap">
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-secondary text-start px-3">
+              <a class="text-black text-decoration-none" href="/user-dashboard">Dashborad</a>
+              <span class="font-size-bold">&gt;</span>
+              <a class="text-black text-decoration-none font-size-bold" href="/user-dashboard-wallet">My wallet</a>
+            </div>
+            <% if(locals.user){ %>
+            <div class="col-sm-12 col-md-12 col-lg-6 font-size text-end px-3">Welcome <span class="text-danger font-size-bold"><%= locals.user.firstName %>&nbsp;<%= locals.user.lastName %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <section>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-2 p-2">
+          <%- include('../../partials/user-partials/user-sideNav.ejs') %>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-10 p-2">
+          <div class="row m-0 p-0 border rounded-3">
+            <div class="col-md-12 col-lg-6 m-0 p-0">
+              <div class="row p-3 m-3 border rounded-3">
+                <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Wallet details<span class="font-size-bold">&gt;&gt;</span> </p>
+                <div class="col-sm-12 col-md-12 col-lg-12 d-flex">
+                  <div class="col-4">
+                    <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet ID</p>
+                    <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet amount</p>
+                  </div>
+                  <div class="col-1">
+                    <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                    <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
+                  </div>
+                  <div class="col-7">
+                    <p class="m-0 p-0 my-1 text-black text-start font-size">bdbjdbjv</p>
+                    <p class="m-0 p-0 my-1 text-black text-start font-size">&#8377;&nbsp;bdbjdbjv</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 col-lg-6 m-0 p-0">
+              <div class="row p-3 m-3 border rounded-3">
+                <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Wallet history<span class="font-size-bold">&gt;&gt;</span> </p>
+                <div class="col-sm-6 col-md-6 col-lg-4">
+                  <p class="m-0 p-0 text-black font-size text-start">Date</p>
+                  <p class="m-0 p-0 text-black font-size text-start">balance</p>
+                  <p class="m-0 p-0 text-black font-size text-start">reason order id</p>
+                </div>
+                <div class="col-sm-1 col-md-1 col-lg-1">
+                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                </div>
+                <div class="col-sm-5 col-md-5 col-lg-7">
+                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- including admin footer  -->
+  <%- include('../../partials/user-partials/user-footer.ejs') %>
+
+</body>
+
+</html>

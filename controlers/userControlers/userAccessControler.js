@@ -8,6 +8,7 @@ const Brand = require('../../models/brand')
 const Color = require('../../models/color')
 const Size = require('../../models/size')
 const Wishlist = require('../../models/wishlist')
+const Wallet = require('../../models/wallet')
 const Order = require('../../models/order')
 const OTPgenerator = require('../../helpers/functions/otpGenerator')
 const sendOTP = require('../../helpers/functions/emailSender');
@@ -46,6 +47,8 @@ const homepage = async (req, res) => {
 	const colors = await Color.find({ status: true })
 	const categories = await Category.find({ status: true })
 	const sizes = await Size.find({ status: true })
+	const wallet = await Wallet.find({ userId: new ObjectId(req.session.userId)})
+	console.log(wallet, 'homepage')
 	const flashSale = await Product.aggregate([
 		{
 			$lookup: {
@@ -209,8 +212,27 @@ const homepage = async (req, res) => {
 	res.render('user-pages/userListProductsPage',
 		{
 			brands, colors, categories, sizes,
-			popuplarProducts, newArrival, flashSale
+			popuplarProducts, newArrival, flashSale, wallet,
+			message : req.flash('message')
 		})
+};
+const userActivateWallet = async (req, res)=>{
+	console.log("ok got it");
+	const existingWallet = await Wallet.find({userId: new ObjectId(req.session.userId)});
+	console.log(existingWallet);
+	if(existingWallet.length === 0){
+		const activateWallet = await Wallet.create({
+			userId: new ObjectId(req.session.userId),
+			status : true
+		})
+		console.log(activateWallet, 'activateWallet')
+		if(activateWallet){
+			return res.json({status : true, message : 'walltet activated successfully'})
+		}else {
+			req.flash('message', 'Something went wrong. try again')
+			return res.redirect('/');
+		}
+	}
 };
 const userSignUp_get = (req, res) => {
 	if (req.session.adminLogged) {
@@ -1564,6 +1586,7 @@ const userListAverageRated_post = async (req, res) => {
 
 module.exports = {
 	homepage,
+	userActivateWallet,
 	userSignUp_get,
 	userSignUpOTP_post,
 	userSignUpOTPValidate_get,

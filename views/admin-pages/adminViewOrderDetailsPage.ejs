@@ -58,7 +58,7 @@
       </script>
       <% } %>
       <div class="col-sm-12 col-md-12 col-lg-9 col-xl-10 right-side-nav m-0 p-0 border">
-        <div class="row m-0 p-0" <% if (orderDetails[0]?.orderStatus === 'delivered') { %> hidden <% } %> >
+        <div class="row m-0 p-0" <% if (orderDetails[0]?.orderStatus === 'delivered') { %> hidden <% } %>>
           <div class="col-md-12 m-0 px-3 pt-3">
             <select class="w-100 border-1 rounded-3 font-size p-1 editOrder" data-status="<%= orderDetails[0]?.orderStatus %>" data-value="<%= orderDetails[0]?._id %>" name="editOrder" id="editOrder<%= orderDetails[0]?._id  %>">
               <% switch(orderDetails[0]?.orderStatus) { 
@@ -144,7 +144,7 @@
           <div class="col-md-12 col-lg-6 m-0 p-0">
             <% orderDetails?.forEach((elem, index) => { %>
             <div class="row p-3 m-3 border rounded-3">
-    <p class="font-size-bold pb-2 text-primary m-0 fst-italic"><%= index+1 %>. Product details<span class="font-size-bold">&gt;&gt;</span> </p>
+              <p class="font-size-bold pb-2 text-primary m-0 fst-italic"><%= index+1 %>. Product details<span class="font-size-bold">&gt;&gt;</span> </p>
 
               <div class="col-sm-12 col-md-12 col-lg-12 m-0 mb-3 p-0 d-flex justify-content-center align-items-start">
                 <img class="m-0 p-0 img-fluid border-0 rounded-3" style="object-fit: cover; width: auto; height: 200px;" src="/productImages/<%= elem?.images[0] %>" alt="">
@@ -251,53 +251,53 @@
             </div>
             <% }) %>
           </div>
-<div class="col-md-12 col-lg-6 m-0 p-0">
-  <% if (orderDetails && orderDetails.length > 0) { %>
-    <% const firstOrder = orderDetails[0]; %>
-    <% if (firstOrder && firstOrder.addressData && firstOrder.addressData.addresses && firstOrder.addressData.addresses.length > 0) { %>
-      <% const address = firstOrder.addressData.addresses.find(element => element._id.toString() === firstOrder.addressId.toString()); %>
-      <% if (address) { %>
-        <div class="row p-3 m-3 border rounded-3">
-    <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Address details<span class="font-size-bold">&gt;&gt;</span> </p>
+          <div class="col-md-12 col-lg-6 m-0 p-0">
+            <% if (orderDetails && orderDetails.length > 0) { %>
+            <% const firstOrder = orderDetails[0]; %>
+            <% if (firstOrder && firstOrder.addressData && firstOrder.addressData.addresses && firstOrder.addressData.addresses.length > 0) { %>
+            <% const address = firstOrder.addressData.addresses.find(element => element._id.toString() === firstOrder.addressId.toString()); %>
+            <% if (address) { %>
+            <div class="row p-3 m-3 border rounded-3">
+              <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Address details<span class="font-size-bold">&gt;&gt;</span> </p>
 
-          <div class="col-sm-6 col-md-6 col-lg-4">
-            <p class="m-0 p-0 text-black font-size text-start">Full Name</p>
-            <p class="m-0 p-0 text-black font-size text-start">Phone Number</p>
-            <p class="m-0 p-0 text-black font-size text-start">Email</p>
-            <p class="m-0 p-0 text-black font-size text-start">Building</p>
-            <p class="m-0 p-0 text-black font-size text-start">House Number</p>
-            <p class="m-0 p-0 text-black font-size text-start">Country</p>
-            <p class="m-0 p-0 text-black font-size text-start">State</p>
-            <p class="m-0 p-0 text-black font-size text-start">District</p>
-            <p class="m-0 p-0 text-black font-size text-start">City</p>
-            <p class="m-0 p-0 text-black font-size text-start">Division</p>
-            <p class="m-0 p-0 text-black font-size text-start">Region</p>
-            <p class="m-0 p-0 text-black font-size text-start">Area</p>
-            <p class="m-0 p-0 text-black font-size text-start">Location</p>
-            <p class="m-0 p-0 text-black font-size text-start">Street</p>
-            <p class="m-0 p-0 text-black font-size text-start">Circle</p>
-            <p class="m-0 p-0 text-black font-size text-start">Pincode</p>
-          </div>
-          <div class="col-sm-1 col-md-1 col-lg-1">
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-            <p class="m-0 p-0 text-black text-center font-size">:</p>
-          </div>
-          <div class="col-sm-5 col-md-5 col-lg-7">
-            <p class="m-0 p-0 text-black font-size text-start"><%= address?.fullName%></p>
+              <div class="col-sm-6 col-md-6 col-lg-4">
+                <p class="m-0 p-0 text-black font-size text-start">Full Name</p>
+                <p class="m-0 p-0 text-black font-size text-start">Phone Number</p>
+                <p class="m-0 p-0 text-black font-size text-start">Email</p>
+                <p class="m-0 p-0 text-black font-size text-start">Building</p>
+                <p class="m-0 p-0 text-black font-size text-start">House Number</p>
+                <p class="m-0 p-0 text-black font-size text-start">Country</p>
+                <p class="m-0 p-0 text-black font-size text-start">State</p>
+                <p class="m-0 p-0 text-black font-size text-start">District</p>
+                <p class="m-0 p-0 text-black font-size text-start">City</p>
+                <p class="m-0 p-0 text-black font-size text-start">Division</p>
+                <p class="m-0 p-0 text-black font-size text-start">Region</p>
+                <p class="m-0 p-0 text-black font-size text-start">Area</p>
+                <p class="m-0 p-0 text-black font-size text-start">Location</p>
+                <p class="m-0 p-0 text-black font-size text-start">Street</p>
+                <p class="m-0 p-0 text-black font-size text-start">Circle</p>
+                <p class="m-0 p-0 text-black font-size text-start">Pincode</p>
+              </div>
+              <div class="col-sm-1 col-md-1 col-lg-1">
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+              </div>
+              <div class="col-sm-5 col-md-5 col-lg-7">
+                <p class="m-0 p-0 text-black font-size text-start"><%= address?.fullName%></p>
                 <p class="m-0 p-0 text-black font-size text-start"><%= address?.phoneNumber%></p>
                 <p class="m-0 p-0 text-black font-size text-start"><%= address?.email%></p>
                 <p class="m-0 p-0 text-black font-size text-start"><%= address?.building%></p>
@@ -313,49 +313,48 @@
                 <p class="m-0 p-0 text-black font-size text-start"><%= address?.street%></p>
                 <p class="m-0 p-0 text-black font-size text-start"><%= address?.circle%></p>
                 <p class="m-0 p-0 text-black font-size text-start"><%= address?.pincode%></p>
+              </div>
+            </div>
+            <% } %>
+            <% } %>
+            <% } %>
+            <div class="row p-3 m-3 border rounded-3">
+              <p class="font-size-bold pb-2 text-primary m-0 fst-italic">GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
+
+              <div class="col-sm-6 col-md-6 col-lg-4">
+                <p class="m-0 p-0 text-black font-size text-start">Total Price</p>
+                <p class="m-0 p-0 text-black font-size text-start">GST @ 18%</p>
+                <p class="m-0 p-0 text-black font-size text-start">SGST @ 9%</p>
+                <p class="m-0 p-0 text-black font-size text-start">CGST @ 9%</p>
+                <p class="m-0 p-0 text-black font-size text-start">Discount %</p>
+                <p class="m-0 p-0 text-black font-size text-start">Discount Amt.</p>
+                <p class="m-0 p-0 text-black font-size text-start">Round-off</p>
+                <p class="font-size-bold pb-2 text-primary m-0 fst-italic text-start">Grand total</p>
+
+              </div>
+              <div class="col-sm-1 col-md-1 col-lg-1">
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <p class="m-0 p-0 text-black text-center font-size">:</p>
+              </div>
+              <div class="col-sm-5 col-md-5 col-lg-7">
+                <p class="m-0 p-0 text-black font-size text-start"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= totalGst?.toFixed(2) %></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= totalSgst?.toFixed(2)  %></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= totalCgst?.toFixed(2)  %></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= totalDiscountPercentage?.toFixed(2)%></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= totalDiscount?.toFixed(2) %></p>
+                <p class="m-0 p-0 text-black font-size text-start"><%= roundOff?.toFixed(2) %></p>
+                <p class="font-size-bold pb-2 text-primary m-0 fst-italic text-start">&#8377;&nbsp;<%= grandTotal?.toFixed(2)%></p>
+
+              </div>
+            </div>
           </div>
-        </div>
-      <% } %>
-    <% } %>
-  <% } %>
-  <div class="row p-3 m-3 border rounded-3">
-    <p class="font-size-bold pb-2 text-primary m-0 fst-italic">GST & tax informations <span class="font-size-bold">&gt;&gt;</span> </p>
-
-    <div class="col-sm-6 col-md-6 col-lg-4">
-      <p class="m-0 p-0 text-black font-size text-start">Total Price</p>
-      <p class="m-0 p-0 text-black font-size text-start">GST @ 18%</p>
-      <p class="m-0 p-0 text-black font-size text-start">SGST @ 9%</p>
-      <p class="m-0 p-0 text-black font-size text-start">CGST @ 9%</p>
-      <p class="m-0 p-0 text-black font-size text-start">Discount %</p>
-      <p class="m-0 p-0 text-black font-size text-start">Discount Amt.</p>
-      <p class="m-0 p-0 text-black font-size text-start">Round-off</p>
-    <p class="font-size-bold pb-2 text-primary m-0 fst-italic text-start">Grand total</p>
-
-    </div>
-    <div class="col-sm-1 col-md-1 col-lg-1">
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-      <p class="m-0 p-0 text-black text-center font-size">:</p>
-    </div>
-    <div class="col-sm-5 col-md-5 col-lg-7">
-      <p class="m-0 p-0 text-black font-size text-start"><%= totalAmountAfterSecondDiscount?.toFixed(2) %></p>
-      <p class="m-0 p-0 text-black font-size text-start"><%= totalGst?.toFixed(2) %></p>
-      <p class="m-0 p-0 text-black font-size text-start"><%= totalSgst?.toFixed(2)  %></p>
-      <p class="m-0 p-0 text-black font-size text-start"><%= totalCgst?.toFixed(2)  %></p>
-      <p class="m-0 p-0 text-black font-size text-start"><%= totalDiscountPercentage?.toFixed(2)%></p>
-      <p class="m-0 p-0 text-black font-size text-start"><%= totalDiscount?.toFixed(2) %></p>
-      <p class="m-0 p-0 text-black font-size text-start"><%= roundOff?.toFixed(2) %></p>
-    <p class="font-size-bold pb-2 text-primary m-0 fst-italic text-start">&#8377;&nbsp;<%= grandTotal?.toFixed(2)%></p>
-
-    </div>
-  </div>
-</div>
-
         </div>
       </div>
     </div>

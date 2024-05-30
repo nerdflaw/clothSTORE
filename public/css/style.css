@@ -131,9 +131,11 @@ ul li a {
 .font-size {
 	font-size: 12px;
 }
+
 .font-size-small {
 	font-size: 10px;
 }
+
 .font-size-small-bold {
 	font-size: 10px;
 	font-weight: bolder;
@@ -258,6 +260,8 @@ textarea {
 	left: 50%;
 	transform: translate(-50%, -50%);
 	z-index: 1050;
-  }
-  
+}
 
+.walletToast {
+	z-index: 1050;
+}

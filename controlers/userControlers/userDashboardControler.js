@@ -16,6 +16,7 @@ const Wishlist = require('../../models/wishlist')
 const Order = require('../../models/order')
 const User = require('../../models/models')
 const Coupon = require('../../models/coupon')
+const Wallet = require('../../models/wallet')
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const bcrypt = require('bcrypt')
@@ -31,11 +32,13 @@ const countryData = allCountries()
 
 const userDashboard = async (req, res) => {
 	const countryCodes = AllCountryCodes.customList('countryCallingCode');
+	const userWallet = await Wallet.find({ userId: new ObjectId(req.session.userId) })
+	console.log(userWallet);
 	res.render('user-pages/userDashboardPage',
 		{
 			success: req.flash('success'),
 			error: req.flash('error'),
-			countryCodes
+			countryCodes, userWallet
 		})
 };
 const userDashboardAddressBook_get = async (req, res) => {
@@ -86,6 +89,12 @@ const userDashboardAddressBook_get = async (req, res) => {
 		}
 	}
 };
+const userDashboardWallet_get = async (req, res) => {
+	res.render('user-pages/userDashboardWalletPage',
+		{
+			message: req.flash('message'),
+		})
+}
 const userAddAddress_get = (req, res) => {
 	res.render('user-pages/userDashboardAddAddressBookPage',
 		{
@@ -117,7 +126,7 @@ const userAddAddress_post = async (req, res) => {
 		if (existingAddress) {
 			req.flash('message', 'Address already exists')
 			return res.redirect('/user-dashboard-address-book');
-		}else {
+		} else {
 			const updatedAddress = await Address.updateOne(
 				{ userId: req.session.userId },
 				{
@@ -129,7 +138,7 @@ const userAddAddress_post = async (req, res) => {
 			req.flash('message', 'Address added successfully')
 			res.redirect('/user-dashboard-address-book');
 		}
-	}else {
+	} else {
 		const createdAddress = await Address.create({
 			userId: new ObjectId(req.session.userId),
 			addresses: req.body
@@ -206,8 +215,8 @@ const userDeleteAddress_post = async (req, res) => {
 
 	const address = await Address.updateOne(
 		{ userId: new ObjectId(req.session.userId) },
-		{ $pull: { addresses: { _id:new ObjectId(id) } } }
-	  )
+		{ $pull: { addresses: { _id: new ObjectId(id) } } }
+	)
 	return res.redirect('/user-dashboard-address-book?message=Address deleted successfully')
 };
 const userCheckOldPassword_post = async (req, res) => {
@@ -5595,6 +5604,493 @@ const userCancelWholeOrder_post = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(req.query.orderId)) {
 		return res.status(404).render('user-pages/404');
 	}
+	const order = await Order.aggregate([
+		{ $match: { _id: new ObjectId(req.query.orderId) } },
+		{ $unwind: "$order" },
+		{
+			$project: {
+				productId: '$order.productId',
+				couponId: { $ifNull: ['$order.couponId', null] },
+				colorId: '$order.colorId',
+				sizeId: '$order.sizeId',
+				quantity: '$order.quantity',
+				paymentStatus: "$paymentStatus",
+				wholeOrderId: '$_id',
+			}
+		},
+		{
+			$lookup: {
+				from: "products",
+				localField: "productId",
+				foreignField: "_id",
+				as: "productData"
+			}
+		},
+		{
+			$lookup: {
+				from: "coupons",
+				localField: "couponId",
+				foreignField: "_id",
+				as: "couponData"
+			}
+		},
+		{
+			$lookup: {
+				from: "colors",
+				localField: "colorId",
+				foreignField: "_id",
+				as: "colorData"
+			}
+		},
+		{
+			$lookup: {
+				from: "sizes",
+				localField: "sizeId",
+				foreignField: "_id",
+				as: "sizeData"
+			}
+		},
+		{ $unwind: "$productData" },
+		{ $unwind: { path: "$couponData", preserveNullAndEmptyArrays: true } },
+		{ $unwind: "$colorData" },
+		{ $unwind: "$sizeData" },
+		{
+			$addFields: {
+				mrp: '$productData.mrp',
+				discount: '$productData.discount',
+				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
+				couponCode: { $ifNull: ['$couponData.couponCode', null] },
+				couponName: { $ifNull: ['$couponData.coupon', null] }
+
+			}
+		},
+		{
+			$project: {
+				individualTotal: {
+					$multiply: ["$mrp", "$quantity"]
+				},
+				taxRate: 0.18,
+				mrpWithoutTax: {
+					$multiply: [
+						{ $multiply: ["$mrp", "$quantity"] },
+						{ $divide: [100, 118] }
+					]
+				},
+				firstDiscountAmount: {
+					$multiply: [
+						{
+							$multiply: [
+								{ $multiply: ["$mrp", "$quantity"] },
+								{ $divide: [100, 118] }
+							]
+						},
+						{ $divide: ["$discount", 100] }
+					]
+				},
+				AmountAfterfirstDiscount: {
+					$subtract: [
+						{
+							$multiply: [
+								{ $multiply: ["$mrp", "$quantity"] },
+								{ $divide: [100, 118] }
+							]
+						},
+						{
+							$multiply: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{ $divide: ["$discount", 100] }
+							]
+						}
+					]
+				},
+				seccondDiscountAmount: {
+					$multiply: [
+						{
+							$subtract: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{
+									$multiply: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{ $divide: ["$discount", 100] }
+									]
+								}
+							]
+						},
+						{ $divide: ["$couponValue", 100] }
+					]
+				},
+				AmountAfterSecondDiscount: {
+					$subtract: [
+						{
+							$subtract: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{
+									$multiply: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{ $divide: ["$discount", 100] }
+									]
+								}
+							]
+						},
+						{
+							$multiply: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{ $divide: ["$couponValue", 100] }
+							]
+						}
+					]
+				},
+				gst: {
+					$multiply: [
+						{ $divide: [18, 100] },
+						{
+							$subtract: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{
+									$multiply: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{ $divide: ["$couponValue", 100] }
+									]
+								}
+							]
+						}
+					]
+				},
+				sgst: {
+					$divide: [
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}, 2
+					]
+				},
+				cgst: {
+					$divide: [
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}, 2
+					]
+				},
+				totalPrice: {
+					$add: [
+						{
+							$subtract: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{
+									$multiply: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{ $divide: ["$couponValue", 100] }
+									]
+								}
+							]
+						},
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				paymentStatus: 1,
+				createdAt: 1,
+				updatedAt: 1,
+				discount: 1,
+				productId: 1,
+				quantity: 1,
+				userId: 1,
+				colorId: 1,
+				sizeId: 1,
+			}
+		},
+		{
+			$group: {
+				_id: "$wholeOrderId",
+				orders: { $push: "$$ROOT" },
+				refundAmount: { $sum: "$totalPrice" }
+			}
+		}
+	])
 	const cancelledOrder = await Order.updateOne(
 		{
 			_id: new ObjectId(req.query.orderId),
@@ -5607,6 +6103,26 @@ const userCancelWholeOrder_post = async (req, res) => {
 			}
 		}
 	);
+	// subtract the quantity and update the stock 
+	// after successfull order creation.
+	const subtractQuantityAndUpdateStock = async (orderArray) => {
+		for (let item of orderArray) {
+			for (let innerItem of item.orders) {
+				await Product.findOneAndUpdate(
+					{
+						_id: innerItem.productId,
+						'variants.color': innerItem.colorId,
+						'variants.size': innerItem.sizeId
+					},
+					{ $inc: { 'variants.$.quantity': innerItem.quantity } },
+					{ new: true }
+				);
+			}
+		}
+	};
+
+	// Call the function only after the order is successfully created
+	await subtractQuantityAndUpdateStock(order);
 	if (cancelledOrder) {
 		req.flash('message', `${req.query.orderName} cancelled successfully`);
 		return res.redirect(`/user-dashboard-orders?page=${req.query.page}`)
@@ -5727,6 +6243,7 @@ const userDashboardOrdersAddReview_get = async (req, res) => {
 module.exports = {
 	userDashboard,
 	userDashboardAddressBook_get,
+	userDashboardWallet_get,
 	userAddAddress_get,
 	userAddAddress_post,
 	userEditAddress_post,

@@ -29,7 +29,32 @@
       </div>
     </div>
   </section>
-
+  <% if (message) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        toastMessage("<%= message %>");
+      });
+    </script>
+    <% } %>
+  <% if (locals.user && wallet?.length <= 0) { %>
+    <!-- Toast message -->
+    <div class="toast walletToast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+      <div class="toast-header bg-white">
+        <img src="/images/clothStore_favicon.jpg" style="width: 20px; height: 20px;" class="border rounded me-2">
+        <strong class="me-auto text-black">clothStore</strong>
+        <small id="toast-timestamp" class="text-black"></small>
+      </div>
+      <div class="toast-body text-white font-size m-0 p-0 py-2">
+        Please activate your wallet, Then you're all set!
+      </div>
+      <div class="d-flex justify-content-end align-items-center">
+        <button type="button" id="confirmChangeBtn" class="btn-sm bg-white border-0 font-size-bold py-2 px-2 rounded-2 text-black">
+          <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Activate wallet
+        </button>
+      </div>
+    </div>
+  <% } %>
+  <div hidden id="walletData" data-wallet="<%= wallet %>"></div>
   <section class="brands-section">
     <div class="container-fluid">
       <div class="row bg-black d-flex justify-content-around">
@@ -322,6 +347,49 @@
         </div>
       </div>
     </div>
+  </section>
+  <section>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+        const walletEl = document.getElementById('walletData');
+        const walletDetails = walletEl.getAttribute('data-wallet'); // Corrected attribute name
+
+        console.log(walletDetails.length, 'walletDetails');
+
+        if (walletDetails.length === 0) {
+          var toast = new bootstrap.Toast(document.getElementById('confirmationToast'),{ autohide: false});
+          toast.show();
+        }
+
+        document.getElementById('confirmChangeBtn').addEventListener('click', function() {
+          window.location.reload()
+          activateWallet();
+        });
+
+      })
+
+      function activateWallet() {
+        const url = `/activate-wallet`;
+        fetch(url, {
+            method: 'POST'
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data,'activateWallet')
+            if(data.status){
+              window.location.href = '/'
+              toastMessage(data.message)
+            }
+          })
+          .catch(error => {
+            console.error('Error updating order status:', error);
+          });
+      }
+    </script>
   </section>
 
   <!-- including user footer  -->

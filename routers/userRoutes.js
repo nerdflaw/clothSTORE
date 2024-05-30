@@ -23,6 +23,8 @@ router.use(passport.session());
 // if user is logged in next process else redirect to login page
 
 router.get('/', adminAuthorization, userAccessControler.homepage)
+router.post('/activate-wallet', adminAuthorization, userAccessControler.userActivateWallet)
+
 
 router.get('/user-list-flash-sales', adminAuthorization, userAccessControler.userListFlashSales_get)
 router.post('/user-list-flash-sales', adminAuthorization, userAccessControler.userListFlashSales_post)
@@ -46,6 +48,7 @@ router.post('/user-signup-otp-validate', adminAuthorization, errorHandlerMiddlew
 
 router.get('/user-dashboard', adminAuthorization, userAuthentication, errorHandlerMiddleware(userDashboardControler.userDashboard))
 router.get('/user-dashboard-address-book', adminAuthorization, userAuthentication, errorHandlerMiddleware(userDashboardControler.userDashboardAddressBook_get))
+router.get('/user-dashboard-wallet', adminAuthorization, userAuthentication, errorHandlerMiddleware(userDashboardControler.userDashboardWallet_get))
 router.get('/user-dashboard-cart', adminAuthorization, userAuthentication, errorHandlerMiddleware(userDashboardControler.userDashboardCart_get))
 router.get('/user-dashboard-orders', adminAuthorization, userAuthentication, errorHandlerMiddleware(userDashboardControler.userDashboardOrders_get))
 router.get('/user-download-Invoice/:id', adminAuthorization, userAuthentication, errorHandlerMiddleware(userDashboardControler.userDownloadInvoice_get))
