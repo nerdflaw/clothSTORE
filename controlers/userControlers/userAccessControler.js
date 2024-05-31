@@ -48,7 +48,6 @@ const homepage = async (req, res) => {
 	const categories = await Category.find({ status: true })
 	const sizes = await Size.find({ status: true })
 	const wallet = await Wallet.find({ userId: new ObjectId(req.session.userId)})
-	console.log(wallet, 'homepage')
 	const flashSale = await Product.aggregate([
 		{
 			$lookup: {
@@ -216,24 +215,32 @@ const homepage = async (req, res) => {
 			message : req.flash('message')
 		})
 };
-const userActivateWallet = async (req, res)=>{
-	console.log("ok got it");
-	const existingWallet = await Wallet.find({userId: new ObjectId(req.session.userId)});
-	console.log(existingWallet);
-	if(existingWallet.length === 0){
+const userActivateWallet = async (req, res) => {
+  
+	  // Find existing wallet for the user
+	  const existingWallet = await Wallet.findOne({ userId : new ObjectId(req.session.userId) });
+  
+	  if (!existingWallet) {
+		// Create a new wallet if none exists
 		const activateWallet = await Wallet.create({
-			userId: new ObjectId(req.session.userId),
-			status : true
-		})
-		console.log(activateWallet, 'activateWallet')
-		if(activateWallet){
-			return res.json({status : true, message : 'walltet activated successfully'})
-		}else {
-			req.flash('message', 'Something went wrong. try again')
-			return res.redirect('/');
+		  userId : new ObjectId(req.session.userId),
+		  status: true,
+		  wallet: [{
+			creditedAgainst: null
+		  }]
+		});
+  
+		if (activateWallet) {
+		  return res.json({ status: true, message: 'Wallet activated successfully' });
+		} else {
+		  req.flash('message', 'Something went wrong. Try again');
+		  return res.redirect('/');
 		}
-	}
-};
+	  } else {
+		// If wallet already exists
+		return res.json({ status: false, message: 'Wallet already activated' });
+	  }
+}
 const userSignUp_get = (req, res) => {
 	if (req.session.adminLogged) {
 		res.redirect('/admin-dashboard')

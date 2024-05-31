@@ -1,5 +1,5 @@
 db.orders.aggregate([
-	{ $match: { _id: new ObjectId('6658254e6790197a775a5c28') } },
+	{ $match: { _id: new ObjectId('66599f91dce97e5bf2593d1a'), "order.status": 'cancelled'}},
 	{ $unwind: "$order" },
 	{
 		$project: {
@@ -479,6 +479,7 @@ db.orders.aggregate([
 			quantity: 1,
 			colorId: 1,
 			sizeId: 1,
+			orderStatus: 1
 		}
 	},
 	{

@@ -22,6 +22,7 @@ const { ObjectId } = mongoose.Types;
 const bcrypt = require('bcrypt')
 const flash = require('connect-flash')
 const getPincodes = require('get-indian-places-on-pincodes')
+const {refundToWallet} = require('../../helpers/functions/refundToWallet');
 const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
 const razorpayInstance = new Razorpay({
 	key_id: RAZORPAY_KEY_ID,
@@ -5581,10 +5582,12 @@ const userCancelSingleOrder_post = async (req, res) => {
 			}
 		}
 	);
+
 	const allOrders = await Order.findOne({
 		userId: new ObjectId(req.session.userId),
 	});
 	const allOrdersCancelled = allOrders.order.every(order => order.status === 'cancelled');
+
 	if (allOrdersCancelled) {
 		await Order.updateOne(
 			{
@@ -5597,6 +5600,540 @@ const userCancelSingleOrder_post = async (req, res) => {
 			}
 		);
 	}
+
+	const order = await Order.aggregate([
+		{ $match: { "order._id": new ObjectId(req.query.single) } },
+		{ $unwind: "$order" },
+		{
+			$project: {
+				addressId: '$addressId',
+				productId: '$order.productId',
+				couponId: { $ifNull: ['$order.couponId', null] },
+				colorId: '$order.colorId',
+				sizeId: '$order.sizeId',
+				quantity: '$order.quantity',
+				status: '$order.status',
+				paymentMode: "$paymentMode",
+				orderStatus: "$orderStatus",
+				paymentStatus: "$paymentStatus",
+				createdAt: "$createdAt",
+				updatedAt: "$updatedAt",
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
+				userId: "$userId"
+			}
+		},
+		{
+			$lookup: {
+				from: "products",
+				localField: "productId",
+				foreignField: "_id",
+				as: "productData"
+			}
+		},
+		{
+			$lookup: {
+				from: "coupons",
+				localField: "couponId",
+				foreignField: "_id",
+				as: "couponData"
+			}
+		},
+		{
+			$lookup: {
+				from: "colors",
+				localField: "colorId",
+				foreignField: "_id",
+				as: "colorData"
+			}
+		},
+		{
+			$lookup: {
+				from: "sizes",
+				localField: "sizeId",
+				foreignField: "_id",
+				as: "sizeData"
+			}
+		},
+		{ $unwind: "$productData" },
+		{ $unwind: { path: "$couponData", preserveNullAndEmptyArrays: true } },
+		{ $unwind: "$colorData" },
+		{ $unwind: "$sizeData" },
+		{
+			$addFields: {
+				mrp: '$productData.mrp',
+				discount: '$productData.discount',
+				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
+				couponCode: { $ifNull: ['$couponData.couponCode', null] },
+				couponName: { $ifNull: ['$couponData.coupon', null] }
+
+			}
+		},
+		{
+			$project: {
+				individualTotal: {
+					$multiply: ["$mrp", "$quantity"]
+				},
+				taxRate: 0.18,
+				mrpWithoutTax: {
+					$multiply: [
+						{ $multiply: ["$mrp", "$quantity"] },
+						{ $divide: [100, 118] }
+					]
+				},
+				firstDiscountAmount: {
+					$multiply: [
+						{
+							$multiply: [
+								{ $multiply: ["$mrp", "$quantity"] },
+								{ $divide: [100, 118] }
+							]
+						},
+						{ $divide: ["$discount", 100] }
+					]
+				},
+				AmountAfterfirstDiscount: {
+					$subtract: [
+						{
+							$multiply: [
+								{ $multiply: ["$mrp", "$quantity"] },
+								{ $divide: [100, 118] }
+							]
+						},
+						{
+							$multiply: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{ $divide: ["$discount", 100] }
+							]
+						}
+					]
+				},
+				seccondDiscountAmount: {
+					$multiply: [
+						{
+							$subtract: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{
+									$multiply: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{ $divide: ["$discount", 100] }
+									]
+								}
+							]
+						},
+						{ $divide: ["$couponValue", 100] }
+					]
+				},
+				AmountAfterSecondDiscount: {
+					$subtract: [
+						{
+							$subtract: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{
+									$multiply: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{ $divide: ["$discount", 100] }
+									]
+								}
+							]
+						},
+						{
+							$multiply: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{ $divide: ["$couponValue", 100] }
+							]
+						}
+					]
+				},
+				gst: {
+					$multiply: [
+						{ $divide: [18, 100] },
+						{
+							$subtract: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{
+									$multiply: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{ $divide: ["$couponValue", 100] }
+									]
+								}
+							]
+						}
+					]
+				},
+				sgst: {
+					$divide: [
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}, 2
+					]
+				},
+				cgst: {
+					$divide: [
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}, 2
+					]
+				},
+				totalPrice: {
+					$add: [
+						{
+							$subtract: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{
+									$multiply: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{ $divide: ["$couponValue", 100] }
+									]
+								}
+							]
+						},
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				paymentStatus: 1,
+				productId: 1,
+				quantity: 1,
+				colorId: 1,
+				sizeId: 1,
+				orderStatus: 1,
+				singleOrderId: 1,
+				wholeOrderId: 1,
+				status:1
+			}
+		},
+		{
+			$group: {
+				_id: "$wholeOrderId",
+				orders: { $push: "$$ROOT" },
+			}
+		}
+	]);
+	console.log(order,'order')
+		// subtract the quantity and update the stock 
+	// after successfull order creation.
+	const subtractQuantityAndUpdateStock = async (orderArray) => {
+		for (let item of orderArray) {
+			for (let innerItem of item.orders) {
+				if(innerItem?.singleOrderId?.toString() === req.query.single ){
+					console.log(req.query.single , 'yes')
+					await Product.findOneAndUpdate(
+						{
+							_id: innerItem.productId,
+							'variants.color': innerItem.colorId,
+							'variants.size': innerItem.sizeId
+						},
+						{ $inc: { 'variants.$.quantity': innerItem.quantity } },
+						{ new: true }
+					);
+				}
+			}
+		}
+	};
+	// Call the function only after the order is successfully created
+	await subtractQuantityAndUpdateStock(order);
+	if(order && order[0]?.orders[0]?.paymentStatus === 'paid'){
+		let refundAmount = 0;
+		let orderStatus = '';
+		const data = order.find(item => {
+		  const foundItem = item.orders.find(order => order.singleOrderId.toString() === req.query.single);
+		  if (foundItem) {
+			refundAmount = foundItem.totalPrice;
+			orderStatus = foundItem.status;
+		  }
+		});
+		const result = await refundToWallet(req.session.userId, refundAmount , orderStatus, req.query.single);
+		req.flash('message', `${req.query.product} cancelled successfully  `);
+		req.flash('message', ` Rs. ${refundAmount.toFixed(2)} will be credited to your wallet`);
+		return res.redirect(`/user-dashboard-orders?page=${req.query.page}`);
+
+	}
 	req.flash('message', `${req.query.product} cancelled successfully`);
 	return res.redirect(`/user-dashboard-orders?page=${req.query.page}`);
 };
@@ -5604,6 +6141,559 @@ const userCancelWholeOrder_post = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(req.query.orderId)) {
 		return res.status(404).render('user-pages/404');
 	}
+
+	const cancelledOrder = await Order.updateOne(
+		{
+			_id: new ObjectId(req.query.orderId),
+			//   "order.status": "pending"
+		},
+		{
+			$set: {
+				"order.$[].status": "cancelled",
+				orderStatus: "cancelled"
+			}
+		}
+	);
+	const order = await Order.aggregate([
+		{ $match: { _id: new ObjectId(req.query.orderId) } },
+		{ $unwind: "$order" },
+		{
+			$project: {
+				addressId: '$addressId',
+				productId: '$order.productId',
+				couponId: { $ifNull: ['$order.couponId', null] },
+				colorId: '$order.colorId',
+				sizeId: '$order.sizeId',
+				quantity: '$order.quantity',
+				status: '$order.status',
+				paymentMode: "$paymentMode",
+				orderStatus: "$orderStatus",
+				paymentStatus: "$paymentStatus",
+				createdAt: "$createdAt",
+				updatedAt: "$updatedAt",
+				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
+				userId: "$userId"
+			}
+		},
+		{
+			$lookup: {
+				from: "products",
+				localField: "productId",
+				foreignField: "_id",
+				as: "productData"
+			}
+		},
+		{
+			$lookup: {
+				from: "coupons",
+				localField: "couponId",
+				foreignField: "_id",
+				as: "couponData"
+			}
+		},
+		{
+			$lookup: {
+				from: "colors",
+				localField: "colorId",
+				foreignField: "_id",
+				as: "colorData"
+			}
+		},
+		{
+			$lookup: {
+				from: "sizes",
+				localField: "sizeId",
+				foreignField: "_id",
+				as: "sizeData"
+			}
+		},
+		{ $unwind: "$productData" },
+		{ $unwind: { path: "$couponData", preserveNullAndEmptyArrays: true } },
+		{ $unwind: "$colorData" },
+		{ $unwind: "$sizeData" },
+		{
+			$addFields: {
+				mrp: '$productData.mrp',
+				discount: '$productData.discount',
+				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
+				couponCode: { $ifNull: ['$couponData.couponCode', null] },
+				couponName: { $ifNull: ['$couponData.coupon', null] }
+
+			}
+		},
+		{
+			$project: {
+				individualTotal: {
+					$multiply: ["$mrp", "$quantity"]
+				},
+				taxRate: 0.18,
+				mrpWithoutTax: {
+					$multiply: [
+						{ $multiply: ["$mrp", "$quantity"] },
+						{ $divide: [100, 118] }
+					]
+				},
+				firstDiscountAmount: {
+					$multiply: [
+						{
+							$multiply: [
+								{ $multiply: ["$mrp", "$quantity"] },
+								{ $divide: [100, 118] }
+							]
+						},
+						{ $divide: ["$discount", 100] }
+					]
+				},
+				AmountAfterfirstDiscount: {
+					$subtract: [
+						{
+							$multiply: [
+								{ $multiply: ["$mrp", "$quantity"] },
+								{ $divide: [100, 118] }
+							]
+						},
+						{
+							$multiply: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{ $divide: ["$discount", 100] }
+							]
+						}
+					]
+				},
+				seccondDiscountAmount: {
+					$multiply: [
+						{
+							$subtract: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{
+									$multiply: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{ $divide: ["$discount", 100] }
+									]
+								}
+							]
+						},
+						{ $divide: ["$couponValue", 100] }
+					]
+				},
+				AmountAfterSecondDiscount: {
+					$subtract: [
+						{
+							$subtract: [
+								{
+									$multiply: [
+										{ $multiply: ["$mrp", "$quantity"] },
+										{ $divide: [100, 118] }
+									]
+								},
+								{
+									$multiply: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{ $divide: ["$discount", 100] }
+									]
+								}
+							]
+						},
+						{
+							$multiply: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{ $divide: ["$couponValue", 100] }
+							]
+						}
+					]
+				},
+				gst: {
+					$multiply: [
+						{ $divide: [18, 100] },
+						{
+							$subtract: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{
+									$multiply: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{ $divide: ["$couponValue", 100] }
+									]
+								}
+							]
+						}
+					]
+				},
+				sgst: {
+					$divide: [
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}, 2
+					]
+				},
+				cgst: {
+					$divide: [
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}, 2
+					]
+				},
+				totalPrice: {
+					$add: [
+						{
+							$subtract: [
+								{
+									$subtract: [
+										{
+											$multiply: [
+												{ $multiply: ["$mrp", "$quantity"] },
+												{ $divide: [100, 118] }
+											]
+										},
+										{
+											$multiply: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{ $divide: ["$discount", 100] }
+											]
+										}
+									]
+								},
+								{
+									$multiply: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{ $divide: ["$couponValue", 100] }
+									]
+								}
+							]
+						},
+						{
+							$multiply: [
+								{ $divide: [18, 100] },
+								{
+									$subtract: [
+										{
+											$subtract: [
+												{
+													$multiply: [
+														{ $multiply: ["$mrp", "$quantity"] },
+														{ $divide: [100, 118] }
+													]
+												},
+												{
+													$multiply: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{ $divide: ["$discount", 100] }
+													]
+												}
+											]
+										},
+										{
+											$multiply: [
+												{
+													$subtract: [
+														{
+															$multiply: [
+																{ $multiply: ["$mrp", "$quantity"] },
+																{ $divide: [100, 118] }
+															]
+														},
+														{
+															$multiply: [
+																{
+																	$multiply: [
+																		{ $multiply: ["$mrp", "$quantity"] },
+																		{ $divide: [100, 118] }
+																	]
+																},
+																{ $divide: ["$discount", 100] }
+															]
+														}
+													]
+												},
+												{ $divide: ["$couponValue", 100] }
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				paymentStatus: 1,
+				productId: 1,
+				quantity: 1,
+				colorId: 1,
+				sizeId: 1,
+				orderStatus: 1
+			}
+		},
+		{
+			$group: {
+				_id: "$wholeOrderId",
+				orders: { $push: "$$ROOT" },
+				refundAmount: { $sum: "$totalPrice" }
+			}
+		}
+	]);
+	console.log(order?.orders[0]?.orderStatus, 'order')
+	// subtract the quantity and update the stock 
+	// after successfull order creation.
+	const subtractQuantityAndUpdateStock = async (orderArray) => {
+		for (let item of orderArray) {
+			for (let innerItem of item.orders) {
+				await Product.findOneAndUpdate(
+					{
+						_id: innerItem.productId,
+						'variants.color': innerItem.colorId,
+						'variants.size': innerItem.sizeId
+					},
+					{ $inc: { 'variants.$.quantity': innerItem.quantity } },
+					{ new: true }
+				);
+			}
+		}
+	};
+	// Call the function only after the order is successfully created
+	await subtractQuantityAndUpdateStock(order);
+	if(order && order[0]?.orders[0]?.paymentStatus === 'paid'){
+		const result = await refundToWallet(req.session.userId, order[0]?.refundAmount ,order[0]?.orders[0]?.orderStatus, req.query.orderId);
+		if (cancelledOrder) {
+			req.flash('message', `${req.query.orderName} cancelled successfully`);
+			req.flash('message', ` Rs. ${order[0]?.refundAmount.toFixed(2)} will be credited to your wallet`);
+			return res.redirect(`/user-dashboard-orders?page=${req.query.page}`)
+		}
+	}
+	if (cancelledOrder) {
+		req.flash('message', `${req.query.orderName} cancelled successfully`);
+		return res.redirect(`/user-dashboard-orders?page=${req.query.page}`)
+	}
+};
+const userReturnWholeOrder_post = async (req, res) => {
+	const { orderId, orderName, currentStatus, page } = req.query;
+	const newStatus = 'returned'
+	const returnedOrder = await Order.updateOne(
+		{
+			_id: new ObjectId(orderId),
+			//   "order.status": "pending"
+		},
+		{
+			$set: {
+				"order.$[].status": newStatus,
+				orderStatus: newStatus
+			}
+		}
+	);
 	const order = await Order.aggregate([
 		{ $match: { _id: new ObjectId(req.query.orderId) } },
 		{ $unwind: "$order" },
@@ -6091,18 +7181,7 @@ const userCancelWholeOrder_post = async (req, res) => {
 			}
 		}
 	])
-	const cancelledOrder = await Order.updateOne(
-		{
-			_id: new ObjectId(req.query.orderId),
-			//   "order.status": "pending"
-		},
-		{
-			$set: {
-				"order.$[].status": "cancelled",
-				orderStatus: "cancelled"
-			}
-		}
-	);
+
 	// subtract the quantity and update the stock 
 	// after successfull order creation.
 	const subtractQuantityAndUpdateStock = async (orderArray) => {
@@ -6123,29 +7202,10 @@ const userCancelWholeOrder_post = async (req, res) => {
 
 	// Call the function only after the order is successfully created
 	await subtractQuantityAndUpdateStock(order);
-	if (cancelledOrder) {
-		req.flash('message', `${req.query.orderName} cancelled successfully`);
-		return res.redirect(`/user-dashboard-orders?page=${req.query.page}`)
-	}
-};
-const userReturnWholeOrder_post = async (req, res) => {
-	const { orderId, orderName, currentStatus, page } = req.query;
-	const newStatus = 'returned'
-
-	const returnedOrder = await Order.updateOne(
-		{
-			_id: new ObjectId(req.query.orderId),
-			//   "order.status": "pending"
-		},
-		{
-			$set: {
-				"order.$[].status": newStatus,
-				orderStatus: newStatus
-			}
-		}
-	);
+	const result = await refundToWallet(req.session.userId, order[0]?.refundAmount ,order[0]?.orders[0]?.orderStatus, req.query.orderId);
 	if (returnedOrder) {
 		req.flash('message', `${orderName} returned successfully`);
+		req.flash('message', ` Rs. ${order[0]?.refundAmount.toFixed(2)} will be credited to your wallet`);
 		return res.redirect(`/user-dashboard-orders?page=${page}`)
 	}
 };
