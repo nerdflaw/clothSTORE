@@ -91,6 +91,9 @@ const userDashboardAddressBook_get = async (req, res) => {
 	}
 };
 const userDashboardWallet_get = async (req, res) => {
+	let currentPage = Number(req.query.page) || 1;
+	let limit = Number(req.query.limit) || 3;
+	let skip = (currentPage - 1) * limit;
 	const userWallet = await Wallet.aggregate([
 		{ $unwind: "$wallet" },
 		{ $sort: { "wallet.createdDate": -1 } },
@@ -105,12 +108,17 @@ const userDashboardWallet_get = async (req, res) => {
 			__v: { $first: "$__v" }
 		  } 
 		},
-		{ $sort: { _id: 1 } }  // Optional: sort the documents by _id
+		{ $sort: { _id: 1 } }
 	  ]);
+	  console.log(userWallet, 'userWallet')
+	  const totalPages = Math.ceil(userWallet[0]?.wallet?.length / limit);
+	  const paginatedUserWallet = userWallet[0]?.wallet?.slice(skip, skip + limit) || []
+	  console.log(paginatedUserWallet, 'paginatedUserWallet')
+
 	res.render('user-pages/userDashboardWalletPage',
 		{
 			message: req.flash('message'),
-			userWallet
+			paginatedUserWallet, userWallet, currentPage, limit, totalPages
 		})
 }
 const userAddAddress_get = (req, res) => {
@@ -2830,11 +2838,28 @@ const userCheckout_get = async (req, res) => {
 	let roundOff = totalIndividualTotal - (totalAmountAfterSecondDiscount + totalGst + totalDiscount)
 	let grandTotal = totalAmountAfterSecondDiscount + totalGst
 
+	const walletTotal = await Wallet.aggregate([
+		{
+			$match: {
+				userId: new ObjectId(req.session.userId)
+			}
+		},
+		{
+			$unwind: "$wallet"
+		},
+		{
+			$group: {
+				_id: null,
+				totalBalance: { $sum: "$wallet.balance" }
+			}
+		}
+	])
+
 	res.render('user-pages/userDashboardCheckoutPage',
 		{
 			totalAmountAfterSecondDiscount, totalGst,
 			totalSgst, totalCgst, totalDiscount, totalDiscountPercentage, roundOff, grandTotal,
-			message: req.flash('message'),
+			message: req.flash('message'), walletTotal,
 			cartDetails, allCoupons, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
 		})
 };
@@ -5503,6 +5528,11 @@ const userPlaceOrder_post = async (req, res) => {
 
 	// Call the function only after the order is successfully created
 	await subtractQuantityAndUpdateStock(orderItems);
+	if(req.body.paymentMode === 'wallet'){
+		let amount = -req.body.amount / 100
+		const result = await refundToWallet(req.session.userId, amount , 'Wallet purchase', newOrder._id);
+		console.log(result, 'wallet data to ptint')
+	}
 
 	const orderID = "clothStore_" + newOrder._id.toString().slice(-8);
 	const deleteUserCart = await Cart.deleteOne({
@@ -5528,6 +5558,28 @@ const userPlaceOrder_post = async (req, res) => {
 		}
 	});
 };
+const userWalletTopupOrder_post = async (req, res)=>{
+	console.log(req.body)
+	const options = {
+		amount: parseInt(req.body.amount),
+		currency: "INR",
+		receipt: `receipt_order_${Date.now()}`
+	};
+	console.log(options);
+
+	razorpayInstance.orders.create(options, (err, order) => {
+		if (err) {
+			console.error(err);
+			res.status(500).json({ error: 'Unable to create order' });
+		} else {
+			console.log(order)
+			res.json({
+				order: order,
+				// message: `Order placed successfully Order ID : ${orderID}`
+			});
+		}
+	});
+}
 const userRetryPayment_post = async (req, res) => {
 	const { orderId, keyId, amount } = req.body;
 	if (!mongoose.Types.ObjectId.isValid(orderId)) {
@@ -5568,6 +5620,39 @@ const userVerifyPayment_post = (req, res) => {
 		return res.json({ placedOrderDetails: placedOrderDetails, status: false, message: 'Payment failed, try again!' })
 	}
 };
+const userVerifyPaymentTopup_post = (req, res) => {
+	const orderId = req.body.orderId;
+	const amount = req.body.amount;
+	const paymentId = req.body.paymentDetails.razorpay_payment_id;
+	const razorpaySignature = req.body.paymentDetails.razorpay_signature;
+	const secret = RAZORPAY_KEY_SECRET;
+
+	const isValid = verifyPayment.verifyPaymentSignature(orderId, paymentId, razorpaySignature, secret);
+	if (isValid) {
+		return res.json({ amount: amount, status: true, message: 'Payment successfull' })
+	} else {
+		return res.json({ amount: amount, status: false, message: 'Payment failed, try again!' })
+	}
+};
+const userWalletTopup_post = async (req, res)=>{
+	console.log(req.body.amount)
+	const updateWallet = await Wallet.updateOne(
+		{ userId: new ObjectId(req.session.userId) },
+		{
+			$push: {
+				wallet: {
+					balance: req.body.amount,
+					creditedFor: 'wallet top-up'
+				}
+			}
+		}
+	);
+	if(updateWallet){
+		res.json({status : true })
+	}else{
+		res.json({status : false })
+	}
+}
 const userChangePaymentStatus_post = async (req, res) => {
 	if (!mongoose.Types.ObjectId.isValid(req?.body?.orderId)) {
 		return res.status(404).render('user-pages/404');
@@ -6651,7 +6736,8 @@ const userCancelWholeOrder_post = async (req, res) => {
 				quantity: 1,
 				colorId: 1,
 				sizeId: 1,
-				orderStatus: 1
+				orderStatus: 1,
+				paymentMode: 1
 			}
 		},
 		{
@@ -7196,7 +7282,8 @@ const userReturnWholeOrder_post = async (req, res) => {
 				userId: 1,
 				colorId: 1,
 				sizeId: 1,
-				orderStatus:1
+				orderStatus:1,
+				paymentMode: 1
 			}
 		},
 		{
@@ -7356,8 +7443,12 @@ module.exports = {
 	userApplyCouponPlaceOrder_post,
 	userCancelCartProductOnPlaceorder_post,
 	userPlaceOrder_post,
+	userWalletTopupOrder_post,
+	userWalletTopup_post,
 	userRetryPayment_post,
 	userVerifyPayment_post,
+	userVerifyPaymentTopup_post,
+	userWalletTopup_post,
 	userChangePaymentStatus_post,
 	userCancelSingleOrder_post,
 	userCancelWholeOrder_post,

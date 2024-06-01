@@ -145,6 +145,24 @@
                     <input required type="radio" id="paymentMode" name="paymentMode" value="online" class="mx-3 pb-3">
                   </div>
                 </div>
+                
+                <div class="col-12 col-md-4 mt-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> disabled <% } %>>
+                  <div class="col-12 w-100 border rounded-3">
+                    <div class="col-12 px-3 pt-3">
+                      <p class="font-size-bold">Wallet Payment (<span class="text-primary"> Balance: <%= walletTotal[0]?.totalBalance %> </span>)</p>
+                    </div>
+                      <input required type="radio" id="paymentMode" name="paymentMode" value="wallet" class="mx-3 pb-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> hidden <% } %>>
+                      <% if (grandTotal >= walletTotal[0]?.totalBalance) { %>
+                        <div class="d-flex justify-content-between align-items-center pb-3 mx-3 ">
+                          <p class="m-0 p-0 font-size-bold text-primary fst-italic">Insufficient balance</p>
+                          <button type="button" id="walletTopup" class="btn-sm bg-black border-0 font-size-bold py-2 px-2 rounded-2 text-white">
+                            <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Top Up
+                          </button>
+                        </div>
+                      <% } %>
+                  </div>
+                </div>                
+  
               </div>
           </div>
         </div>
@@ -344,6 +362,31 @@
       </div>
   </section>
   <section>
+    <!-- Modal -->
+<div class="modal fade" id="topupModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="topupModalLabel">Top-up Wallet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="topupForm">
+          <div class="mb-3">
+            <label for="topupAmount" class="form-label">Enter Top-up Amount</label>
+            <input type="number" class="form-control" id="topupAmount" required>
+          </div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmTopup">Confirm</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  </section>
+  <section>
     <script>
       let plusButton = document.querySelector('.quantity-right-plus-place-order')
       let minusButton = document.querySelector('.quantity-left-minus-place-order')
@@ -449,6 +492,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- place order  -->
     <script>
       $(document).ready(function() {
         let formData = {};
@@ -498,6 +542,9 @@
           if (response.paymentMode === 'COD') {
             location.replace("/user-dashboard-orders");
             toastMessage(response.message);
+          } else if (response.paymentMode === 'wallet') {
+            orderId = response?.order?.receipt;
+            changePaymentStatus(orderId, 'paid');
           } else if (response.paymentMode === 'online') {
             orderId = response?.order?.receipt;
             handleOnlinePayment(response);
@@ -514,6 +561,7 @@
             "image": "/images/clothStore_favicon.jpg",
             "order_id": online?.order?.id,
             "handler": function(response) {
+              console.log(response, 'response', online, 'online')
               paymentVerification(response, online);
             },
             "prefill": {
@@ -630,7 +678,175 @@
 
         $('#placeOrderForm').submit(handleSubmit);
       });
+
     </script>
+    <!-- wallet top up -->
+    <script>
+      $(document).ready(function() {
+        let formData = {};
+    
+        // Open modal on button click
+        $('#walletTopup').click(function() {
+          $('#topupModal').modal('show');
+        });
+    
+        // Handle confirm button click
+        $('#confirmTopup').click(function() {
+          const topupAmount = $('#topupAmount').val();
+          if (topupAmount) {
+            formData.amount = topupAmount * 100; // Convert to paise
+            $('#topupModal').modal('hide');
+            createRazorpayOrder(formData.amount);
+          } else {
+            alert('Please enter a valid amount.');
+          }
+        });
+    
+        // Create Razorpay Order
+        async function createRazorpayOrder(topupAmount) {
+          try {
+            const response = await fetch('/create-order', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ amount: topupAmount })
+            });
+            const data = await response.json();
+            console.log(data.order.id)
+            openRazorpay(data.order.id, topupAmount);
+          } catch (error) {
+            console.error('Error creating Razorpay order:', error);
+          }
+        }
+    
+        // Open Razorpay
+        function openRazorpay(orderId, topupAmount) {
+          const options = {
+            "key": $('#razorpay').data('keyid'), // Get your Razorpay Key ID
+            "amount": topupAmount,
+            "currency": "INR",
+            "name": "clothSTORE",
+            "description": "Wallet Top-up",
+            "order_id": orderId,
+            "image": "/images/clothStore_favicon.jpg",
+            "handler": function(response) {
+              console.log(response, 'openRazorpay');
+              handlePaymentSuccess(response, orderId);
+            },
+            "prefill": {
+              "name": "Your Name",
+              "email": "your.email@example.com",
+              "contact": "9000090000"
+            },
+            "theme": {
+              "color": "#000000"
+            }
+          };
+          const rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function(response) {
+            handlePaymentFailure(response);
+          });
+          rzp1.open();
+        }
+    
+        // Handle payment success
+        function handlePaymentSuccess(response, orderId) {
+          console.log(response, 'handlePaymentSuccess')
+          $.ajax({
+            url: '/verify/payment/topup',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              paymentDetails: response,
+              amount: formData.amount,
+              orderId: orderId
+            }),
+            success: function(res) {
+              if (res.status) {
+                topupWallet(res.amount)
+              } else {
+                Swal.fire({
+                  title: 'Error!',
+                  text: res.message,
+                  icon: 'error',
+                  confirmButtonText: 'OK',
+                  confirmButtonColor: 'red'
+                });
+              }
+            },
+            error: function(err) {
+              Swal.fire({
+                title: 'Error!',
+                text: 'There was an issue processing your payment. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'red'
+              });
+            }
+          });
+        }
+        function topupWallet (amount){
+          $.ajax({
+            url: '/wallet/topup',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              amount: amount,
+            }),
+            success: function(res) {
+              if (res.status) {
+                Swal.fire({
+                  title: 'Success!',
+                  text: 'Wallet top-up successful!',
+                  icon: 'success',
+                  confirmButtonText: 'OK',
+                  confirmButtonColor: 'green'
+                }).then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire({
+                  title: 'Error!',
+                  text: res.message,
+                  icon: 'error',
+                  confirmButtonText: 'OK',
+                  confirmButtonColor: 'red'
+                });
+              }
+            },
+            error: function(err) {
+              Swal.fire({
+                title: 'Error!',
+                text: 'There was an issue processing your payment. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'red'
+              });
+            }
+          });
+        }
+    
+        // Handle payment failure
+        function handlePaymentFailure(response) {
+          const errorMessage = `
+            <p style="text-align: left; font-size: 15px;">Reason: ${response.error.reason}</p>
+            <p style="text-align: left; font-size: 15px;">Order ID: ${response.error.metadata.order_id}</p>
+            <p style="text-align: left; font-size: 15px;">Payment ID: ${response.error.metadata.payment_id}</p>
+            <p style="text-align: left; font-size: 15px;">Info: ${response.error.description}</p>
+          `;
+          Swal.fire({
+            title: 'Error!',
+            html: errorMessage.trim(),
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: 'red'
+          });
+        }
+      });
+    </script>
+    
+    
   </section>
   <!-- including admin footer  -->
   <%- include('../../partials/user-partials/user-footer.ejs') %>

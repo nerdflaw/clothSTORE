@@ -31,20 +31,25 @@
           <%- include('../../partials/user-partials/user-sideNav.ejs') %>
         </div>
         <div class="col-sm-12 col-md-12 col-lg-10 p-2">
+          <% if (paginatedUserWallet?.length === 0) { %>
+            <div class="row m-0 p-0 border rounded-3">
+              <h6 class="text-danger font-size m-0 pb-3 animate__animated animate__flash " colspan="5"><em>Your haven`t ordered a product yet</em></h6>
+            </div>
+          <% } %>
+          <% if (paginatedUserWallet?.length > 0) { %>
           <div class="row m-0 p-0 border rounded-3">
             <div class="col-md-12 col-lg-6 m-0 p-0">
               <div class="row p-3 m-3 border rounded-3">
-                <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Wallet details<span class="font-size-bold">&gt;&gt;</span> </p>
+                <p class="font-size-bold pb-2 text-primary m-0 p-0 fst-italic">Wallet details <span class="font-size-bold">&gt;&gt;</span> </p>
                 <% const walletID = "clothSTORE_" + userWallet[0]?._id.toString().slice(-8); %>
-
-                <% const totals = userWallet[0]?.wallet?.reduce((acc, element) => {
+                <% const totals = paginatedUserWallet?.reduce((acc, element) => {
                   acc.balance += parseFloat(element?.balance);
                   return acc;
                 }, {
                   balance: 0,
                 }); %>
 
-                <div class="col-sm-12 col-md-12 col-lg-12 d-flex">
+                <div class="col-sm-12 col-md-12 col-lg-12 d-flex m-0 p-0">
                   <div class="col-4">
                     <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet ID</p>
                     <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet balance</p>
@@ -58,14 +63,12 @@
                     <p class="m-0 p-0 my-1 text-black text-end font-size-bold">&#8377;&nbsp;<%= totals?.balance?.toFixed(2) %></p>
                   </div>
                 </div>
-
-
               </div>
             </div>
             <div class="col-md-12 col-lg-6 m-0 p-0">
               <div class="row p-3 m-3 border rounded-3 ">
-                <p class="font-size-bold pb-2 p-0 text-primary m-0 fst-italic">Wallet history<span class="font-size-bold">&gt;&gt;</span> </p>
-                <%  userWallet[0]?.wallet?.forEach((el, index) => { %>
+                <p class="font-size-bold pb-2 p-0 text-primary m-0 fst-italic">Wallet history <span class="font-size-bold">&gt;&gt;</span> </p>
+                <%  paginatedUserWallet?.forEach((el, index) => { %>
                 <div class="col-sm-6 col-md-6 col-lg-4 p-0">
                   <p class="m-0 p-0 text-secondary font-size text-start py-1 border-bottom fst-italic"><%= index+ 1%>. Transaction</p>
                   <p class="m-0 p-0 text-black font-size text-start pt-1">Amount</p>
@@ -74,14 +77,15 @@
                   <p class="m-0 p-0 text-black font-size text-start">Credited on</p>
                 </div>
                 <div class="col-sm-1 col-md-1 col-lg-1 p-0">
-                  <p class="m-0 p-0 text-secondary text-center font-size py-1 border-bottom fst-italic">Refference</p>
+                  <p class="m-0 p-0 text-secondary text-center font-size py-1 border-bottom fst-italic">&nbsp;</p>
                   <p class="m-0 p-0 text-black text-center font-size pt-1">:</p>
                   <p class="m-0 p-0 text-black text-center font-size">:</p>
                   <p class="m-0 p-0 text-black text-center font-size">:</p>
                   <p class="m-0 p-0 text-black text-center font-size">:</p>
                 </div>
                 <div class="col-sm-5 col-md-5 col-lg-7 p-0">
-                  <p class="m-0 p-0 text-end font-size py-1  border-bottom text-secondary fst-italic"><%= el?._id %></p>
+                  <% const Refference = "Refference_" + el._id.toString().slice(-8) %>
+                  <p class="m-0 p-0 text-end font-size py-1  border-bottom text-secondary fst-italic"><%= Refference %></p>
                   <p class="m-0 p-0 text-end font-size-bold pt-1" style="color: rgb(50, 202, 50);"><%= el?.balance?.toFixed(2) %>&nbsp;&#8377;</p>
                   <% const creditedFor = el?.creditedFor === 'wallet created' ? el?.creditedFor : 'credited for ' + el?.creditedFor + ' order'%>
                   <% const orderID = el?.creditedAgainst ? "clothSTORE_" + el.creditedAgainst.toString().slice(-8) : "wallet created"  %>
@@ -99,12 +103,51 @@
                       }
                     ) %>
                   </p>
-
                 </div>
                 <% }) %>
               </div>
+              <div class="row p-0 m-3 border rounded-3 ">
+                <div class="col-12 justify-content-center py-2" style="display: flex;" id="pagination">
+                  <% if (currentPage > 1) { %>
+                  <div class="text-center border rounded-1 bg-light">
+                    <a class="text-decoration-none" href="/user-dashboard-wallet?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+                      <p class="font-size px-3 py-2 m-0 text-dark">&lt;</p>
+                    </a>
+                  </div>
+                  <% } %>
+
+                  <% for (let i = 1; i <= totalPages; i++) { %>
+                  <% if (i === currentPage) { %>
+                  <div class="text-center border rounded-1 <%= i === currentPage ? 'bg-dark' : 'bg-light' %>">
+                    <a class="text-decoration-none" href="/user-dashboard-wallet?page=<%= i %>&limit=<%= limit %>">
+
+                      <p class="font-size px-3 py-2 m-0 text-white"><%= i %></p>
+                    </a>
+                  </div>
+                  <% } else { %>
+                  <div class="text-center border rounded-1 bg-light">
+                    <a class="text-decoration-none" href="/user-dashboard-wallet?page=<%= i %>&limit=<%= limit %>">
+                      <p class="font-size px-3 py-2 m-0 text-dark"><%= i %></p>
+                    </a>
+                  </div>
+                  <div id="limit" hidden data-limit="<%= limit %>"></div>
+                  <div id="page" hidden data-page="<%= i %>"></div>
+                  <% } %>
+                  <% } %>
+
+                  <% if (currentPage < totalPages) { %>
+                  <div class="text-center border rounded-1 bg-light">
+                    <a class="text-decoration-none" href="/user-dashboard-wallet?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+                      <p class="font-size px-3 py-2 m-0 text-dark">&gt;</p>
+                    </a>
+                  </div>
+                  <% } %>
+
+                </div>
+              </div>
             </div>
           </div>
+          <% } %>
         </div>
       </div>
     </div>
