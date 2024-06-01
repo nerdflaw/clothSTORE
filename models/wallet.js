@@ -7,6 +7,7 @@ const walletSchema = new mongoose.Schema({
 		balance: { type: Number, default: 0 },
 		creditedFor: { type: String, default: 'wallet created' },
 		creditedAgainst: { type: mongoose.Schema.Types.ObjectId, default: null },
+		createdDate: { type: Date, default: Date.now }
 	}],
 	status: { type: Boolean, default: false }
 }, { timestamps: true });

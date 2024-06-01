@@ -91,9 +91,26 @@ const userDashboardAddressBook_get = async (req, res) => {
 	}
 };
 const userDashboardWallet_get = async (req, res) => {
+	const userWallet = await Wallet.aggregate([
+		{ $unwind: "$wallet" },
+		{ $sort: { "wallet.createdDate": -1 } },
+		{ 
+		  $group: {
+			_id: "$_id",
+			userId: { $first: "$userId" },
+			wallet: { $push: "$wallet" },
+			status: { $first: "$status" },
+			createdAt: { $first: "$createdAt" },
+			updatedAt: { $first: "$updatedAt" },
+			__v: { $first: "$__v" }
+		  } 
+		},
+		{ $sort: { _id: 1 } }  // Optional: sort the documents by _id
+	  ]);
 	res.render('user-pages/userDashboardWalletPage',
 		{
 			message: req.flash('message'),
+			userWallet
 		})
 }
 const userAddAddress_get = (req, res) => {
@@ -6159,7 +6176,6 @@ const userCancelWholeOrder_post = async (req, res) => {
 		{ $unwind: "$order" },
 		{
 			$project: {
-				addressId: '$addressId',
 				productId: '$order.productId',
 				couponId: { $ifNull: ['$order.couponId', null] },
 				colorId: '$order.colorId',
@@ -6646,7 +6662,9 @@ const userCancelWholeOrder_post = async (req, res) => {
 			}
 		}
 	]);
-	console.log(order?.orders[0]?.orderStatus, 'order')
+	console.log(order, 'order')
+	console.log(order[0]?.orders[0]?.orderStatus, 'order')
+	console.log(order[0]?.refundAmount, 'refundAmount')
 	// subtract the quantity and update the stock 
 	// after successfull order creation.
 	const subtractQuantityAndUpdateStock = async (orderArray) => {
@@ -6704,8 +6722,15 @@ const userReturnWholeOrder_post = async (req, res) => {
 				colorId: '$order.colorId',
 				sizeId: '$order.sizeId',
 				quantity: '$order.quantity',
+				status: '$order.status',
+				paymentMode: "$paymentMode",
+				orderStatus: "$orderStatus",
 				paymentStatus: "$paymentStatus",
+				createdAt: "$createdAt",
+				updatedAt: "$updatedAt",
 				wholeOrderId: '$_id',
+				singleOrderId: '$order._id',
+				userId: "$userId"
 			}
 		},
 		{
@@ -7171,6 +7196,7 @@ const userReturnWholeOrder_post = async (req, res) => {
 				userId: 1,
 				colorId: 1,
 				sizeId: 1,
+				orderStatus:1
 			}
 		},
 		{

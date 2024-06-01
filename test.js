@@ -1,5 +1,5 @@
 db.orders.aggregate([
-	{ $match: { _id: new ObjectId('66599f91dce97e5bf2593d1a'), "order.status": 'cancelled'}},
+	{ $match: { _id: new ObjectId('665a978ea9bc5680130417b6') } },
 	{ $unwind: "$order" },
 	{
 		$project: {
@@ -489,4 +489,4 @@ db.orders.aggregate([
 			refundAmount: { $sum: "$totalPrice" }
 		}
 	}
-])
+]);

@@ -35,40 +35,73 @@
             <div class="col-md-12 col-lg-6 m-0 p-0">
               <div class="row p-3 m-3 border rounded-3">
                 <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Wallet details<span class="font-size-bold">&gt;&gt;</span> </p>
+                <% const walletID = "clothSTORE_" + userWallet[0]?._id.toString().slice(-8); %>
+
+                <% const totals = userWallet[0]?.wallet?.reduce((acc, element) => {
+                  acc.balance += parseFloat(element?.balance);
+                  return acc;
+                }, {
+                  balance: 0,
+                }); %>
+
                 <div class="col-sm-12 col-md-12 col-lg-12 d-flex">
                   <div class="col-4">
                     <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet ID</p>
-                    <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet amount</p>
+                    <p class="m-0 p-0 my-1 text-black text-start font-size">Wallet balance</p>
                   </div>
                   <div class="col-1">
                     <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
                     <p class="m-0 p-0 my-1 text-black text-center font-size">:</p>
                   </div>
                   <div class="col-7">
-                    <p class="m-0 p-0 my-1 text-black text-start font-size">bdbjdbjv</p>
-                    <p class="m-0 p-0 my-1 text-black text-start font-size">&#8377;&nbsp;bdbjdbjv</p>
+                    <p class="m-0 p-0 my-1 text-black text-end font-size-bold"><%= walletID %></p>
+                    <p class="m-0 p-0 my-1 text-black text-end font-size-bold">&#8377;&nbsp;<%= totals?.balance?.toFixed(2) %></p>
                   </div>
                 </div>
+
+
               </div>
             </div>
             <div class="col-md-12 col-lg-6 m-0 p-0">
-              <div class="row p-3 m-3 border rounded-3">
-                <p class="font-size-bold pb-2 text-primary m-0 fst-italic">Wallet history<span class="font-size-bold">&gt;&gt;</span> </p>
-                <div class="col-sm-6 col-md-6 col-lg-4">
-                  <p class="m-0 p-0 text-black font-size text-start">Date</p>
-                  <p class="m-0 p-0 text-black font-size text-start">balance</p>
-                  <p class="m-0 p-0 text-black font-size text-start">reason order id</p>
+              <div class="row p-3 m-3 border rounded-3 ">
+                <p class="font-size-bold pb-2 p-0 text-primary m-0 fst-italic">Wallet history<span class="font-size-bold">&gt;&gt;</span> </p>
+                <%  userWallet[0]?.wallet?.forEach((el, index) => { %>
+                <div class="col-sm-6 col-md-6 col-lg-4 p-0">
+                  <p class="m-0 p-0 text-secondary font-size text-start py-1 border-bottom fst-italic"><%= index+ 1%>. Transaction</p>
+                  <p class="m-0 p-0 text-black font-size text-start pt-1">Amount</p>
+                  <p class="m-0 p-0 text-black font-size text-start">Credited against</p>
+                  <p class="m-0 p-0 text-black font-size text-start">Credited for</p>
+                  <p class="m-0 p-0 text-black font-size text-start">Credited on</p>
                 </div>
-                <div class="col-sm-1 col-md-1 col-lg-1">
+                <div class="col-sm-1 col-md-1 col-lg-1 p-0">
+                  <p class="m-0 p-0 text-secondary text-center font-size py-1 border-bottom fst-italic">Refference</p>
+                  <p class="m-0 p-0 text-black text-center font-size pt-1">:</p>
                   <p class="m-0 p-0 text-black text-center font-size">:</p>
                   <p class="m-0 p-0 text-black text-center font-size">:</p>
                   <p class="m-0 p-0 text-black text-center font-size">:</p>
                 </div>
-                <div class="col-sm-5 col-md-5 col-lg-7">
-                  <p class="m-0 p-0 text-black text-center font-size">:</p>
-                  <p class="m-0 p-0 text-black text-center font-size">:</p>
-                  <p class="m-0 p-0 text-black text-center font-size">:</p>
+                <div class="col-sm-5 col-md-5 col-lg-7 p-0">
+                  <p class="m-0 p-0 text-end font-size py-1  border-bottom text-secondary fst-italic"><%= el?._id %></p>
+                  <p class="m-0 p-0 text-end font-size-bold pt-1" style="color: rgb(50, 202, 50);"><%= el?.balance?.toFixed(2) %>&nbsp;&#8377;</p>
+                  <% const creditedFor = el?.creditedFor === 'wallet created' ? el?.creditedFor : 'credited for ' + el?.creditedFor + ' order'%>
+                  <% const orderID = el?.creditedAgainst ? "clothSTORE_" + el.creditedAgainst.toString().slice(-8) : "wallet created"  %>
+                  <p class="m-0 p-0 text-primary text-end font-size fst-italic"><%= orderID %></p>
+                  <p class="m-0 p-0 text-primary text-end font-size fst-italic"><%= creditedFor %></p>
+                  <p class="m-0 p-0 text-secondary text-end font-size fst-italic">
+                    <%= el?.createdDate?.toLocaleString("en-US", 
+                      { 
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric'
+                      }
+                    ) %>
+                  </p>
+
                 </div>
+                <% }) %>
               </div>
             </div>
           </div>
