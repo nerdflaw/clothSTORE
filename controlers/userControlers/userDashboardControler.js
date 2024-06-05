@@ -5455,6 +5455,7 @@ const updateQuantityPlaceOrder_post = async (req, res) => {
 
 };
 const userPlaceOrder_post = async (req, res) => {
+	console.log('req reached to userPlaceOrder_post')
 	const cartId = req.params.id;
 	if (!mongoose.Types.ObjectId.isValid(cartId)) {
 		return res.status(404).render('user-pages/404');

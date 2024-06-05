@@ -290,14 +290,10 @@
     <div hidden id="userLogged" data-userLogged="<%= locals?.user %>"></div>
   </section>
   <% } %>
-
-
   <section>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
       var productVariants;
-
       function getSelectedValue() {
         var selectElement = document.getElementById("colorSelect");
         var selectedColor = selectElement.options[selectElement.selectedIndex].value;
@@ -373,7 +369,10 @@
         var productIdElement = document.getElementById("productId");
         var productIdValue = productIdElement.getAttribute("data-productId");
         const userLoggedEl = document.getElementById('userLogged');
-        const isUserLogged = userLoggedEl.getAttribute("data-userLogged");
+        console.log(userLoggedEl, 'userLoggedEl')
+
+        const isUserLogged = userLoggedEl.getAttribute('data-userLogged');
+        console.log(isUserLogged, 'isUserLogged')
         if (isUserLogged && selectedColor === '') {
           Swal.fire({
             text: 'Please select a color',

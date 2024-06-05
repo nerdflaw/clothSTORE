@@ -505,26 +505,25 @@
 
         async function sendData() {
           let formData = gatherFormData();
-          console.table(formData);
-
+          console.table(formData)
           if (formData) {
-            if (!formData.paymentMode) {
+            if (formData.paymentMode === '' || formData.paymentMode === undefined) {
               Swal.fire({
+                title: 'Please select a payment mode',
                 text: 'You must select a payment mode to proceed.',
                 icon: 'info',
                 confirmButtonText: 'OK',
-                confirmButtonColor: 'blue'
-              });
+                confirmButtonColor: 'green'
+              })
               return;
-            }
-
-            if (!formData.address) {
+            } else if (formData.address === '' || formData.address === undefined) {
               Swal.fire({
+                title: 'Please select an address',
                 text: 'You must select or create an address to proceed.',
                 icon: 'info',
                 confirmButtonText: 'OK',
-                confirmButtonColor: 'blue'
-              });
+                confirmButtonColor: 'green'
+              })
               return;
             }
 
@@ -533,14 +532,6 @@
               handleResponse(response);
             } catch (error) {
               console.error("Error:", error);
-              // Optionally handle the error, e.g., show an error alert
-              Swal.fire({
-                title: 'Error!',
-                text: 'An error occurred while processing your request. Please try again later.',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                confirmButtonColor: 'red'
-              });
             }
           }
         }
@@ -763,7 +754,7 @@
         // Open Razorpay
         function openRazorpay(orderId, topupAmount) {
           const options = {
-            "key": $('#razorpay').data('keyid'), // Get your Razorpay Key ID
+            "key": $('#razorpay').data('keyid'),
             "amount": topupAmount,
             "currency": "INR",
             "name": "clothSTORE",
