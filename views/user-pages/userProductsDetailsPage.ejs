@@ -287,11 +287,14 @@
         <% }) %>
       </div>
     </div>
+    <div hidden id="userLogged" data-userLogged="<%= locals?.user %>"></div>
   </section>
   <% } %>
 
 
   <section>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
       var productVariants;
 
@@ -369,7 +372,33 @@
         var selectedQuantity = document.getElementById("quantitySelect").value;
         var productIdElement = document.getElementById("productId");
         var productIdValue = productIdElement.getAttribute("data-productId");
-
+        const userLoggedEl = document.getElementById('userLogged');
+        const isUserLogged = userLoggedEl.getAttribute("data-userLogged");
+        if (isUserLogged && selectedColor === '') {
+          Swal.fire({
+            text: 'Please select a color',
+            icon: 'info',
+            confirmButtonText: 'OK',
+            confirmButtonColor: 'blue'
+          });
+          return;
+        } else if (isUserLogged && selectedSize === '') {
+          Swal.fire({
+            text: 'Please select a size',
+            icon: 'info',
+            confirmButtonText: 'OK',
+            confirmButtonColor: 'blue'
+          });
+          return;
+        } else if (isUserLogged && selectedQuantity === '') {
+          Swal.fire({
+            text: 'Please select a quantity',
+            icon: 'info',
+            confirmButtonText: 'OK',
+            confirmButtonColor: 'blue'
+          });
+          return;
+        }
         var data = {
           selectedColor: selectedColor,
           selectedSize: selectedSize,
@@ -384,8 +413,20 @@
           },
           body: JSON.stringify(data)
         };
-
-        fetch('/user-add-to-cart', options)
+        if(!isUserLogged){
+          Swal.fire({
+                title: 'You`re not logged in',
+                text: 'Please log-in or sign-up',
+                icon: 'info',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'blue'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.replace('/user-login');
+                }
+              });
+        }else {
+          fetch('/user-add-to-cart', options)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -399,6 +440,7 @@
           .catch(error => {
             console.error('Error during fetch operation:', error);
           });
+        }
       }
     </script>
     <script>
