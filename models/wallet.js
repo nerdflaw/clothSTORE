@@ -5,7 +5,7 @@ const walletSchema = new mongoose.Schema({
 	userId: { type: mongoose.Schema.Types.ObjectId, required: true },
 	wallet: [{
 		balance: { type: Number, default: 0 },
-		creditedFor: { type: String, default: 'wallet created' },
+		creditedFor: { type: String, default: 'Wallet created' },
 		creditedAgainst: { type: mongoose.Schema.Types.ObjectId, default: null },
 		createdDate: { type: Date, default: Date.now }
 	}],

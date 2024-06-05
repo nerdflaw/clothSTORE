@@ -226,12 +226,13 @@ const userActivateWallet = async (req, res) => {
 		  userId : new ObjectId(req.session.userId),
 		  status: true,
 		  wallet: [{
+			balance: 1000,
 			creditedAgainst: null
 		  }]
 		});
   
 		if (activateWallet) {
-		  return res.json({ status: true, message: 'Wallet activated successfully' });
+		  return res.json({ status: true, message: 'Wallet activated successfully, Yay!. congratulations! credited Rs. 1000 to your wallet' });
 		} else {
 		  req.flash('message', 'Something went wrong. Try again');
 		  return res.redirect('/');

@@ -525,37 +525,9 @@
             method: 'POST',
             success: (response) => {
               if (response.status) {
-                if (response.message) {
-                  Swal.fire({
-                    title: 'Success!',
-                    text: response.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: 'green'
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      changePaymentStatus(orderId, 'paid');
-                    }
-                  });
-                } else {
-                  changePaymentStatus(orderId, 'paid');
-                }
+                changePaymentStatus(orderId, 'paid');
               } else {
-                if (response.message) {
-                  Swal.fire({
-                    title: 'Error!',
-                    text: response.message,
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: 'red'
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      changePaymentStatus(orderId, 'failed');
-                    }
-                  });
-                } else {
-                  changePaymentStatus(orderId, 'failed');
-                }
+                changePaymentStatus(orderId, 'failed');
               }
             }
           });
@@ -571,20 +543,31 @@
             method: 'POST',
             success: (response) => {
               if (response.status) {
-                if (response.message) {
+                if (response.paymentStatus === 'paid') {
                   Swal.fire({
                     title: 'Payment status',
-                    text: response.paymentStatus,
-                    icon: 'info',
+                    text: 'Payment recieved, thank you for the order!',
+                    icon: 'success',
                     confirmButtonText: 'OK',
-                    confirmButtonColor: 'blue'
+                    confirmButtonColor: 'green'
                   }).then((result) => {
                     if (result.isConfirmed) {
                       location.replace(`/user-dashboard-orders?page=${formData.page}`);
                     }
                   });
-                } else {
-                  location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                }
+                if (response.paymentStatus === 'failed') {
+                  Swal.fire({
+                    title: 'Payment status',
+                    text: `Payment ${response.paymentStatus}, please try again.`,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'red'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                    }
+                  });
                 }
               }
             }

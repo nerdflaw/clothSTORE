@@ -145,24 +145,24 @@
                     <input required type="radio" id="paymentMode" name="paymentMode" value="online" class="mx-3 pb-3">
                   </div>
                 </div>
-                
+
                 <div class="col-12 col-md-4 mt-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> disabled <% } %>>
                   <div class="col-12 w-100 border rounded-3">
                     <div class="col-12 px-3 pt-3">
-                      <p class="font-size-bold">Wallet Payment (<span class="text-primary"> Balance: <%= walletTotal[0]?.totalBalance %> </span>)</p>
+                      <p class="font-size-bold">Wallet Payment (<span class="text-primary"> Balance: <%= walletTotal[0]?.totalBalance?.toFixed(2) %> </span>)</p>
                     </div>
-                      <input required type="radio" id="paymentMode" name="paymentMode" value="wallet" class="mx-3 pb-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> hidden <% } %>>
-                      <% if (grandTotal >= walletTotal[0]?.totalBalance) { %>
-                        <div class="d-flex justify-content-between align-items-center pb-3 mx-3 ">
-                          <p class="m-0 p-0 font-size-bold text-primary fst-italic">Insufficient balance</p>
-                          <button type="button" id="walletTopup" class="btn-sm bg-black border-0 font-size-bold py-2 px-2 rounded-2 text-white">
-                            <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Top Up
-                          </button>
-                        </div>
-                      <% } %>
+                    <input required type="radio" id="paymentMode" name="paymentMode" value="wallet" class="mx-3 pb-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> hidden <% } %>>
+                    <% if (grandTotal >= walletTotal[0]?.totalBalance) { %>
+                    <div class="d-flex justify-content-between align-items-center pb-3 mx-3 ">
+                      <p class="m-0 p-0 font-size-bold text-primary fst-italic">Insufficient balance</p>
+                      <button type="button" id="walletTopup" class="btn-sm bg-black border-0 font-size-bold py-2 px-2 rounded-2 text-white">
+                        <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Top Up
+                      </button>
+                    </div>
+                    <% } %>
                   </div>
-                </div>                
-  
+                </div>
+
               </div>
           </div>
         </div>
@@ -363,27 +363,27 @@
   </section>
   <section>
     <!-- Modal -->
-<div class="modal fade" id="topupModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="topupModalLabel">Top-up Wallet</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="topupForm">
-          <div class="mb-3">
-            <label for="topupAmount" class="form-label">Enter Top-up Amount</label>
-            <input type="number" class="form-control" id="topupAmount" required>
+    <div class="modal fade" id="topupModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title font-size-bold" id="topupModalLabel">Top-up Wallet</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="confirmTopup">Confirm</button>
-        </form>
+          <div class="modal-body">
+            <form id="topupForm">
+              <div class="mb-3">
+                <label for="topupAmount" class="form-label font-size">Enter Top-up Amount</label>
+                <input type="number" class="form-control font-size" id="topupAmount" required>
+                <div id="topupAmountError" class="text-danger mt-2 font-size" style="display:none;">Please enter a valid amount greater than 0.</div>
+              </div>
+              <button type="button" class="btn btn-secondary font-size" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary font-size" id="confirmTopup">Confirm</button>
+            </form>
+          </div>
+        </div>
       </div>
-
     </div>
-  </div>
-</div>
 
   </section>
   <section>
@@ -610,37 +610,9 @@
             method: 'POST',
             success: (response) => {
               if (response.status) {
-                if (response.message) {
-                  Swal.fire({
-                    title: 'Success!',
-                    text: response.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: 'green'
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      changePaymentStatus(orderId, 'paid');
-                    }
-                  });
-                } else {
-                  changePaymentStatus(orderId, 'paid');
-                }
+                changePaymentStatus(orderId, 'paid');
               } else {
-                if (response.message) {
-                  Swal.fire({
-                    title: 'Error!',
-                    text: response.message,
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: 'red'
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      changePaymentStatus(orderId, 'failed');
-                    }
-                  });
-                } else {
-                  changePaymentStatus(orderId, 'failed');
-                }
+                changePaymentStatus(orderId, 'failed');
               }
             }
           });
@@ -656,21 +628,68 @@
             method: 'POST',
             success: (response) => {
               if (response.status) {
-                if (response.message) {
+                if (response.paymentStatus === 'paid') {
                   Swal.fire({
-                    title: 'Payment status',
-                    text: response.paymentStatus,
-                    icon: 'info',
+                    title: 'Success!',
+                    text: 'Order placed successfully',
+                    icon: 'success',
                     confirmButtonText: 'OK',
-                    confirmButtonColor: 'blue'
+                    confirmButtonColor: 'green'
                   }).then((result) => {
                     if (result.isConfirmed) {
-                      location.replace(`/user-dashboard-orders`);
+                      Swal.fire({
+                        title: 'Payment status',
+                        text: 'Payment recieved, thank you for the order!',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: 'green'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          location.replace(`/user-dashboard-orders`);
+                        }
+                      });
                     }
                   });
-                } else {
-                  location.replace(`/user-dashboard-orders`);
                 }
+                if (response.paymentStatus === 'failed') {
+                  Swal.fire({
+                    title: 'Success!',
+                    text: 'Order placed successfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'green'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      Swal.fire({
+                        title: 'Payment status',
+                        text: `Payment ${response.paymentStatus}, please try again.`,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: 'red'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          location.replace(`/user-dashboard-orders`);
+                        }
+                      });
+                    }
+                  });
+                }
+
+                // if (response.message) {
+                //   Swal.fire({
+                //     title: 'Payment status',
+                //     text: response.paymentStatus,
+                //     icon: 'info',
+                //     confirmButtonText: 'OK',
+                //     confirmButtonColor: 'blue'
+                //   }).then((result) => {
+                //     if (result.isConfirmed) {
+                //       location.replace(`/user-dashboard-orders`);
+                //     }
+                //   });
+                // } else {
+                //   location.replace(`/user-dashboard-orders`);
+                // }
               }
             }
           });
@@ -678,30 +697,35 @@
 
         $('#placeOrderForm').submit(handleSubmit);
       });
-
     </script>
     <!-- wallet top up -->
     <script>
       $(document).ready(function() {
         let formData = {};
-    
+
         // Open modal on button click
         $('#walletTopup').click(function() {
           $('#topupModal').modal('show');
         });
-    
+
+        // Validate input field
+        $('#topupAmount').on('input', function() {
+          this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
         // Handle confirm button click
         $('#confirmTopup').click(function() {
           const topupAmount = $('#topupAmount').val();
-          if (topupAmount) {
+          if (topupAmount && parseInt(topupAmount) > 0) {
             formData.amount = topupAmount * 100; // Convert to paise
+            $('#topupAmountError').hide();
             $('#topupModal').modal('hide');
             createRazorpayOrder(formData.amount);
           } else {
-            alert('Please enter a valid amount.');
+            $('#topupAmountError').show();
           }
         });
-    
+
         // Create Razorpay Order
         async function createRazorpayOrder(topupAmount) {
           try {
@@ -710,7 +734,9 @@
               headers: {
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify({ amount: topupAmount })
+              body: JSON.stringify({
+                amount: topupAmount
+              })
             });
             const data = await response.json();
             console.log(data.order.id)
@@ -719,7 +745,7 @@
             console.error('Error creating Razorpay order:', error);
           }
         }
-    
+
         // Open Razorpay
         function openRazorpay(orderId, topupAmount) {
           const options = {
@@ -749,7 +775,7 @@
           });
           rzp1.open();
         }
-    
+
         // Handle payment success
         function handlePaymentSuccess(response, orderId) {
           console.log(response, 'handlePaymentSuccess')
@@ -786,19 +812,20 @@
             }
           });
         }
-        function topupWallet (amount){
+
+        function topupWallet(amount) {
           $.ajax({
             url: '/wallet/topup',
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-              amount: amount,
+              amount: amount / 100,
             }),
             success: function(res) {
               if (res.status) {
                 Swal.fire({
                   title: 'Success!',
-                  text: 'Wallet top-up successful!',
+                  text: `Wallet top-up of Rs. ${amount / 100} was successful!`,
                   icon: 'success',
                   confirmButtonText: 'OK',
                   confirmButtonColor: 'green'
@@ -826,7 +853,7 @@
             }
           });
         }
-    
+
         // Handle payment failure
         function handlePaymentFailure(response) {
           const errorMessage = `
@@ -845,8 +872,8 @@
         }
       });
     </script>
-    
-    
+
+
   </section>
   <!-- including admin footer  -->
   <%- include('../../partials/user-partials/user-footer.ejs') %>

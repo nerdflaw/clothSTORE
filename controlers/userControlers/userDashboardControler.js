@@ -105,20 +105,20 @@ const userDashboardWallet_get = async (req, res) => {
 			status: { $first: "$status" },
 			createdAt: { $first: "$createdAt" },
 			updatedAt: { $first: "$updatedAt" },
+			totalBalance: { $sum: "$wallet.balance" },
 			__v: { $first: "$__v" }
 		  } 
 		},
 		{ $sort: { _id: 1 } }
 	  ]);
-	  console.log(userWallet, 'userWallet')
 	  const totalPages = Math.ceil(userWallet[0]?.wallet?.length / limit);
 	  const paginatedUserWallet = userWallet[0]?.wallet?.slice(skip, skip + limit) || []
-	  console.log(paginatedUserWallet, 'paginatedUserWallet')
 
 	res.render('user-pages/userDashboardWalletPage',
 		{
 			message: req.flash('message'),
-			paginatedUserWallet, userWallet, currentPage, limit, totalPages
+			paginatedUserWallet, userWallet, currentPage, limit, totalPages,
+			RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
 		})
 }
 const userAddAddress_get = (req, res) => {
@@ -5642,7 +5642,7 @@ const userWalletTopup_post = async (req, res)=>{
 			$push: {
 				wallet: {
 					balance: req.body.amount,
-					creditedFor: 'wallet top-up'
+					creditedFor: 'Wallet top-up',
 				}
 			}
 		}

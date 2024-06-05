@@ -416,6 +416,8 @@
   <section>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
       $(document).ready(function() {
         let formData = {};
@@ -442,6 +444,7 @@
           formData.amount = $('#submitButton').data('amount') * 100;
           formData.keyId = $('#submitButton').data('keyid');
           formData.orderId = $('#submitButton').data('orderid');
+          formData.page = $('#submitButton').data('page');
           return formData;
         }
 
@@ -489,11 +492,27 @@
             }
           }
 
-          var rzp1 = new Razorpay(options);
-          rzp1.open()
-          rzp1.on('payment.failed', function(response) {
-            changePaymentStatus(orderId, 'failed');
+          let razorpay = new Razorpay(options);
+          razorpay.on('payment.failed', function(response) {
+            const errorMessage = `
+              <p style="text-align: left; font-size: 15px;">Reason: ${response.error.reason}</p>
+              <p style="text-align: left; font-size: 15px;">Order ID: ${response.error.metadata.order_id}</p>
+              <p style="text-align: left; font-size: 15px;">Payment ID: ${response.error.metadata.payment_id}</p>
+              <p style="text-align: left; font-size: 15px;">Info: ${response.error.description}</p>
+            `;
+            Swal.fire({
+              title: 'Error!',
+              html: errorMessage.trim(),
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: 'red'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                changePaymentStatus(orderId, 'failed');
+              }
+            });
           });
+          razorpay.open();
         }
         // Function to handle verify the online payment
         function paymentVerification(paymentDetails, orderDetails) {
@@ -511,7 +530,7 @@
                 changePaymentStatus(orderId, 'failed');
               }
             }
-          })
+          });
         }
 
         function changePaymentStatus(orderId, status) {
@@ -524,13 +543,35 @@
             method: 'POST',
             success: (response) => {
               if (response.status) {
-                if (response.message) {
-                  toastMessage(response.message);
+                if (response.paymentStatus === 'paid') {
+                  Swal.fire({
+                        title: 'Payment status',
+                        text: 'Payment recieved, thank you for the order!',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: 'green'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                        }
+                      });
                 }
-                location.replace('/user-dashboard-orders');
+                if (response.paymentStatus === 'failed') {
+                  Swal.fire({
+                        title: 'Payment status',
+                        text: `Payment ${response.paymentStatus}, please try again.`,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: 'red'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                        }
+                      });
+                }
               }
             }
-          })
+          });
         }
         $('#makePaymentForm').submit(handleSubmit);
       });
