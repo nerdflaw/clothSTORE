@@ -55,7 +55,7 @@
                 <% data?.addresses?.forEach((address, index)=>{ %>
                 <div class="col-12 col-md-6">
                   <div class="col border mt-3 rounded-top position-relative">
-                    <input required type="radio" id="address" name="address" value="<%= address._id %>" class="mx-3 position-absolute top-0 mt-3 start-0">
+                    <input type="radio" id="address" name="address" value="<%= address._id %>" class="mx-3 position-absolute top-0 mt-3 start-0">
                     <a class="btn w-100 p-3 border-0" type="text" data-bs-toggle="collapse" data-bs-target="#collapseExample<%= index %>" aria-expanded="false" aria-controls="collapseExample<%= index %>">
                       <p class="font-size-bold">Saved address - <%= index+1 %></p>
                       <div class="col-12 d-flex justify-content-around">
@@ -133,7 +133,7 @@
                     <div class="col-12 px-3 pt-3">
                       <p class="font-size-bold">Cash On Delivery (COD)</p>
                     </div>
-                    <input required type="radio" id="paymentMode" name="paymentMode" value="COD" class="mx-3 pb-3">
+                    <input type="radio" id="paymentMode" name="paymentMode" value="COD" class="mx-3 pb-3">
                   </div>
                 </div>
                 <% } %>
@@ -142,7 +142,7 @@
                     <div class="col-12 px-3 pt-3">
                       <p class="font-size-bold">Online Payment</p>
                     </div>
-                    <input required type="radio" id="paymentMode" name="paymentMode" value="online" class="mx-3 pb-3">
+                    <input type="radio" id="paymentMode" name="paymentMode" value="online" class="mx-3 pb-3">
                   </div>
                 </div>
 
@@ -151,7 +151,7 @@
                     <div class="col-12 px-3 pt-3">
                       <p class="font-size-bold">Wallet Payment (<span class="text-primary"> Balance: <%= walletTotal[0]?.totalBalance?.toFixed(2) %> </span>)</p>
                     </div>
-                    <input required type="radio" id="paymentMode" name="paymentMode" value="wallet" class="mx-3 pb-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> hidden <% } %>>
+                    <input type="radio" id="paymentMode" name="paymentMode" value="wallet" class="mx-3 pb-3" <% if (grandTotal >= walletTotal[0]?.totalBalance) { %> hidden <% } %>>
                     <% if (grandTotal >= walletTotal[0]?.totalBalance) { %>
                     <div class="d-flex justify-content-between align-items-center pb-3 mx-3 ">
                       <p class="m-0 p-0 font-size-bold text-primary fst-italic">Insufficient balance</p>
@@ -374,7 +374,7 @@
             <form id="topupForm">
               <div class="mb-3">
                 <label for="topupAmount" class="form-label font-size">Enter Top-up Amount</label>
-                <input type="number" class="form-control font-size" id="topupAmount" required>
+                <input type="number" class="form-control font-size" id="topupAmount">
                 <div id="topupAmountError" class="text-danger mt-2 font-size" style="display:none;">Please enter a valid amount greater than 0.</div>
               </div>
               <button type="button" class="btn btn-secondary font-size" data-bs-dismiss="modal">Cancel</button>
@@ -505,12 +505,42 @@
 
         async function sendData() {
           let formData = gatherFormData();
+          console.table(formData);
+
           if (formData) {
+            if (!formData.paymentMode) {
+              Swal.fire({
+                text: 'You must select a payment mode to proceed.',
+                icon: 'info',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'blue'
+              });
+              return;
+            }
+
+            if (!formData.address) {
+              Swal.fire({
+                text: 'You must select or create an address to proceed.',
+                icon: 'info',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'blue'
+              });
+              return;
+            }
+
             try {
               const response = await sendRequest(formData);
               handleResponse(response);
             } catch (error) {
               console.error("Error:", error);
+              // Optionally handle the error, e.g., show an error alert
+              Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while processing your request. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'red'
+              });
             }
           }
         }
@@ -674,22 +704,6 @@
                     }
                   });
                 }
-
-                // if (response.message) {
-                //   Swal.fire({
-                //     title: 'Payment status',
-                //     text: response.paymentStatus,
-                //     icon: 'info',
-                //     confirmButtonText: 'OK',
-                //     confirmButtonColor: 'blue'
-                //   }).then((result) => {
-                //     if (result.isConfirmed) {
-                //       location.replace(`/user-dashboard-orders`);
-                //     }
-                //   });
-                // } else {
-                //   location.replace(`/user-dashboard-orders`);
-                // }
               }
             }
           });

@@ -7,6 +7,7 @@ const fetchBrandsMiddleware = require('./middlewares/brandMiddleware')
 const fetchProductsMiddleware = require('./middlewares/productsMiddleware')
 const fetchCartsMiddleware = require('./middlewares/cartMiddleware')
 const fetchWishlistsMiddleware = require('./middlewares/wishlistMiddleware')
+const fetchWalletMiddleware = require('./middlewares/userWalletMiddlewar')
 const fetchGrandTotalMiddleware = require('./middlewares/cartGrandTotalMiddleware')
 const fetchAddressesMiddleware = require('./middlewares/addressMiddleware')
 const fetchOrderGrandTotalMiddleware = require('./middlewares/orderGrandTotal&TotalMiddleware')
@@ -73,6 +74,7 @@ app.use(fetchProductsMiddleware);
 app.use(fetchBrandsMiddleware);
 app.use(fetchCartsMiddleware);
 app.use(fetchWishlistsMiddleware);
+app.use(fetchWalletMiddleware);
 app.use(fetchGrandTotalMiddleware);
 app.use(fetchAddressesMiddleware);
 app.use(fetchOrderGrandTotalMiddleware);

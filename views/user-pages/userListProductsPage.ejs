@@ -36,9 +36,9 @@
     });
   </script>
   <% } %>
-  <% if (locals.user && wallet?.length <= 0) { %>
+  <%# if (locals.user && wallet?.length <= 0) { %>
   <!-- Toast message -->
-  <div class="toast walletToast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+  <!-- <div class="toast walletToast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
     <div class="toast-header bg-white">
       <img src="/images/clothStore_favicon.jpg" style="width: 20px; height: 20px;" class="border rounded me-2">
       <strong class="me-auto text-black">clothStore</strong>
@@ -58,9 +58,9 @@
         <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Activate wallet
       </button>
     </div>
-  </div>
-  <% } %>
-  <div hidden id="walletData" data-wallet="<%= wallet %>"></div>
+  </div> -->
+  <%# } %>
+  <!-- <div hidden id="walletData" data-wallet="<%#= wallet %>"></div> -->
   <section class="brands-section">
     <div class="container-fluid">
       <div class="row bg-black d-flex justify-content-around">
@@ -359,12 +359,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
     <script>
       document.addEventListener('DOMContentLoaded', (event) => {
         const walletEl = document.getElementById('walletData');
-        const walletDetails = walletEl.getAttribute('data-wallet'); // Corrected attribute name
+        const walletDetails = walletEl.getAttribute('data-wallet');
 
         console.log(walletDetails.length, 'walletDetails');
 

@@ -58,6 +58,87 @@
       </div>
     </div>
   </section>
+  <section>
+    <% if (locals?.user && locals?.wallet?.length <= 0) { %>
+      <!-- Toast message -->
+      <div class="toast walletToast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+        <div class="toast-header bg-white">
+          <img src="/images/clothStore_favicon.jpg" style="width: 20px; height: 20px;" class="border rounded me-2">
+          <strong class="me-auto text-black">clothStore</strong>
+          <small id="toast-timestamp" class="text-black"></small>
+        </div>
+        <div class="toast-body text-white font-size m-0 p-0 py-2">
+          Activate your wallet now and claim Rs. 1000!
+        </div>
+        <div class="toast-body text-white font-size m-0 p-0 py-2">
+          Don't miss out—activate your wallet and seize the offer.
+        </div>
+        <div class="toast-body text-white font-size m-0 p-0 py-2">
+          Activate your wallet and you're all set to enjoy Rs. 1000!
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+          <button type="button" id="confirmChangeBtn" class="btn-sm bg-white border-0 font-size-bold py-2 px-2 rounded-2 text-black">
+            <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Activate wallet
+          </button>
+        </div>
+      </div>
+      <% } %>
+      <div hidden id="walletData" data-wallet="<%= locals?.wallet %>"></div>
+  </section>
+  <section>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+        const walletEl = document.getElementById('walletData');
+        const walletDetails = walletEl.getAttribute('data-wallet'); // Corrected attribute name
+
+        console.log(walletDetails.length, 'walletDetails');
+
+        if (walletDetails.length === 0) {
+          var toast = new bootstrap.Toast(document.getElementById('confirmationToast'), {
+            autohide: false
+          });
+          toast.show();
+        }
+
+        document.getElementById('confirmChangeBtn').addEventListener('click', function() {
+          activateWallet();
+        });
+
+      })
+
+      function activateWallet() {
+        const url = `/activate-wallet`;
+        fetch(url, {
+            method: 'POST'
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status) {
+              Swal.fire({
+                title: 'Your wallet is now active',
+                text: 'Yay! Congratulations, you have received Rs. 1000 in your wallet',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'green'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  location.replace('/user-dashboard-wallet');
+                }
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error updating order status:', error);
+          });
+      }
+    </script>
+  </section>
   
   <script>
     const wishlistButtons = document.querySelectorAll('.wish-list-button');
