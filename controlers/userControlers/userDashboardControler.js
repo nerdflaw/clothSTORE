@@ -95,22 +95,24 @@ const userDashboardWallet_get = async (req, res) => {
 	let limit = Number(req.query.limit) || 3;
 	let skip = (currentPage - 1) * limit;
 	const userWallet = await Wallet.aggregate([
+		{ $match: { userId: new ObjectId(req.session.userId) } },
 		{ $unwind: "$wallet" },
 		{ $sort: { "wallet.createdDate": -1 } },
-		{ 
-		  $group: {
-			_id: "$_id",
-			userId: { $first: "$userId" },
-			wallet: { $push: "$wallet" },
-			status: { $first: "$status" },
-			createdAt: { $first: "$createdAt" },
-			updatedAt: { $first: "$updatedAt" },
-			totalBalance: { $sum: "$wallet.balance" },
-			__v: { $first: "$__v" }
-		  } 
+		{
+			$group: {
+				_id: "$_id",
+				userId: { $first: "$userId" },
+				wallet: { $push: "$wallet" },
+				status: { $first: "$status" },
+				createdAt: { $first: "$createdAt" },
+				updatedAt: { $first: "$updatedAt" },
+				totalBalance: { $sum: "$wallet.balance" },
+				__v: { $first: "$__v" }
+			}
 		},
 		{ $sort: { _id: 1 } }
-	  ]);
+	]);
+	console.log(userWallet, 'userWallet')
 	  const totalPages = Math.ceil(userWallet[0]?.wallet?.length / limit);
 	  const paginatedUserWallet = userWallet[0]?.wallet?.slice(skip, skip + limit) || []
 
