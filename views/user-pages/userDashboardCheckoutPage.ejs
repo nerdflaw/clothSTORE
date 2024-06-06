@@ -561,8 +561,27 @@
 
         function handleResponse(response) {
           if (response.paymentMode === 'COD') {
-            location.replace("/user-dashboard-orders");
-            toastMessage(response.message);
+            Swal.fire({
+              title: 'Success!',
+              text: 'Order placed successfully',
+              icon: 'success',
+              confirmButtonText: 'OK',
+              confirmButtonColor: 'green'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Swal.fire({
+                  title: 'Payment status',
+                  text: 'Thank you for the order, Your payment status is currently pending',
+                  icon: 'info',
+                  confirmButtonText: 'OK',
+                  confirmButtonColor: 'blue'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    location.replace("/user-dashboard-orders");
+                  }
+                });
+              }
+            });
           } else if (response.paymentMode === 'wallet') {
             orderId = response?.order?.receipt;
             changePaymentStatus(orderId, 'paid');
