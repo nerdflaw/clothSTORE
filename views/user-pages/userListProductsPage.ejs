@@ -136,7 +136,7 @@
                         <% } %>
                         <% } %>
                         <span class="font-size text-primary">
-                          <%= flashsales?.averageRating %> Stars. |
+                          <%= Math.round(flashsales?.averageRating)%> Stars. |
                           <%= flashsales?.countOfRatings%> Ratings.
                         </span>
                       </div>
@@ -225,7 +225,7 @@
                         <% } %>
                         <% } %>
                         <span class="font-size text-primary">
-                          <%= newArrived?.averageRating%> Stars. |
+                          <%= Math.round(newArrived?.averageRating) %> Stars. |
                           <%= newArrived?.countOfRatings%> Ratings.
                         </span>
                       </div>
@@ -314,7 +314,7 @@
                         <% } %>
                         <% } %>
                         <span class="font-size text-primary">
-                          <%= popuplarProduct?.averageRating%> Stars. |
+                          <%= Math.round(popuplarProduct?.averageRating) %> Stars. |
                           <%= popuplarProduct?.countOfRatings%> Ratings.
                         </span>
                       </div>
