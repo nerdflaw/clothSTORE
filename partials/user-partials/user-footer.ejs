@@ -60,37 +60,39 @@
   </section>
   <section>
     <% if (locals?.user && locals?.wallet?.length <= 0) { %>
-      <!-- Toast message -->
-      <div class="toast walletToast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
-        <div class="toast-header bg-white">
-          <img src="/images/clothStore_favicon.jpg" style="width: 20px; height: 20px;" class="border rounded me-2">
-          <strong class="me-auto text-black">clothStore</strong>
-          <small id="toast-timestamp" class="text-black"></small>
-        </div>
-        <div class="toast-body text-white font-size m-0 p-0 py-2">
-          Activate your wallet now and claim Rs. 1000!
-        </div>
-        <div class="toast-body text-white font-size m-0 p-0 py-2">
-          Don't miss out—activate your wallet and seize the offer.
-        </div>
-        <div class="toast-body text-white font-size m-0 p-0 py-2">
-          Activate your wallet and you're all set to enjoy Rs. 1000!
-        </div>
-        <div class="d-flex justify-content-end align-items-center">
-          <button type="button" id="confirmChangeBtn" class="btn-sm bg-white border-0 font-size-bold py-2 px-2 rounded-2 text-black">
-            <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Activate wallet
-          </button>
-        </div>
+    <!-- Toast message -->
+    <div class="toast walletToast position-fixed top-50 start-50 translate-middle p-3 bg-black" id="confirmationToast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+      <div class="toast-header bg-white">
+        <img src="/images/clothStore_favicon.jpg" style="width: 20px; height: 20px;" class="border rounded me-2">
+        <strong class="me-auto text-black">clothStore</strong>
+        <small id="toast-timestamp" class="text-black"></small>
       </div>
-      <% } %>
-      <div hidden id="walletData" data-wallet="<%= locals?.wallet %>"></div>
+      <div class="toast-body text-white font-size m-0 p-0 py-2">
+        Activate your wallet now and claim Rs. 1000!
+      </div>
+      <div class="toast-body text-white font-size m-0 p-0 py-2">
+        Don't miss out—activate your wallet and seize the offer.
+      </div>
+      <div class="toast-body text-white font-size m-0 p-0 py-2">
+        Activate your wallet and you're all set to enjoy Rs. 1000!
+      </div>
+      <div class="d-flex justify-content-end align-items-center">
+        <button type="button" id="confirmChangeBtn" class="btn-sm bg-white border-0 font-size-bold py-2 px-2 rounded-2 text-black">
+          <i class="fa-solid fa-wallet fa-xl fa-bounce pe-2 text-primary"></i>Activate wallet
+        </button>
+      </div>
+    </div>
+    <% } %>
+    <div hidden id="walletData" data-wallet="<%= locals?.wallet %>"></div>
   </section>
+  <!-- wallet activation -->
   <section>
     <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <!-- <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
 
     <script>
       document.addEventListener('DOMContentLoaded', (event) => {
@@ -107,6 +109,9 @@
         }
 
         document.getElementById('confirmChangeBtn').addEventListener('click', function() {
+          var toastElement = document.getElementById('confirmationToast');
+          var toast = bootstrap.Toast.getInstance(toastElement);
+          toast.hide();
           activateWallet();
         });
 
@@ -120,16 +125,21 @@
           .then(response => response.json())
           .then(data => {
             if (data.status) {
-              Swal.fire({
-                title: 'Your wallet is now active',
-                text: 'Yay! Congratulations, you have received Rs. 1000 in your wallet',
-                icon: 'success',
-                confirmButtonText: 'OK',
-                confirmButtonColor: 'green'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  location.replace('/user-dashboard-wallet');
-                }
+              const jsConfetti = new JSConfetti();
+              jsConfetti.addConfetti({
+                confettiNumber: 500
+              }).then(() => {
+                Swal.fire({
+                  title: 'Your wallet is now active',
+                  text: 'Yay! Congratulations, you have received Rs. 1000 in your wallet',
+                  icon: 'success',
+                  confirmButtonText: 'OK',
+                  confirmButtonColor: 'green'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    location.replace('/user-dashboard-wallet');
+                  }
+                });
               });
             }
           })
@@ -139,7 +149,7 @@
       }
     </script>
   </section>
-  
+
   <script>
     const wishlistButtons = document.querySelectorAll('.wish-list-button');
     wishlistButtons.forEach(button => {
@@ -166,73 +176,73 @@
       };
     });
   </script>
-    <!-- toast messages for actions -->
-    <script>
-      function toastMessage(message) {
-        if (message) {
-          // Create the toast div
-          let toastDiv = document.createElement('div');
-          toastDiv.classList.add('toast', 'position-fixed', 'top-0', 'end-0', 'p-3', 'bg-black');
-          toastDiv.setAttribute('role', 'alert');
-          toastDiv.setAttribute('aria-live', 'assertive');
-          toastDiv.setAttribute('aria-atomic', 'true');
-          toastDiv.setAttribute('data-delay', '3000');
-  
-          // Create the toast header
-          let toastHeaderDiv = document.createElement('div');
-          toastHeaderDiv.classList.add('toast-header', 'bg-white');
-  
-          // Create and append the image to the toast header
-          let img = document.createElement('img');
-          img.src = "/images/clothStore_favicon.jpg";
-          img.style.width = '20px';
-          img.style.height = '20px';
-          img.classList.add('border', 'rounded', 'me-2');
-          toastHeaderDiv.appendChild(img);
-  
-          // Create and append the strong element for store name to the toast header
-          let strong = document.createElement('strong');
-          strong.classList.add('me-auto', 'text-black');
-          strong.textContent = 'clothStore';
-          toastHeaderDiv.appendChild(strong);
-  
-          // Create and append the small element for timestamp to the toast header
-          let small = document.createElement('small');
-          small.id = 'toast-timestamp';
-          small.classList.add('text-black');
-          toastHeaderDiv.appendChild(small);
-  
-          // Create and append the button element for closing the toast to the toast header
-          let closeButton = document.createElement('button');
-          closeButton.type = 'button';
-          closeButton.classList.add('btn-close', 'font-size-bold');
-          closeButton.setAttribute('data-bs-dismiss', 'toast');
-          closeButton.setAttribute('aria-label', 'Close');
-          toastHeaderDiv.appendChild(closeButton);
-  
-          // Append the toast header to the toast div
-          toastDiv.appendChild(toastHeaderDiv);
-  
-          // Create and append the toast body to the toast div
-          let toastBodyDiv = document.createElement('div');
-          toastBodyDiv.classList.add('toast-body', 'text-white', 'font-size');
-          toastBodyDiv.textContent = message;
-          toastDiv.appendChild(toastBodyDiv);
-  
-          // Append the toast div to the document body
-          document.body.appendChild(toastDiv);
-  
-          // Show the toast notification
-          let notification = new bootstrap.Toast(toastDiv);
-          notification.show();
-  
-          // Update the timestamp
-          let timestampElement = document.getElementById('toast-timestamp');
-          timestampElement.textContent = new Date().toLocaleTimeString();
-        }
+  <!-- toast messages for actions -->
+  <script>
+    function toastMessage(message) {
+      if (message) {
+        // Create the toast div
+        let toastDiv = document.createElement('div');
+        toastDiv.classList.add('toast', 'position-fixed', 'top-0', 'end-0', 'p-3', 'bg-black');
+        toastDiv.setAttribute('role', 'alert');
+        toastDiv.setAttribute('aria-live', 'assertive');
+        toastDiv.setAttribute('aria-atomic', 'true');
+        toastDiv.setAttribute('data-delay', '3000');
+
+        // Create the toast header
+        let toastHeaderDiv = document.createElement('div');
+        toastHeaderDiv.classList.add('toast-header', 'bg-white');
+
+        // Create and append the image to the toast header
+        let img = document.createElement('img');
+        img.src = "/images/clothStore_favicon.jpg";
+        img.style.width = '20px';
+        img.style.height = '20px';
+        img.classList.add('border', 'rounded', 'me-2');
+        toastHeaderDiv.appendChild(img);
+
+        // Create and append the strong element for store name to the toast header
+        let strong = document.createElement('strong');
+        strong.classList.add('me-auto', 'text-black');
+        strong.textContent = 'clothStore';
+        toastHeaderDiv.appendChild(strong);
+
+        // Create and append the small element for timestamp to the toast header
+        let small = document.createElement('small');
+        small.id = 'toast-timestamp';
+        small.classList.add('text-black');
+        toastHeaderDiv.appendChild(small);
+
+        // Create and append the button element for closing the toast to the toast header
+        let closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.classList.add('btn-close', 'font-size-bold');
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.setAttribute('aria-label', 'Close');
+        toastHeaderDiv.appendChild(closeButton);
+
+        // Append the toast header to the toast div
+        toastDiv.appendChild(toastHeaderDiv);
+
+        // Create and append the toast body to the toast div
+        let toastBodyDiv = document.createElement('div');
+        toastBodyDiv.classList.add('toast-body', 'text-white', 'font-size');
+        toastBodyDiv.textContent = message;
+        toastDiv.appendChild(toastBodyDiv);
+
+        // Append the toast div to the document body
+        document.body.appendChild(toastDiv);
+
+        // Show the toast notification
+        let notification = new bootstrap.Toast(toastDiv);
+        notification.show();
+
+        // Update the timestamp
+        let timestampElement = document.getElementById('toast-timestamp');
+        timestampElement.textContent = new Date().toLocaleTimeString();
       }
-    </script>
-      <!-- review submition validation -->
+    }
+  </script>
+  <!-- review submition validation -->
   <script>
     $(document).ready(function() {
       $.validator.addMethod('categoryValidation', function(value, element) {
