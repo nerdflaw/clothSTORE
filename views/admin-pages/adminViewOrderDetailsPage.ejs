@@ -362,6 +362,8 @@
   </section>
 
   <section>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
       document.querySelectorAll('select.editOrder').forEach(function(select) {
         select.addEventListener('change', function() {
@@ -375,7 +377,8 @@
         });
 
         document.getElementById('confirmChangeBtn').addEventListener('click', function() {
-          window.location.reload()
+          var toast = new bootstrap.Toast(document.getElementById('confirmationToast'));
+          toast.hide();
           getSelectedStatus(select);
         });
       });
@@ -392,7 +395,20 @@
             })
             .then(response => response.json())
             .then(data => {
-              window.location.href = `/view-order-details/${orderId}?message=Order status changed successfully`
+              console.log(data, 'data')
+              if (data.status) {
+                  Swal.fire({
+                    title: 'Order status',
+                    text: `${data.message}`,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'green'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.replace(`/view-order-details/${orderId}`);
+                    }
+                  })
+                }
             })
             .catch(error => {
               console.error('Error updating order status:', error);
