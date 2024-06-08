@@ -105,3 +105,5 @@ Pending.
 [x] Handle duplicate coupon validation
 
 Project Hosting
+
+Basic Heavy Weight T-shirt

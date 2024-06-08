@@ -5689,14 +5689,14 @@ const userCancelSingleOrder_post = async (req, res) => {
 	);
 
 	const allOrders = await Order.findOne({
-		userId: new ObjectId(req.session.userId),
+		'order._id': new ObjectId(req.query.single),
 	});
 	const allOrdersCancelled = allOrders.order.every(order => order.status === 'cancelled');
 
 	if (allOrdersCancelled) {
 		await Order.updateOne(
 			{
-				userId: new ObjectId(req.session.userId)
+				_id : new ObjectId(allOrders?._id)
 			},
 			{
 				$set: {
@@ -6200,14 +6200,12 @@ const userCancelSingleOrder_post = async (req, res) => {
 			}
 		}
 	]);
-	console.log(order,'order')
 		// subtract the quantity and update the stock 
 	// after successfull order creation.
 	const subtractQuantityAndUpdateStock = async (orderArray) => {
 		for (let item of orderArray) {
 			for (let innerItem of item.orders) {
 				if(innerItem?.singleOrderId?.toString() === req.query.single ){
-					console.log(req.query.single , 'yes')
 					await Product.findOneAndUpdate(
 						{
 							_id: innerItem.productId,
@@ -6751,9 +6749,7 @@ const userCancelWholeOrder_post = async (req, res) => {
 			}
 		}
 	]);
-	console.log(order, 'order')
-	console.log(order[0]?.orders[0]?.orderStatus, 'order')
-	console.log(order[0]?.refundAmount, 'refundAmount')
+
 	// subtract the quantity and update the stock 
 	// after successfull order creation.
 	const subtractQuantityAndUpdateStock = async (orderArray) => {
@@ -6789,20 +6785,37 @@ const userCancelWholeOrder_post = async (req, res) => {
 const userReturnWholeOrder_post = async (req, res) => {
 	const { orderId, orderName, currentStatus, page } = req.query;
 	const newStatus = 'returned'
+	const validStatus = ["pending", "shipped", "delivered", "placed"];
+	// const returnedOrder = await Order.updateOne(
+	// 	{
+	// 		_id: new ObjectId(orderId),
+	// 		"order.status": { $in: validStatus }
+	// 	},
+	// 	{
+	// 		$set: {
+	// 			// "order.$.status": newStatus,
+	// 			"order.$[].status": newStatus,
+	// 			orderStatus: newStatus
+	// 		}
+	// 	}
+	// );
 	const returnedOrder = await Order.updateOne(
 		{
 			_id: new ObjectId(orderId),
-			//   "order.status": "pending"
+			"order.status": "delivered" // Only update if the current status is 'delivered'
 		},
 		{
 			$set: {
-				"order.$[].status": newStatus,
-				orderStatus: newStatus
+				"order.$[elem].status": newStatus, // Update the 'status' field of all elements in the 'order' array
+				orderStatus: newStatus // Update the overall order status
 			}
+		},
+		{
+			arrayFilters: [{ "elem.status": { $in: validStatus } }] // Filter to update only where status is within validStatus
 		}
 	);
 	const order = await Order.aggregate([
-		{ $match: { _id: new ObjectId(req.query.orderId) } },
+		{ $match: { _id: new ObjectId(req.query.orderId) , 'order.status': 'returned'} },
 		{ $unwind: "$order" },
 		{
 			$project: {
@@ -6865,7 +6878,7 @@ const userReturnWholeOrder_post = async (req, res) => {
 				couponValue: { $ifNull: ['$couponData.couponValue', 0] },
 				couponCode: { $ifNull: ['$couponData.couponCode', null] },
 				couponName: { $ifNull: ['$couponData.coupon', null] }
-
+	
 			}
 		},
 		{
@@ -7286,32 +7299,44 @@ const userReturnWholeOrder_post = async (req, res) => {
 				colorId: 1,
 				sizeId: 1,
 				orderStatus:1,
-				paymentMode: 1
+				paymentMode: 1,
+				status: 1
 			}
 		},
 		{
 			$group: {
 				_id: "$wholeOrderId",
 				orders: { $push: "$$ROOT" },
-				refundAmount: { $sum: "$totalPrice" }
+				refundAmount: {
+					$sum: {
+						$cond: {
+							if: { $eq: ["$status", "returned"] },
+							then: "$totalPrice",
+							else: 0
+						}
+					}
+				}
 			}
 		}
 	])
+	console.log(order, 'order');
 
 	// subtract the quantity and update the stock 
 	// after successfull order creation.
 	const subtractQuantityAndUpdateStock = async (orderArray) => {
 		for (let item of orderArray) {
 			for (let innerItem of item.orders) {
-				await Product.findOneAndUpdate(
-					{
-						_id: innerItem.productId,
-						'variants.color': innerItem.colorId,
-						'variants.size': innerItem.sizeId
-					},
-					{ $inc: { 'variants.$.quantity': innerItem.quantity } },
-					{ new: true }
-				);
+				if(innerItem.status === 'returned'){
+					await Product.findOneAndUpdate(
+						{
+							_id: innerItem.productId,
+							'variants.color': innerItem.colorId,
+							'variants.size': innerItem.sizeId
+						},
+						{ $inc: { 'variants.$.quantity': innerItem.quantity } },
+						{ new: true }
+					);
+				}
 			}
 		}
 	};

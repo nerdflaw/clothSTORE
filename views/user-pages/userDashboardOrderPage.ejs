@@ -323,6 +323,12 @@
                         <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>shipped</button>
                       </div>
                       <%  }%>
+
+                      <% if(item.status === 'returned') {%>
+                      <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>returned</button>
+                      </div>
+                      <%  }%>
                     </div>
                   </div>
                 </div>

@@ -1,9 +1,8 @@
 db.orders.aggregate([
-	{ $match: { _id: new ObjectId('665a978ea9bc5680130417b6') } },
+	{ $match: { _id: new ObjectId('6663efc46f3b2b765b3890f7') , 'order.status': 'returned'} },
 	{ $unwind: "$order" },
 	{
 		$project: {
-			addressId: '$addressId',
 			productId: '$order.productId',
 			couponId: { $ifNull: ['$order.couponId', null] },
 			colorId: '$order.colorId',
@@ -475,18 +474,32 @@ db.orders.aggregate([
 				]
 			},
 			paymentStatus: 1,
+			createdAt: 1,
+			updatedAt: 1,
+			discount: 1,
 			productId: 1,
 			quantity: 1,
+			userId: 1,
 			colorId: 1,
 			sizeId: 1,
-			orderStatus: 1
+			orderStatus:1,
+			paymentMode: 1,
+			status: 1
 		}
 	},
 	{
 		$group: {
 			_id: "$wholeOrderId",
 			orders: { $push: "$$ROOT" },
-			refundAmount: { $sum: "$totalPrice" }
+			refundAmount: {
+				$sum: {
+					$cond: {
+						if: { $eq: ["$status", "returned"] },
+						then: "$totalPrice",
+						else: 0
+					}
+				}
+			}
 		}
 	}
-]);
+])
