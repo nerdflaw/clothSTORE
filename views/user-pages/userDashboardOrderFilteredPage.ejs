@@ -58,10 +58,10 @@
                     </form>
                     <% } %>
                     <% if (paginatedOrder[0]?.orders[0]?.paymentStatus === 'paid') { %>
-                      <div class="col-12 d-flex justify-content-end align-items-center">
-                        <a href="/user-download-Invoice/<%= paginatedOrder[0]?._id %>" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-solid fa-eye fa-bounce pe-2 text-primary"></i>View Invoice</a>
-                      </div>
-                      <% } %>
+                    <div class="col-12 d-flex justify-content-end align-items-center">
+                      <a href="/user-download-Invoice/<%= paginatedOrder[0]?._id %>" class="border-0 bg-black text-white font-size-bold m-0 outline-none px-3 py-2 rounded-1 text-decoration-none " style="cursor: pointer;"><i class="fa-solid fa-eye fa-bounce pe-2 text-primary"></i>View Invoice</a>
+                    </div>
+                    <% } %>
                   </div>
                 </div>
               </div>
@@ -249,17 +249,19 @@
                                 <% for (let i = 0; i <= 5; i++) { %>
                                 <div class="">
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="rating" id="rating<%= index %>-<%= i %>" value="<%= i %>" required <% if (productIdToDisplayReviewFor && productToDisplayReviewFor && productToDisplayReviewFor?.rating === i) { %> checked <% } %>>
+                                    <input class="form-check-input validateRating" type="radio" name="rating" id="rating<%= index %>-<%= i %>" value="<%= i %>" required <% if (productIdToDisplayReviewFor && productToDisplayReviewFor && productToDisplayReviewFor?.rating === i) { %> checked <% } %>>
                                     <label class="form-check-label" for="rating<%= index %>-<%= i %>">
                                       <% for (let j = 1; j <= i; j++) { %>
                                       <i class="fas fa-star" style="color: #ffee00;"></i>
                                       <% } %><%= i %> stars
                                     </label>
+                                    <div class="error-message text-danger py-1"></div> <!-- Error message placeholder -->
                                   </div>
                                 </div>
                                 <% } %>
                                 <div class="mb-3 font-size">
-                                  <textarea class="form-control font-size text-black" id="reviewMessage<%= index%>" name="reviewMessage" minlength="1" maxlength="50" rows="1" required <% let message = ''; %> <% if (productIdToDisplayReviewFor && productToDisplayReviewFor ){ %> <% message = productToDisplayReviewFor.message; %> <% } %>><%= message %></textarea>
+                                  <textarea class="form-control font-size text-black" oninput="reviewMsg('<%= index%>')" id="reviewMessage<%= index %>" name="reviewMessage" minlength="1" maxlength="50" rows="1" required <% let message = ''; %> <% if (productIdToDisplayReviewFor && productToDisplayReviewFor ){ %> <% message = productToDisplayReviewFor.message; %> <% } %>><%= message %></textarea>
+                                  <div class="error-message text-danger py-1"></div> <!-- Error message placeholder -->
                                 </div>
                                 <button type="submit" id="submitButton<%= index %>" class="btn btn-dark font-size">Submit Review</button>
                               </div>
@@ -324,10 +326,10 @@
                       <%  }%>
 
                       <% if(item.status === 'returned') {%>
-                        <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
-                          <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>returned</button>
-                        </div>
-                        <%  }%>
+                      <div class="border-top border-1 col-sm-12 col-md-12 col-lg-6 d-flex justify-content-center align-items-center py-2">
+                        <button class="btn font-size-bold text-danger border-0 m-0 p-0" type="submit" disabled>returned</button>
+                      </div>
+                      <%  }%>
                     </div>
                   </div>
                 </div>
@@ -551,29 +553,29 @@
               if (response.status) {
                 if (response.paymentStatus === 'paid') {
                   Swal.fire({
-                        title: 'Payment status',
-                        text: 'Payment recieved, thank you for the order!',
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: 'green'
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          location.replace(`/user-dashboard-orders?page=${formData.page}`);
-                        }
-                      });
+                    title: 'Payment status',
+                    text: 'Payment recieved, thank you for the order!',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'green'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                    }
+                  });
                 }
                 if (response.paymentStatus === 'failed') {
                   Swal.fire({
-                        title: 'Payment status',
-                        text: `Payment ${response.paymentStatus}, please try again.`,
-                        icon: 'error',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: 'red'
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          location.replace(`/user-dashboard-orders?page=${formData.page}`);
-                        }
-                      });
+                    title: 'Payment status',
+                    text: `Payment ${response.paymentStatus}, please try again.`,
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: 'red'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.replace(`/user-dashboard-orders?page=${formData.page}`);
+                    }
+                  });
                 }
               }
             }
@@ -581,6 +583,30 @@
         }
         $('#makePaymentForm').submit(handleSubmit);
       });
+    </script>
+    <!-- review message validation -->
+    <script>
+      function reviewMsg(index) {
+        let submitButton = document.getElementById('submitButton' + index);
+        let reviewMessage = document.getElementById('reviewMessage' + index);
+        reviewMessage.addEventListener('input', (e) => {
+          let value = reviewMessage.value;
+          let reviewMessageRegex = /^[a-z]+(([',. -=/?{}().*!`@#$%^+/|<>][a-z ])?[a-z]*)*$/;
+          if (value === '') {
+            reviewMessage.nextElementSibling.textContent = 'This field cannot be empty';
+            submitButton.setAttribute('disabled', 'true');
+          } else if (!reviewMessageRegex.test(value)) {
+            reviewMessage.nextElementSibling.textContent = 'This field cannot have leading/trailing spaces or uppercase letters';
+            submitButton.setAttribute('disabled', 'true');
+          } else if (value.length < 5) {
+            reviewMessage.nextElementSibling.textContent = 'This field must be at least 5 characters long';
+            submitButton.setAttribute('disabled', 'true');
+          } else {
+            reviewMessage.nextElementSibling.textContent = '';
+            submitButton.removeAttribute('disabled');
+          }
+        });
+      }
     </script>
   </section>
   <!-- including admin footer  -->
