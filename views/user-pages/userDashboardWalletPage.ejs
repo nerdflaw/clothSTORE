@@ -227,15 +227,21 @@
         $('#topupAmount').on('input', function() {
           this.value = this.value.replace(/[^0-9]/g, '');
         });
+        // Clear the input field when the modal is hidden
+        $('#topupModal').on('hidden.bs.modal', function () {
+          $('#topupAmount').val(''); // Clear the input field
+          $('#topupAmountError').hide(); // Hide the error message
+        });
 
         // Handle confirm button click
         $('#confirmTopup').click(function() {
           const topupAmount = $('#topupAmount').val();
           if (topupAmount && parseInt(topupAmount) > 0) {
-            formData.amount = topupAmount * 100; // Convert to paise
+            formData.amount = topupAmount * 100;
             $('#topupAmountError').hide();
             $('#topupModal').modal('hide');
             createRazorpayOrder(formData.amount);
+            $('#topupAmount').val('');
           } else {
             $('#topupAmountError').show();
           }
