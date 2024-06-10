@@ -126,24 +126,23 @@
           .then(data => {
             if (data.status) {
               Swal.fire({
-                  title: 'Your wallet is now active',
-                  text: 'Yay! Congratulations, you have received Rs. 1000 in your wallet',
-                  icon: 'success',
-                  confirmButtonText: 'OK',
-                  confirmButtonColor: 'green'
-                }).then((result) => {
-                  const jsConfetti = new JSConfetti();
-              jsConfetti.addConfetti({
-                confettiNumber: 500
-              })
-                  if (result.isConfirmed) {
-                    location.replace('/user-dashboard-wallet');
-                  }
+                title: 'Your wallet is now active',
+                text: 'Yay! Congratulations, you have received Rs. 1000 in your wallet',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'green'
+              }).then((result) => {
+                const jsConfetti = new JSConfetti();
+                jsConfetti.addConfetti({
+                  confettiNumber: 500
                 });
-
+                
+                if (result.isConfirmed) {
+                  location.replace('/user-dashboard-wallet');
+                }
+              });
             }
-          })
-          .catch(error => {
+          }).catch(error => {
             console.error('Error updating order status:', error);
           });
       }
