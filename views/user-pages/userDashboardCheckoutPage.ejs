@@ -384,7 +384,7 @@
         </div>
       </div>
     </div>
-
+    <div id="loader" style="display:none;"></div>     
   </section>
   <section>
     <script>
@@ -513,7 +513,7 @@
                 text: 'You must select a payment mode to proceed.',
                 icon: 'info',
                 confirmButtonText: 'OK',
-                confirmButtonColor: 'green'
+                confirmButtonColor: 'blue'
               })
               return;
             } else if (formData.address === '' || formData.address === undefined) {
@@ -522,16 +522,20 @@
                 text: 'You must select or create an address to proceed.',
                 icon: 'info',
                 confirmButtonText: 'OK',
-                confirmButtonColor: 'green'
+                confirmButtonColor: 'blue'
               })
               return;
             }
 
             try {
+              const loader = document.getElementById('loader');
+              loader.style.display = 'block';
               const response = await sendRequest(formData);
               handleResponse(response);
             } catch (error) {
               console.error("Error:", error);
+            } finally {
+              loader.style.display = 'none';
             }
           }
         }
