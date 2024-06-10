@@ -2,7 +2,7 @@ const adminAuthentication = (req, res, next) => {
 	if (req.session.adminLogged) {
 		next();
 	} else {
-		res.redirect('/user-login');
+		return res.redirect('/user-login');
 	}
 };
 
