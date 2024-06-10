@@ -50,7 +50,8 @@
                 </div>
                 <div class="col-sm-12 col-md-12 col-lg-4 m-0 p-0">
                   <div class="d-flex justify-content-end align-items-center m-0 p-0">
-                    <% if (paginatedOrder[0]?.orders[0]?.paymentStatus === 'failed') { %>
+                    <% if (paginatedOrder[0]?.orders[0]?.paymentStatus === 'failed' || 
+                    paginatedOrder[0]?.orders[0]?.paymentMode === 'online' &&  paginatedOrder[0]?.orders[0]?.paymentStatus === 'pending') { %>
                     <form id="makePaymentForm" method="post">
                       <button id="submitButton" data-page="<%= currentPage %>" data-orderId="<%= paginatedOrder[0]?._id %>" data-amount="<%= grandTotal?.toFixed(2) %>" data-keyId="<%= RAZORPAY_KEY_ID %>" type="submit" class="border-0 font-size bg-dark text-white px-3 py-2" style="border-top-right-radius: 5px;">
                         Complete Payment
