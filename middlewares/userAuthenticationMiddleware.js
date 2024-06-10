@@ -8,4 +8,3 @@ const userAuthentication = (req, res, next) => {
 
 module.exports = userAuthentication;
 // if user is logged in next process else redirect to login page
-
