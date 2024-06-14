@@ -16,9 +16,10 @@ const { ObjectId } = require('mongodb');
 
 // setting admin credential
 const credential = {
-	email: 'admin@gmail.com',
-	password: 'adminPass'
+  email: process.env.ADMIN_EMAIL,
+  password: process.env.ADMIN_PASSWORD
 };
+
 
 // homepage,
 // userSignUp_get,
